@@ -1,0 +1,30 @@
+{
+  "name": "extract-cbd-shape",
+  "version": "1.0.0",
+  "description": "Extract an entity based on CBD and a SHACL shape",
+  "main": "lib/extract-cbd-shape.js",
+  "scripts": {
+    "test": "mocha tests/*",
+    "build": "tsc"
+  },
+  "keywords": [
+    "CBD",
+    "RDF",
+    "SHACL",
+    "RDF-JS"
+  ],
+  "author": "Pieter Colpaert",
+  "license": "MIT",
+  "dependencies": {
+    "n3": "^1.17.0",
+    "rdf-dereference": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.5",
+    "@types/mocha": "^10.0.1",
+    "ts-node": "^10.9.1",
+    "@types/sinon": "^10.0.16",
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0"
+  }
+}

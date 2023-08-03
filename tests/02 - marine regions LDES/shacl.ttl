@@ -1,0 +1,76 @@
+@prefix tree: <https://w3id.org/tree#> .
+@prefix ldes: <https://w3id.org/ldes#> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix gsp: <http://www.opengis.net/ont/geosparql#> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix mr: <http://marineregions.org/ns/ontology#> .
+@prefix schema: <https://schema.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ex: <http://example.org/>.
+
+ex:Geo a sh:NodeShape ;
+    sh:property [
+        sh:path gsp:asWKT;
+        sh:minCount 1
+    ] .
+ex:shape a sh:NodeShape ;
+    sh:nodeKind sh:IRI ;
+    sh:property [
+      sh:datatype xsd:dateTime ;
+      sh:minCount 1 ;
+      sh:path dc:modified
+    ], [
+      sh:minCount 1 ;
+      sh:nodeKind sh:IRI ;
+      sh:path dc:isVersionOf
+    ], [ sh:path skos:note ], [ sh:path skos:historyNote ], [
+      sh:datatype gsp:wktLiteral ;
+      sh:maxCount 1 ;
+      sh:minCount 1 ;
+      sh:path dcat:centroid
+    ], [
+      sh:datatype gsp:wktLiteral ;
+      sh:maxCount 1 ;
+      sh:minCount 0 ;
+      sh:path dcat:bbox
+    ], [
+      sh:minCount 0 ;
+      sh:nodekind sh:IRI ;
+      sh:path mr:hasGeometry ;
+      sh:node ex:Geo 
+    ], [
+      sh:minCount 0 ;
+      sh:node [
+        a sh:NodeShape ;
+        sh:nodeKind sh:IRI ;
+        sh:property [
+          sh:class schema:PropertyValue ;
+          sh:maxCount 1 ;
+          sh:minCount 1 ;
+          sh:path schema:identifier
+        ], [
+          sh:maxCount 1 ;
+          sh:minCount 1 ;
+          sh:nodeKind sh:IRI ;
+          sh:path schema:url
+        ]
+      ] ;
+      sh:path skos:exactMatch
+    ], [
+      sh:datatype rdf:langString ;
+      sh:minCount 1 ;
+      sh:path skos:prefLabel
+    ], [
+      sh:datatype rdf:langString ;
+      sh:minCount 0 ;
+      sh:path skos:altLabel
+    ], [
+      sh:class mr:MRGeoObject ;
+      sh:minCount 0 ;
+      sh:nodeKind sh:IRI ;
+      sh:path mr:isRelatedTo
+    ] ;
+    sh:targetClass mr:MRGeoObject .
