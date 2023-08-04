@@ -23,13 +23,6 @@ ex:OrganizationShape
 	a sh:NodeShape ;
 	sh:targetClass ex:Organization ;    # Applies to all organizations
 	sh:property [
-		sh:path ex:ssn ;           # constrains the values of ex:ssn
-		sh:maxCount 1 ;
-		sh:datatype xsd:string ;
-		sh:pattern "^\\d{3}-\\d{2}-\\d{4}$" ;
-	] ;
-	sh:property [
-		sh:path ex:employee ;
-		sh:class ex:Person ;
-		sh:nodeKind sh:IRI 
+		sh:path ex:employee ;           # constrains the values of ex:ssn
+		sh:node ex:PersonShape
 	] .

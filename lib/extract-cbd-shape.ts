@@ -14,15 +14,16 @@ export class CBDShapeExtractor {
     shapesGraph: ShapesGraph;
     extracted : Array<string>;
 
-    constructor (shapesGraphStore:Store, dereferencer?: RdfDereferencer) {
+    constructor (shapesGraphStore?:Store, dereferencer?: RdfDereferencer) {
         if (!dereferencer)
-        this.dereferencer = rdfDereference;
+            this.dereferencer = rdfDereference;
         else
-        this.dereferencer = dereferencer;
+            this.dereferencer = dereferencer;
         
         this.extracted = [];
         //Pre-process shape
-        this.shapesGraph = new ShapesGraph(shapesGraphStore);
+        if (shapesGraphStore)
+            this.shapesGraph = new ShapesGraph(shapesGraphStore);
     }
     
     loadQuadStreamInStore(store, quadStream) {
@@ -39,18 +40,18 @@ export class CBDShapeExtractor {
         this.extracted.push(id);
         let result: Quad[] = [];
         let shape: Shape;
-        if (shapeId) {
+        if (shapeId && this.shapesGraph) {
             shape = this.shapesGraph.shapes.get(shapeId.value);
-            if (shape.inverseProperties.length > 0) {
-                //Has inverse properties that need to be looked up!
-                console.error('Inverse properties!!');
-            }
             for (let prop of shape.requiredProperties) {
                 if (store.getQuads(id, new NamedNode(prop), null, null).length === 0) {
                     //Need to do an extra HTTP request, probably want to log this somehow (TODO)
                     console.error('Dereferencing ' + id.value);
                     await this.loadQuadStreamInStore(store, (await this.dereferencer.dereference(id.value)).data);
                 }
+            }
+            //look up all inverse proprties and add them to the result
+            for (let inverseProperty of shape.inverseProperties) {
+                store.getQuads(null, inverseProperty, id);   
             }
         }
         const quads = store.getQuads(id,null,null,null);

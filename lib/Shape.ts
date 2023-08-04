@@ -44,8 +44,15 @@ export class ShapesGraph {
         const shapeNodes = shapeStore.getSubjects("http://www.w3.org/ns/shacl#property").filter((value, index, array) => {return array.indexOf(value) === index;});
         let shapes = new Map();
         for (let shapeId of shapeNodes) {
-            let properties = shapeStore.getObjects(shapeId, "http://www.w3.org/ns/shacl#property");
             let shape = new Shape();
+            //process sh:targetObjectsOf: this is a hint that there is a possible non-required inverse property
+            let targetObjectsOfArray = shapeStore.getObjects(shapeId, "http://www.w3.org/ns/shacl#targetObjectsOf");
+            for (let tOF of targetObjectsOfArray) {
+                shape.inverseProperties.push(tOF.value);
+            }
+
+            //Process properties
+            let properties = shapeStore.getObjects(shapeId, "http://www.w3.org/ns/shacl#property");
             for (let prop of properties) {
                 let propertyId:string;
                 let path = shapeStore.getObjects(prop, 'http://www.w3.org/ns/shacl#path')[0];
