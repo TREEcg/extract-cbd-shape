@@ -81,4 +81,19 @@ describe('Test CBD with named graph', () => {
         //writer.end((err, res) => {console.log(res);});
         assert.equal(result.length, 8); // Only this many triples are given using plain CBD
     })
+    it('Should retrieve only the quads from that particular update in an LDES', async () => {
+        let extractor = new CBDShapeExtractor();
+        let dataStore = new Store();
+        let readStream = (await rdfDereference.dereference("./tests/03 - CBD tests without a shape/data.ttl", { localFiles: true })).data;
+        await new Promise ((resolve, reject) => {
+            dataStore.import(readStream).on("end",resolve)
+            .on("error", reject);
+        });
+        let result = await extractor.extract(dataStore, new NamedNode("http://example.org/Activity1"));
+        let writer = new Writer();
+        writer.addQuads(result);
+        writer.end((err, res) => {console.log(res);});
+        assert.equal(result.length, 6); // Only this many triples are given using plain CBD
+        ///// LIMITATION: You can only describe the triples that don’t overlap in the SHACL shape. From the moment you use a named graph, you cannot describe what’s inside using the tree:shape.
+    })
 });

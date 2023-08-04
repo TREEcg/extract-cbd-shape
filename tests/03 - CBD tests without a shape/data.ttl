@@ -1,4 +1,7 @@
 @prefix ex: <http://example.org/> .
+
+
+## Next blank nodes test
 ex:A ex:P1 _:b0 .
 _:b0 ex:P2 _:b1 .
 _:b1 ex:P3 _:b2 .
@@ -15,3 +18,26 @@ ex:D ex:P1 ex:O5 ex:B .
 ex:D ex:P2 ex:O6 ex:B .
 ex:E ex:P3 ex:O7 ex:B .
 ex:F ex:P4 ex:O8 ex:B .
+
+# Real-world-like example of what becomes possible thanks to named graphs: putting conflicting triples in separate graphs and contextualizing them.
+
+ex:LDES1 ex:member ex:Activity1, ex:Activity2 .
+ex:Activity1 a ex:Create ;
+    ex:created "2023-09-01T12:00Z" ;
+    ex:creator <https://pietercolpaert.be/#me> ;
+    ex:object ex:Object1 .
+
+ex:Activity2 a ex:Update ;
+    ex:created "2023-09-01T13:00Z" ;
+    ex:creator <https://pieterheyvaert.com/#me> ;
+    ex:object ex:Object1 .
+
+ex:Activity1 {
+    ex:Object1 a ex:StreetName ;
+        ex:label "Station street" .
+}
+
+ex:Activity2 {
+    ex:Object1 a ex:StreetName ;
+        ex:label "Station square" .
+}
