@@ -3,3 +3,15 @@ ex:A ex:P1 _:b0 .
 _:b0 ex:P2 _:b1 .
 _:b1 ex:P3 _:b2 .
 _:b2 ex:P4 ex:O .
+
+## When extracting C, 4 triples should be fetched 
+## When extracting B, 8 triples should be retrieved by combining named graphs and CBD
+ex:B ex:P1 ex:O1 ex:C .
+ex:B ex:P2 ex:O2 ex:C .
+ex:B ex:P3 ex:O3 ex:C .
+ex:B ex:P4 ex:O4 ex:C .
+
+ex:D ex:P1 ex:O5 ex:B .
+ex:D ex:P2 ex:O6 ex:B .
+ex:E ex:P3 ex:O7 ex:B .
+ex:F ex:P4 ex:O8 ex:B .

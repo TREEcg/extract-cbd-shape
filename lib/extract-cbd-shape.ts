@@ -55,7 +55,7 @@ export class CBDShapeExtractor {
             }
         }
         const quads = store.getQuads(id,null,null,null);
-        
+        //Iterate over the quads, add them to the result and check whether we should further get other quads based on blank nodes or the SHACL shape
         for (const q of quads) {
             result.push(q);
             // Conditionally get more quads
@@ -75,6 +75,9 @@ export class CBDShapeExtractor {
                 result = result.concat(additionalQuads);
             }
         }
+        //add the quads where the named graph matches the current id
+        result = result.concat(store.getQuads(null,null,null,id));
+
         return result;
     }
 }

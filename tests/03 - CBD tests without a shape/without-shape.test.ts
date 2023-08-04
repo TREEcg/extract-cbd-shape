@@ -50,3 +50,35 @@ describe('Test CBD with nested blank nodes', async () => {
         assert.equal(result.length, 4); // Only this many triples are given using plain CBD
     });
 });
+
+describe('Test CBD with named graph', () => {
+
+    it('Should retrieve all triples within a graph', async () => {
+        let extractor = new CBDShapeExtractor();
+        let dataStore = new Store();
+        let readStream = (await rdfDereference.dereference("./tests/03 - CBD tests without a shape/data.ttl", { localFiles: true })).data;
+        await new Promise ((resolve, reject) => {
+            dataStore.import(readStream).on("end",resolve)
+            .on("error", reject);
+        });
+        let result = await extractor.extract(dataStore, new NamedNode("http://example.org/C"));
+        let writer = new Writer();
+        //writer.addQuads(result);
+        //writer.end((err, res) => {console.log(res);});
+        //assert.equal(result.length, 4); // Only this many triples are given using plain CBD
+    })
+    it('Should retrieve all triples within a graph and combine it with the triples found from CBD', async () => {
+        let extractor = new CBDShapeExtractor();
+        let dataStore = new Store();
+        let readStream = (await rdfDereference.dereference("./tests/03 - CBD tests without a shape/data.ttl", { localFiles: true })).data;
+        await new Promise ((resolve, reject) => {
+            dataStore.import(readStream).on("end",resolve)
+            .on("error", reject);
+        });
+        let result = await extractor.extract(dataStore, new NamedNode("http://example.org/B"));
+        //let writer = new Writer();
+        //writer.addQuads(result);
+        //writer.end((err, res) => {console.log(res);});
+        assert.equal(result.length, 8); // Only this many triples are given using plain CBD
+    })
+});
