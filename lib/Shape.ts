@@ -45,11 +45,11 @@ export class ShapesGraph {
         let shapes = new Map();
         for (let shapeId of shapeNodes) {
             let shape = new Shape();
-            //process sh:targetObjectsOf: this is a hint that there is a possible non-required inverse property
-            let targetObjectsOfArray = shapeStore.getObjects(shapeId, "http://www.w3.org/ns/shacl#targetObjectsOf");
+            //Should we process sh:targetObjectsOf? This could be a hint that there is a possible non-required inverse property? Or should we only interpret this for target selection and of no value to triple selection?
+            /*let targetObjectsOfArray = shapeStore.getObjects(shapeId, "http://www.w3.org/ns/shacl#targetObjectsOf");
             for (let tOF of targetObjectsOfArray) {
                 shape.inverseProperties.push(tOF.value);
-            }
+            }*/
 
             //Process properties
             let properties = shapeStore.getObjects(shapeId, "http://www.w3.org/ns/shacl#property");
@@ -99,7 +99,7 @@ export class ShapesGraph {
                     } else if (pathPart['@id'] === "http://www.w3.org/ns/shacl#zeroOrMorePath" || pathPart['@id'] === "http://www.w3.org/ns/shacl#oneOrMorePath") {
                         console.error('We will not support one or more paths or zero or More paths at this time');
                     } else { 
-                        // Only possibilities left: a predicate path or a sequence path
+                        // Only possibilities left: a predicate path, a sequence path, or a blank node indicating something else
                         if (i === length-1 ) {
                             //check whether previous flags have been set
                             if (sequence) {
