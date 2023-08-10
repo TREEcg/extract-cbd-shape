@@ -96,13 +96,18 @@ shsh:ShapeShape
 		sh:path sh:targetObjectsOf ;
 		sh:nodeKind sh:IRI ;            # targetObjectsOf-nodeKind
 	] ;
+    ## If s is a SHACL instance of sh:NodeShape or sh:PropertyShape in an RDF graph G and s is also a SHACL instance
+    ## of rdfs:Class in G and s is not an IRI then s is an ill-formed shape in G.
+    ### ==> IF (s is a sh:NodeShape or sh:PropertyShape) AND s is an instance of rdfs:Class, then s must be an IRI
+
+    #### ==> IF(  (s is not a sh:NodeShape AND not a sh:PropertyShape AND s is not an instance of rdfs:Class), or s is just an IRI, then it’s valid 
 	sh:or ( [ sh:not [ 
 				sh:class rdfs:Class ; 
 				sh:or ( [ sh:class sh:NodeShape ] [ sh:class sh:PropertyShape ] )
 			] ]
 			[ sh:nodeKind sh:IRI ]
 		  ) ;                           # implicit-targetClass-nodeKind
-	
+
 	sh:property [
 		sh:path sh:severity ;
 		sh:maxCount 1 ;                 # severity-maxCount
@@ -296,14 +301,32 @@ shsh:NodeShapeShape
 		sh:maxCount 0 ;                 # uniqueLang-scope
 	] ;
 
-    ### PROPRIETARY EXTENSION IN TREE: we consider sh:property as a mandatory field
-    ### If it is not, our example 01.3 won’t work
-    sh:property [
-		sh:path sh:property;
-		sh:minCount 1 ;                 # I made property a required property here!
-		sh:node shsh:PropertyShapeShape ;        # path-node
-	] .
-
+    ### We made an extra constraint here based on the extraction algorithm: 
+    ### While a NodeShape without sh:property is valid SHACL, our application profile expects an sh:property, otherwise it cannot derive any useful information
+    sh:or ( [
+		sh:property [
+		        sh:path sh:property;
+		        sh:minCount 1 ;                 # I made property a required property here!
+		        sh:node shsh:PropertyShapeShape ;
+		]
+	        ]
+            [
+		        sh:path sh:or;
+		        sh:minCount 1 ;                 # or required
+		        sh:node shsh:ShapesListShape ;
+	        ]
+            [
+		        sh:path sh:xone;
+		        sh:minCount 1 ;                 # xone required
+		        sh:node shsh:ShapesListShape ;       
+	        ]
+            [
+		        sh:path sh:and;
+		        sh:minCount 1 ;                 # and required
+		        sh:node shsh:ShapesListShape ;    
+	        ]
+    ).
+    
 shsh:PropertyShapeShape
 	a sh:NodeShape ;
 	sh:targetObjectsOf sh:property ;    # property-node
@@ -313,9 +336,10 @@ shsh:PropertyShapeShape
 		sh:minCount 1 ;                 # PropertyShape-path-minCount
 		sh:node shsh:PathShape ;        # path-node
 	] ;
+    # We added this to indicate that a property will refer to a NodeShape through sh:node
     sh:property [
         sh:path sh:node ;
-        sh:node shsh:NodeShapeShape
+        sh:node shsh:NodeShapeShape ;
     ].
 
 # Values of sh:and, sh:or and sh:xone must be lists of shapes

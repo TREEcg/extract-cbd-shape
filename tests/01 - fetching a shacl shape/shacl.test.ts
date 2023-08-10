@@ -33,12 +33,21 @@ describe('Check whether we can successfully extract a SHACL shape', async () => 
         //writer.end((err, res) => {console.log(res);});
         assert.equal(result.length, 11); // Just testing whether there are 11 quads being returned
     });
-    it ("Can extract a deeper nested organization based on targetSubjectOf and targetObjectOf links", async () => {
+    it ("Can extract a deeper nested organization based on an optional sh:node link", async () => {
+        //console.log(extractor.shapesGraph.shapes.get("http://www.w3.org/ns/shacl-shacl#NodeShape"));
         let result = await extractor.extract(dataStore, new NamedNode("http://example.org/OrganizationShape"), new NamedNode("http://www.w3.org/ns/shacl-shacl#NodeShapeShape"));
         let writer = new Writer();
         writer.addQuads(result);
         writer.end((err, res) => {console.log(res);});
         assert.equal(result.length, 16); // Just testing whether there are 16 quads being returned now
    });
+
+   it ("Can extract itself from itself", async () => {
+    let result = await extractor.extract(shapeStore, new NamedNode("http://www.w3.org/ns/shacl-shacl#ShapeShape"),new NamedNode("http://www.w3.org/ns/shacl-shacl#ShapeShape"));
+    //let writer = new Writer();
+    //writer.addQuads(result);
+    //writer.end((err, res) => {console.log(res);});
+    assert.equal(result.length, 423); // Just testing whether there are 16 quads being returned now
+});
 
 });

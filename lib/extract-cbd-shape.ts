@@ -32,12 +32,18 @@ export class CBDShapeExtractor {
         });
     }
 
+    public extract (store: Store, id: Term, shapeId?:Term): Promise<Array<Quad>> {
+        this.extracted = [];
+        return this.extractRecursively(store, id, shapeId);
+    }
 
-    async extract (store: Store, id: Term, shapeId?:Term): Promise<Array<Quad>> {
-        if (this.extracted.includes(id)) {
+    private async extractRecursively (store: Store, id: Term, shapeId?:Term): Promise<Array<Quad>> {
+        //If it has already been extracted, don’t extract it again: prevents cycles
+        if (this.extracted.includes(id.value)) {
             return [];
         }
-        this.extracted.push(id);
+
+        this.extracted.push(id.value);
         let result: Quad[] = [];
         let shape: Shape;
         if (shapeId && this.shapesGraph) {
@@ -49,7 +55,11 @@ export class CBDShapeExtractor {
                     await this.loadQuadStreamInStore(store, (await this.dereferencer.dereference(id.value)).data);
                 }
             }
-            //look up all inverse proprties and add them to the result
+            for (let xoneList of shape.xone) {
+                //TODO: process xone’s items!
+                //for (xoneItem of )
+            }
+            //look up all inverse properties and add them to the result
             for (let inverseProperty of shape.inverseProperties) {
                 store.getQuads(null, inverseProperty, id);   
             }
@@ -61,17 +71,17 @@ export class CBDShapeExtractor {
             // Conditionally get more quads
             // 1. CBD: always further explore blanknodes, but mind that when you further explore a blank node, also take into account the shape again of following that node if it exist
             //console.log("Processing: ", q)
-            if (q.object instanceof BlankNode && !this.extracted.includes(q.object)) {
+            if (q.object instanceof BlankNode && !this.extracted.includes(q.object.value)) {
                 if (shape && shape.nodeLinks) {
-                    result = result.concat(await this.extract(store, q.object, shape.nodeLinks.get(q.predicate.value)));
+                    result = result.concat(await this.extractRecursively(store, q.object, shape.nodeLinks.get(q.predicate.value)));
                 } else {
-                    result = result.concat(await this.extract(store, q.object));
+                    result = result.concat(await this.extractRecursively(store, q.object));
                 }
             }
             // 2. According to the shacl Shape, there are potentially deeper down properties to be found, so let’s go there if this property is one of them
             else if (q.object instanceof NamedNode && shape && shape.nodeLinks.get(q.predicate.value) && !this.extracted.includes(q.object)) {
                 //Extract additional quads, and do extra HTTP request if needed (included in this extract script)
-                let additionalQuads = await this.extract(store, q.object, shape.nodeLinks.get(q.predicate.value));
+                let additionalQuads = await this.extractRecursively(store, q.object, shape.nodeLinks.get(q.predicate.value));
                 result = result.concat(additionalQuads);
             }
         }

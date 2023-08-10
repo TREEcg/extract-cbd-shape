@@ -62,10 +62,10 @@ describe('Test CBD with named graph', () => {
             .on("error", reject);
         });
         let result = await extractor.extract(dataStore, new NamedNode("http://example.org/C"));
-        let writer = new Writer();
+        //let writer = new Writer();
         //writer.addQuads(result);
         //writer.end((err, res) => {console.log(res);});
-        //assert.equal(result.length, 4); // Only this many triples are given using plain CBD
+        assert.equal(result.length, 4); // Only this many triples are given using plain CBD
     })
     it('Should retrieve all triples within a graph and combine it with the triples found from CBD', async () => {
         let extractor = new CBDShapeExtractor();
@@ -90,9 +90,9 @@ describe('Test CBD with named graph', () => {
             .on("error", reject);
         });
         let result = await extractor.extract(dataStore, new NamedNode("http://example.org/Activity1"));
-        let writer = new Writer();
-        writer.addQuads(result);
-        writer.end((err, res) => {console.log(res);});
+        //let writer = new Writer();
+        //writer.addQuads(result);
+        //writer.end((err, res) => {console.log(res);});
         assert.equal(result.length, 6); // Only this many triples are given using plain CBD
         ///// LIMITATION: You can only describe the triples that don’t overlap in the SHACL shape. From the moment you use a named graph, you cannot describe what’s inside using the tree:shape.
     })

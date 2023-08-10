@@ -1,0 +1,54 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+@prefix ex:  <http://example.org/> .
+
+ex:Shape
+	a sh:NodeShape ;         
+    sh:and ( ex:PersonShape  ).               # AND the Person shape needs to be taken into account as well
+
+
+ex:KnowsPieterShape 
+	a sh:NodeShape ;
+	sh:property [
+		sh:node ex:PieterShape ;
+		sh:path ex:knows
+	] .
+
+ex:PieterShape sh:property [
+	sh:minCount 1 ;
+	sh:path foaf:name 
+].
+	
+ex:PersonShape
+	a sh:NodeShape ;
+	sh:property [
+		sh:node ex:PersonShape ;
+		sh:path ex:knows
+	];
+	## If knows is provided, it should refer to a person, which needs to have a name
+	sh:xone ( 
+		# Or it has a property firstname and lastname, or it has a property name. If it has a property firstname, it must also have a property lastname or sirname.
+			[ 
+				sh:path ex:name ;
+				sh:minCount 1 ;
+			]
+			[ 
+					sh:property [
+						sh:path ex:firstName ;
+						sh:minCount 1
+					];
+					sh:xone (
+						[ 
+							sh:path ex:lastName ;
+							sh:minCount 1
+						]
+						[
+							sh:path ex:sirname;
+							sh:minCount 1 
+						]
+					)
+			]
+		  ) .
