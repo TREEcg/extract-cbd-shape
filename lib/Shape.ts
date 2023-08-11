@@ -9,7 +9,7 @@ export class Property {
 export class Shape {
     nodeLinks: Map<string, string>;
     requiredProperties: Array<string> ;
-    xone: Array<Array<string>>; //the first match, then stop
+    xone: Array<Array<Shape>>; //the first match, then stop
     inverseProperties : Array<string> ;
     constructor () {
         //All properties will be added, but if a required property is not available, then we need to further look it up
@@ -67,7 +67,7 @@ export class ShapesGraph {
             let nodeLink = shapeStore.getObjects(propertyShapeId, 'http://www.w3.org/ns/shacl#node');
             if (nodeLink[0]) {
                 shape.nodeLinks.set(propertyId, nodeLink[0]);
-                //TODO: potentially in conditional cases?
+                //TODO: Nodelinks in conditionals?
             }
             return true; // Success: the property shape has been processed
             
@@ -123,12 +123,17 @@ export class ShapesGraph {
         
     }
 
+    preprocessShape(shapeStore: Store, shapeId: string, shape: Shape) {
+        return this.preprocessPropertyShape(shapeStore, shapeId, shape)?true: this.preprocessNodeShape(shapeStore, shapeId, shape);
+    }
+
     protected preprocessNodeShape(shapeStore: Store, nodeShapeId: string, shape: Shape) {
             //Should we process sh:targetObjectsOf? This could be a hint that there is a possible non-required inverse property? Or should we only interpret this for target selection and of no value to triple selection?
             /*let targetObjectsOfArray = shapeStore.getObjects(shapeId, "http://www.w3.org/ns/shacl#targetObjectsOf");
             for (let tOF of targetObjectsOfArray) {
                 shape.inverseProperties.push(tOF.value);
             }*/
+            //Answer: no, we won’t
 
             //Process properties if it has any
             let properties = shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#property");
@@ -155,17 +160,19 @@ export class ShapesGraph {
                 
             }
             
-
             //TODO: XONE
             //This or can refer to: properties or a nodeshape. If it refers to a nodeshape, then that nodeshape must be merged with this one.
             //process sh:xone on shapeId
-            if (shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#xone")[0]) {
-                shape.xone.push(this.rdfListToArray(shapeStore, shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#xone")[0]).map((val) => {return val.value}));
-                console.log(shape.xone)
+            for (let xoneList of shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#xone")) {
+                shape.xone.push(this.rdfListToArray(shapeStore, xoneList).map((val): Shape => {
+                        let newShape = new Shape();
+                        this.preprocessShape(shapeStore, val, newShape);
+                        //Add this one to the shapesgraph
+                        return newShape;
+                    }));
+                console.log(shape.xone);
             }
-
-            //we’re ignoring sh:not. Don’t process this one
-
+            //And finally, we’re just ignoring sh:not. Don’t process this one
     }
 
     /**
@@ -205,7 +212,7 @@ export class ShapesGraph {
         if (shapeStore.getObjects(item, "http://www.w3.org/1999/02/22-rdf-syntax-ns#first")[0]) {
             yield shapeStore.getObjects(item, "http://www.w3.org/1999/02/22-rdf-syntax-ns#first")[0];
             let rest = shapeStore.getObjects(item, "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest")[0];
-            while (rest && rest.value !== 'http://www.w3.org/1999/02/22-rdf-syntax-ns#nil') {// rest.termType === "NamedNode" && 
+            while (rest && rest.value !== 'http://www.w3.org/1999/02/22-rdf-syntax-ns#nil') {
                 yield shapeStore.getObjects(rest, "http://www.w3.org/1999/02/22-rdf-syntax-ns#first")[0];
                 rest = shapeStore.getObjects(rest, "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest")[0];
             }
@@ -218,33 +225,6 @@ export class ShapesGraph {
 
     protected rdfListToArray(shapeStore: Store, item: Term): Array<Term> {
         return Array.from(this.rdfListToGenerator(shapeStore,item));
-        /*
-        let result : Array<Term> = [];
-        let firstArray = shapeStore.getObjects(item, "http://www.w3.org/1999/02/22-rdf-syntax-ns#first");
-        console.log("ITEM: ", item);
-        if (item instanceof BlankNode ) {
-            console.log("LOOK AT THESE",  shapeStore.getObjects(shapeStore.getQuads(item, "http://www.w3.org/1999/02/22-rdf-syntax-ns#first")[0].object), "http://www.w3.org/1999/02/22-rdf-syntax-ns#first");
-        }
-        if (firstArray[0]) {
-            result.push(firstArray[0]);
-            let restArray = shapeStore.getObjects(firstArray[0], "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest");
-            console.log(firstArray);
-            while (restArray[0] && restArray[0].value !== 'http://www.w3.org/1999/02/22-rdf-syntax-ns#nil') {
-                console.error("ANOTHE REST IS TRIGGERED");
-                firstArray = shapeStore.getObjects(item, "http://www.w3.org/1999/02/22-rdf-syntax-ns#first");
-                if (firstArray[0]) {
-                    result.push(firstArray[0]);
-                    restArray = shapeStore.getObjects(firstArray[0], "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest");
-                } else {
-                    throw new Error('Mallformed RDF list ' + item);
-                }
-            }
-            return result;
-        } else {
-            //it’s not a list, it’s just one element
-            return [item];
-        }
-     */       
     }
 
 }

@@ -52,3 +52,50 @@ ex:PersonShape
 					)
 			]
 		  ) .
+
+
+# It has either a foaf:name, or it has a ex:qualifiedName
+ex:XoneWithNodeShape a sh:NodeShape ;
+	sh:xone ( [
+		sh:path foaf:name; 
+		sh:minCount 1 
+	] [
+		sh:property [
+			sh:path ex:qualifiedName ;
+			sh:node ex:QualifiedNameShape
+		] 
+	]) .
+
+ex:QualifiedNameShape a sh:NodeShape ;
+	sh:property [
+		sh:minCount 1 ;
+		sh:path foaf:name ;
+	], [
+		sh:path ex:validUntil ;
+		# ...
+	] .
+
+
+# A conditional that is a circular reference
+
+ex:CircularOrShape a sh:NodeShape ;
+	sh:property [
+		sh:minCount 1 ;
+		sh:path ex:name
+	] ;
+	sh:or (
+		[ 
+			sh:path ex:knows ;
+			sh:node ex:CircularOrShape ;
+			sh:minCount 1
+		]
+		[
+			sh:path ex:knows ;
+			sh:node [
+				sh:property [
+					sh:path ex:name ;
+					sh:minCount 1 
+				]
+			]
+		]
+	) .

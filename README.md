@@ -45,9 +45,10 @@ Next, it takes _hints_ (it does not guarantee a result that validates) from an o
          - Iterate over the list
          - The first match that is found is processed, the rest is ignored
          - If nothing was however found, it starts over, but dereferences the node that needs to be found.
- 3. Processes all `sh:property` links to property shapes with a `sh:minCount` > 1. It processes the full `sh:path`.
- 4. Won’t process `sh:value` and `sh:QualifiedValueShapes`: if it provides a wrong item, that’s the data publisher’s fault
- 5. ISSUE: Doesn’t (yet?) process `ex:node sh:class ex:S` as `ex:node sh:property [ sh:path ( rdf:type [sh:zeroOrMorePath rdfs:subClassOf ]); sh:value ex:S ; sh:minCount 1 ;]` -- But we should probably look into doing this, although entailment regimes might make this task complex, and we said we wouldn’t process sh:value...
+ 3. Processes all `sh:property` links to property shapes. Only marks a property as required if `sh:minCount` > 0. It does not validate cardinalities.
+ 4. It processes the full `sh:path` and includes the triples necessary to reach the path.
+ 5. Won’t process `sh:value` and `sh:QualifiedValueShapes`: if it provides a wrong item, that’s the data publisher’s fault
+ 6. ISSUE: Doesn’t (yet?) process `ex:node sh:class ex:S` as `ex:node sh:property [ sh:path ( rdf:type [sh:zeroOrMorePath rdfs:subClassOf ]); sh:value ex:S ; sh:minCount 1 ;]` -- But we should probably look into doing this, although entailment regimes might make this task complex, and we said we wouldn’t process sh:value... 
  
 
 A nodeshape is just an array of property shapes.

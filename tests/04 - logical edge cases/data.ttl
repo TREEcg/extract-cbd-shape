@@ -1,4 +1,6 @@
 @prefix ex: <http://example.org/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+
 
 ex:Person1 a ex:Person ;
     ex:firstName "Person";
@@ -12,3 +14,10 @@ ex:Person2 a ex:Person ;
 ex:Person3 a ex:Person; 
     ex:name "Person 3";
     ex:knows <https://pietercolpaert.be/#me> .
+
+
+
+ex:Person4 a ex:Person ;
+    ex:qualifiedName ex:NamePerson4 .
+# This triple must be included when extracting Person4, but it’s harder to find due to the sh:xone case
+ex:NamePerson4  foaf:name "Person 4" .

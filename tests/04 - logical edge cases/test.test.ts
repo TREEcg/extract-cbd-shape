@@ -42,4 +42,11 @@ describe('Tests whether plain CBD works using the data from 01 and 02', function
         //writer.end((err, res) => {console.log(res);});
         assert.equal(result.length, 43); // This count might be tricky as a test as my profile is of course able to change... TODO: change to an archived test case ttl
     })
+    it("Check whether it finds the nodelink in a xone in a xone", async () => {
+        let result = await extractor.extract(dataStore, new NamedNode("http://example.org/Person4"), new NamedNode("http://example.org/XoneWithNodeShape"));
+        //let writer = new Writer();
+        //writer.addQuads(result);
+        //writer.end((err, res) => {console.log(res);});
+        assert.equal(result.length, 3);
+    })
 });
