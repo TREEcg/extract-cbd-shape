@@ -28,11 +28,11 @@ Tests and examples provided in the [tests](tests/) library
 
 ## Algorithm and limitations
 
-This is an extension of CBD:
- 1. Fetches all quads with subject this entity, and their blank node triples (recursively)
- 2. Fetches all quads with graph this entity (TODO)
- 3. Fetches all RDF reification triples (TODO)
- 4. Fetches all singleton properties (TODO)
+This is an extension of CBD. It extracts:
+ 1. all quads with subject this entity, and their blank node triples (recursively)
+ 2. all quads with a named graph matching the entity we’re looking up
+ 3. _all RDF reification quads (TODO)_ (Included in the original CBD)
+ 4. _Should it also extract all singleton properties?_
  5. _Should it also extract RDF* annnotations?_
 
 If no triples were found based on CBD, it does an HTTP request to the entity’s IRI (fallback to IRI dereferencing)
