@@ -67,3 +67,8 @@ e.g.:
 ```
 
 Note: as we must process `sh:or` in the same way as a `sh:and` to be logically sound, it can easily blow up the number of HTTP requests the extraction algorithm is going to do. In order to avoid this, we propose SHACL shape builders to prioritize the use of `sh:xone`, where we can be sure that no other required properties will be used.
+
+TODO:
+ * Process sh:path properly
+ * Second iteration when processing xone after dereferencing when no matches in a xone list were found.
+ * More test cases for logic cases
