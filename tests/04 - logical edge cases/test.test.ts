@@ -22,7 +22,6 @@ describe('Tests whether plain CBD works using the data from 01 and 02', function
     })
     it("Check whether the OR condition works - and check with recursion", async () => {
         let result = await extractor.extract(dataStore, new NamedNode("http://example.org/Person1"), new NamedNode("http://example.org/Shape"));
-        console.log(extractor.shapesGraph)
         //let writer = new Writer();
         //writer.addQuads(result);
         //writer.end((err, res) => {console.log(res);});

@@ -142,7 +142,6 @@ export class ShapesGraph {
             }
 
             //process sh:and and sh:or on shapeId: just add all IDs to this array
-
             // Process everything you can find nested in AND or OR clauses
             // Reason why we must process OR and AND in the same way for discovery is provided in the README.md
             for (let andList of shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#and").concat( shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#or"))) {
@@ -160,9 +159,7 @@ export class ShapesGraph {
                 
             }
             
-            //TODO: XONE
-            //This or can refer to: properties or a nodeshape. If it refers to a nodeshape, then that nodeshape must be merged with this one.
-            //process sh:xone on shapeId
+            //Process zero or more sh:xone lists
             for (let xoneList of shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#xone")) {
                 shape.xone.push(this.rdfListToArray(shapeStore, xoneList).map((val): Shape => {
                         let newShape = new Shape();
@@ -170,7 +167,6 @@ export class ShapesGraph {
                         //Add this one to the shapesgraph
                         return newShape;
                     }));
-                console.log(shape.xone);
             }
             //And finally, we’re just ignoring sh:not. Don’t process this one
     }
