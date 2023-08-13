@@ -78,6 +78,28 @@ ex:QualifiedNameShape a sh:NodeShape ;
 
 # A conditional that is a circular reference
 
+ex:CircularXoneShape a sh:NodeShape ;
+	sh:property [
+		sh:minCount 1 ;
+		sh:path ex:name
+	] ;
+	sh:xone (
+		[ 
+			sh:path ex:knows ;
+			sh:node ex:CircularXoneShape ;
+			sh:minCount 1
+		]
+		[
+			sh:path ex:knows ;
+			sh:node [
+				sh:property [
+					sh:path ex:name ;
+					sh:minCount 1 
+				]
+			]
+		]
+	) .
+
 ex:CircularOrShape a sh:NodeShape ;
 	sh:property [
 		sh:minCount 1 ;

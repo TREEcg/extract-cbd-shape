@@ -26,4 +26,4 @@ ex:NamePerson4  foaf:name "Person 4" .
 ## This one, if configured with ex:TriggersHTTPShape, will trigger an HTTP request to be done
 
 ex:Person5 a ex:Person; 
-    ex:qualifiedName </name.ttl> .
+    ex:qualifiedName <https://raw.githubusercontent.com/pietercolpaert/extract-cbd-shape/main/tests/04%20-%20logical%20edge%20cases/name.ttl> .

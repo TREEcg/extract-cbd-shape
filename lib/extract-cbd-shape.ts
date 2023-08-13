@@ -49,15 +49,27 @@ export class CBDShapeExtractor {
         for (let xoneList of shape.xone) {
             //First iteration: check if at least one is set
             let found: Shape;
-            for (let xoneItem of xoneList) {
+            for (let currentXoneShapeItem of xoneList) {
                 //Loop through requiredProperties to check whether they are set. If at least one is not set, mark this iteration as false.
                 let allSet = true;
                 // Also check whether there are even more xoneLists in it and process these as well.
-                let xoneShape:Shape = await this.xoneListsToShapeWithoutXone(store, currentEntityId, xoneItem);
+
+                let requiredProperties = currentXoneShapeItem.requiredProperties;
+
+                let xoneShape:Shape;
+                if (currentXoneShapeItem.nodeLinks.size > 0) {
+                    xoneAdditionalShapes.nodeLinks = new Map([...Array.from(xoneAdditionalShapes.nodeLinks.entries()), ...Array.from(currentXoneShapeItem.nodeLinks.entries())]);
+                }
+                if (currentXoneShapeItem.xone.length > 0) {
+                    xoneShape = await this.xoneListsToShapeWithoutXone(store, currentEntityId, currentXoneShapeItem);                    
+                    requiredProperties = requiredProperties.concat(xoneShape.requiredProperties)
+                }
                 //If there’s a possible addition nodelist from the xoneShape, do add it - it doesn’t matter if it’s actually valid.
-                //console.log(xoneShape);
-                xoneAdditionalShapes.nodeLinks = new Map([...Array.from(xoneAdditionalShapes.nodeLinks.entries()), ...Array.from(xoneShape.nodeLinks.entries())]);
-                for (let prop of xoneItem.requiredProperties.concat(xoneShape.requiredProperties)) {
+                if (xoneShape && xoneShape.nodeLinks.size > 0 ) {
+                    xoneAdditionalShapes.nodeLinks = new Map([...Array.from(xoneAdditionalShapes.nodeLinks.entries()), ...Array.from(xoneShape.nodeLinks.entries())]);
+                }
+
+                for (let prop of requiredProperties) {
                     //Check if the property is set, if not, change the allSet to false and break out of this loop as this won’t be a match
                     if (store.getQuads(currentEntityId, prop, null, null).length === 0) {
                         allSet = false;
@@ -66,7 +78,7 @@ export class CBDShapeExtractor {
                 }
                 if (allSet) {
                     //This is the one! We can break out of the loop and set this as the XONE option without having to dereference anything else
-                    found = xoneItem;
+                    found = currentXoneShapeItem;
                     break;
                 }
             }
@@ -94,6 +106,7 @@ export class CBDShapeExtractor {
             //We did or did not find a solution after fetching the shape Merge the requiredproperties
             //xoneAdditionalShapes.nodeLinks = xoneAdditionalShapes.nodeLinks.(found.nodeLinks)
             xoneAdditionalShapes.requiredProperties = xoneAdditionalShapes.requiredProperties.concat(found.requiredProperties);
+            
         }
         return xoneAdditionalShapes;
     }
@@ -107,13 +120,14 @@ export class CBDShapeExtractor {
         extracted.push(id.value);
         let result: Quad[] = [];
         let shape: Shape;
-        let xoneShape: Shape; 
+        let xoneShape: Shape = new Shape(); 
         //First, let’s check whether all required properties on this node are available. If not, we’re going to have to do an HTTP request to the current one
         if (shapeId && this.shapesGraph) {
             shape = this.shapesGraph.shapes.get(shapeId);
             //also process the resolved xone list of required properties.
-            xoneShape = await this.xoneListsToShapeWithoutXone(store,id,shape);
-
+            if (shape.xone.length > 0) {
+                xoneShape = await this.xoneListsToShapeWithoutXone(store,id,shape);
+            }
             for (let prop of shape.requiredProperties.concat(xoneShape.requiredProperties)) {
                 if (store.getQuads(id, new NamedNode(prop), null, null).length === 0) {
                     //Need to do an extra HTTP request, probably want to log this somehow (TODO)
@@ -150,7 +164,7 @@ export class CBDShapeExtractor {
                 let additionalQuads = await this.extractRecursively(store, q.object, shape.nodeLinks.get(q.predicate.value), extracted);
                 result = result.concat(additionalQuads);
             } //Do the same for the result of the xone array
-            else if (q.object instanceof NamedNode && shape && xoneShape.nodeLinks.get(q.predicate.value) && !extracted.includes(q.object)) {
+            else if (q.object instanceof NamedNode && xoneShape && xoneShape.nodeLinks.has(q.predicate.value) && !extracted.includes(q.object)) {
                 //Extract additional quads, and do extra HTTP request if needed (included in this extract script)
                 let additionalQuads = await this.extractRecursively(store, q.object, xoneShape.nodeLinks.get(q.predicate.value), extracted);
                 result = result.concat(additionalQuads);

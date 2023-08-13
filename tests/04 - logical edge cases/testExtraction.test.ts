@@ -3,7 +3,9 @@ import {Store, NamedNode, Writer, Term, Parser, StreamParser} from "n3";
 import {CBDShapeExtractor} from '../../lib/extract-cbd-shape';
 import rdfDereference from 'rdf-dereference';
 
-describe('Tests whether plain CBD works using the data from 01 and 02', function () {
+describe('Extracting logical edge cases', function () {
+    this.timeout(25000); 
+
     let shapeStore = new Store();
     let extractor;
     let dataStore = new Store();
@@ -41,14 +43,14 @@ describe('Tests whether plain CBD works using the data from 01 and 02', function
         //writer.end((err, res) => {console.log(res);});
         assert.equal(result.length, 43); // This count might be tricky as a test as my profile is of course able to change... TODO: change to an archived test case ttl
     })
-    it("Check whether it finds the nodelink in a xone in a xone", async () => {
+    it("Check whether it finds the nodelink in a xone", async () => {
         let result = await extractor.extract(dataStore, new NamedNode("http://example.org/Person4"), new NamedNode("http://example.org/XoneWithNodeShape"));
         //let writer = new Writer();
         //writer.addQuads(result);
         //writer.end((err, res) => {console.log(res);});
         assert.equal(result.length, 3);
     })
-    it("Check whether a node in a xone triggers an HTTP request", async () => {
+    it("Check whether a node link in a xone in a xone triggers an HTTP request", async () => {
         let result = await extractor.extract(dataStore, new NamedNode("http://example.org/Person5"), new NamedNode("http://example.org/TriggersHTTPShape"));
         //let writer = new Writer();
         //writer.addQuads(result);

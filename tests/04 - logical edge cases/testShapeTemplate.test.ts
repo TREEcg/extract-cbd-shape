@@ -15,8 +15,12 @@ describe('Test shape template of the logical edge cases', function () {
         shapesGraph = new ShapesGraph(shapeStore);
         
     })
-    it("Check whether the OR condition works - and check with recursion", async () => {
-        console.log(shapesGraph.shapes.get('http://example.org/TriggersHTTPShape').xone[0][0].xone[0][0]);
+    it("Check whether a circular Xone shape works", async () => {
+        console.log(shapesGraph.shapes.get('http://example.org/CircularXoneShape').xone.flat(10));//.xone[0][0].xone[0][0]);
+        assert(shapesGraph.shapes.get('http://example.org/TriggersHTTPShape').xone[0][0].xone[0][0].nodeLinks.size > 0);
+    })
+    it("Check whether the XONE condition works 2 levels deep", async () => {
+        console.log(shapesGraph.shapes.get('http://example.org/TriggersHTTPShape').xone[0][0].xone.flat(10));//.xone[0][0].xone[0][0]);
         assert(shapesGraph.shapes.get('http://example.org/TriggersHTTPShape').xone[0][0].xone[0][0].nodeLinks.size > 0);
     })
 });
