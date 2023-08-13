@@ -306,23 +306,19 @@ shsh:NodeShapeShape
     sh:or ( [
 		sh:property [
 		        sh:path sh:property;
-		        sh:minCount 1 ;                 # I made property a required property here!
 		        sh:node shsh:PropertyShapeShape ;
 		]
 	        ]
             [
 		        sh:path sh:or;
-		        sh:minCount 1 ;                 # or required
 		        sh:node shsh:ShapesListShape ;
 	        ]
             [
 		        sh:path sh:xone;
-		        sh:minCount 1 ;                 # xone required
 		        sh:node shsh:ShapesListShape ;       
 	        ]
             [
 		        sh:path sh:and;
-		        sh:minCount 1 ;                 # and required
 		        sh:node shsh:ShapesListShape ;    
 	        ]
     ).

@@ -60,13 +60,13 @@ export class ShapesGraph {
             if ((minCount[0] && minCount[0].value !== "0") || required) {
                 shape.requiredProperties.push(propertyId);
             }
-            // TODO: will the sh:or, sh:xone, sh:and, etc. be of use here? It won’t contain any more information about possible properties?
+            // **TODO**: will the sh:or, sh:xone, sh:and, etc. be of use here? It won’t contain any more information about possible properties?
             // Maybe to potentially point to another node, xone a datatype?
 
             // Does it link to a literal or to a new node?
             let nodeLink = shapeStore.getObjects(propertyShapeId, 'http://www.w3.org/ns/shacl#node');
             if (nodeLink[0]) {
-                shape.nodeLinks.set(propertyId, nodeLink[0]);
+                shape.nodeLinks.set(propertyId, nodeLink[0].value);
                 //TODO: Nodelinks in conditionals?
             }
             return true; // Success: the property shape has been processed
@@ -123,10 +123,23 @@ export class ShapesGraph {
         
     }
 
+    /**
+     * Processes a NodeShape or PropertyShape and adds NodeLinks and required properties to the arrays.
+     * @param shapeStore 
+     * @param shapeId 
+     * @param shape 
+     * @returns 
+     */
     preprocessShape(shapeStore: Store, shapeId: string, shape: Shape) {
         return this.preprocessPropertyShape(shapeStore, shapeId, shape)?true: this.preprocessNodeShape(shapeStore, shapeId, shape);
     }
 
+    /**
+     * Processes a NodeShape
+     * @param shapeStore 
+     * @param nodeShapeId 
+     * @param shape 
+     */
     protected preprocessNodeShape(shapeStore: Store, nodeShapeId: string, shape: Shape) {
             //Should we process sh:targetObjectsOf? This could be a hint that there is a possible non-required inverse property? Or should we only interpret this for target selection and of no value to triple selection?
             /*let targetObjectsOfArray = shapeStore.getObjects(shapeId, "http://www.w3.org/ns/shacl#targetObjectsOf");
@@ -148,7 +161,9 @@ export class ShapesGraph {
                 // Try to process it as a property shape
                 //for every andList found, iterate through it and try to preprocess the property shape, if doesn’t work, preprocess as a nodeshape again
                 for (let and of this.rdfListToArray(shapeStore, andList)) {
-                    let success = this.preprocessPropertyShape(shapeStore, andList, shape);
+                    //this.preprocessShape(shapeStore, and, shape);
+                    //TODO: Why does this work? Does it actually work??
+                    let success = this.preprocessPropertyShape(shapeStore, and, shape);
                     if (!success) {
                         //This wasn’t a property shape:
                         // - now it can possibly again be a nodeshape, and then it means that nodeshape needs to also be processed every time this one is encountered. I’d add all required properties here as well.
@@ -159,7 +174,7 @@ export class ShapesGraph {
                 
             }
             
-            //Process zero or more sh:xone lists
+            //Process zero or more possibly recursive sh:xone lists
             for (let xoneList of shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#xone")) {
                 shape.xone.push(this.rdfListToArray(shapeStore, xoneList).map((val): Shape => {
                         let newShape = new Shape();

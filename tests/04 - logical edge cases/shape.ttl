@@ -99,3 +99,21 @@ ex:CircularOrShape a sh:NodeShape ;
 			]
 		]
 	) .
+
+## A conditional case that should trigger an HTTP request: a xone in a xone with an optional property containing a node link
+
+ex:TriggersHTTPShape a sh:NodeShape ;
+	sh:xone (
+		[
+			sh:xone (
+				[
+					sh:path ex:qualifiedName ;
+					sh:node ex:QualifiedNameShape
+					
+				]
+			)
+		]
+	) .
+
+### Should give a tempalte like this:
+### { xone : [{ xone : { requiredProperties: qualifiedName, nodeLinks Map {"ex:qualifiedName" → "QualifiedNameShape"} } } ]}

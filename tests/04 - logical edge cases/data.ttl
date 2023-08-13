@@ -21,3 +21,9 @@ ex:Person4 a ex:Person ;
     ex:qualifiedName ex:NamePerson4 .
 # This triple must be included when extracting Person4, but it’s harder to find due to the sh:xone case
 ex:NamePerson4  foaf:name "Person 4" .
+
+
+## This one, if configured with ex:TriggersHTTPShape, will trigger an HTTP request to be done
+
+ex:Person5 a ex:Person; 
+    ex:qualifiedName </name.ttl> .
