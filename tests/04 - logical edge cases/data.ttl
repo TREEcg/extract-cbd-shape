@@ -13,9 +13,7 @@ ex:Person2 a ex:Person ;
 
 ex:Person3 a ex:Person; 
     ex:name "Person 3";
-    ex:knows <https://pietercolpaert.be/#me> .
-
-
+    ex:knows <https://raw.githubusercontent.com/pietercolpaert/extract-cbd-shape/main/tests/04%20-%20logical%20edge%20cases/name.ttl#Person1> .
 
 ex:Person4 a ex:Person ;
     ex:qualifiedName ex:NamePerson4 .
@@ -27,3 +25,7 @@ ex:NamePerson4  foaf:name "Person 4" .
 
 ex:Person5 a ex:Person; 
     ex:qualifiedName <https://raw.githubusercontent.com/pietercolpaert/extract-cbd-shape/main/tests/04%20-%20logical%20edge%20cases/name.ttl> .
+
+ex:Person6 a ex:Person ;
+    ex:name "Person6" ;
+    ex:knows ex:Person3 .
