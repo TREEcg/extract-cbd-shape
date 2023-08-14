@@ -96,11 +96,7 @@ shsh:ShapeShape
 		sh:path sh:targetObjectsOf ;
 		sh:nodeKind sh:IRI ;            # targetObjectsOf-nodeKind
 	] ;
-    ## If s is a SHACL instance of sh:NodeShape or sh:PropertyShape in an RDF graph G and s is also a SHACL instance
-    ## of rdfs:Class in G and s is not an IRI then s is an ill-formed shape in G.
-    ### ==> IF (s is a sh:NodeShape or sh:PropertyShape) AND s is an instance of rdfs:Class, then s must be an IRI
-
-    #### ==> IF(  (s is not a sh:NodeShape AND not a sh:PropertyShape AND s is not an instance of rdfs:Class), or s is just an IRI, then it’s valid 
+    
 	sh:or ( [ sh:not [ 
 				sh:class rdfs:Class ; 
 				sh:or ( [ sh:class sh:NodeShape ] [ sh:class sh:PropertyShape ] )
@@ -301,27 +297,11 @@ shsh:NodeShapeShape
 		sh:maxCount 0 ;                 # uniqueLang-scope
 	] ;
 
-    ### We made an extra constraint here based on the extraction algorithm: 
-    ### While a NodeShape without sh:property is valid SHACL, our application profile expects an sh:property, otherwise it cannot derive any useful information
-    sh:or ( [
-		sh:property [
-		        sh:path sh:property;
-		        sh:node shsh:PropertyShapeShape ;
-		]
-	        ]
-            [
-		        sh:path sh:or;
-		        sh:node shsh:ShapesListShape ;
-	        ]
-            [
-		        sh:path sh:xone;
-		        sh:node shsh:ShapesListShape ;       
-	        ]
-            [
-		        sh:path sh:and;
-		        sh:node shsh:ShapesListShape ;    
-	        ]
-    ).
+    ### We made an extra constraint here for our extraction algorithm, saying that property will always refer to a property shape
+    sh:property [
+		sh:path sh:property;
+		sh:node shsh:PropertyShapeShape ;
+	] .
     
 shsh:PropertyShapeShape
 	a sh:NodeShape ;

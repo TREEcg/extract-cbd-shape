@@ -6,6 +6,65 @@ export class Property {
     }
 }
 
+export abstract class PathItem {
+    value: PathPattern|NamedNode;
+    constructor (value:PathPattern|NamedNode){
+        this.value = value;
+    }
+}
+
+export class PredicateItem extends PathItem{
+    constructor (value:NamedNode){
+        super(value);
+    }
+}
+export class AlternativePathItem extends PathItem{
+
+}
+export class InversePathItem extends PathItem{
+
+}
+
+export class ZeroOrMorePathItem extends PathItem{
+
+}
+
+export class OneOrMorePathItem extends PathItem{
+
+}
+
+export class ZeroOrOnePathItem extends PathItem{
+
+}
+
+export class PathPattern {
+    pathItems:Array<PathItem>;
+    constructor (pathItems: Array<PathItem>) {
+        this.pathItems = pathItems;
+        //preprocess our items to contain all data we need here...
+
+    }
+
+    public * match (store:Store, focusNode: Term, currentPath?: Array<Term>): Generator<Array<Term>> {
+        //returns all real paths that match the path pattern starting from the focusNode        
+        if (!currentPath) {
+            currentPath = [];
+        }
+        //Step 1: check if this is a blank node,
+        // if it is, then this can be:
+          // Alternative path: make a fork
+          // inversePath: look up quads backwards
+          // zeroOrMorePath: look up zero or more hops
+          // oneOrMorePath:
+          // zeroOrOnePath:
+        // Add the quads to the current array
+        
+        // if it isn’t, then this is a regular sequence path
+
+        yield [];
+    }
+}
+
 export class Shape {
     nodeLinks: Map<string, string>;
     requiredProperties: Array<string> ;
@@ -29,6 +88,41 @@ export class ShapesGraph {
         this.shapes = this.initializeFromStore(shapeStore);
     }
 
+    protected constructPathPattern(shapeStore: Store, pathNode: Term): PathPattern {
+        let listArray = this.rdfListToArray(shapeStore, pathNode);
+        let result:PathItem[] = [];
+        for (let listItem of listArray) {
+            let p: PathItem;
+            if (listItem instanceof BlankNode) {
+                //Look for special types
+                let zeroOrMorePathObjects = shapeStore.getObjects(listItem, "http://www.w3.org/ns/shacl#zeroOrMorePath");
+                let oneOrMorePathObjects = shapeStore.getObjects(listItem, "http://www.w3.org/ns/shacl#oneOrMorePath");
+                let zeroOrOnePathObjects = shapeStore.getObjects(listItem, "http://www.w3.org/ns/shacl#zeroOrOnePath");
+                let inversePathObjects = shapeStore.getObjects(listItem, "http://www.w3.org/ns/shacl#inversePath");
+                let alternativePathObjects = shapeStore.getObjects(listItem, "http://www.w3.org/ns/shacl#alternativePath");
+                if (zeroOrMorePathObjects[0]) {
+                    p = new ZeroOrMorePathItem(this.constructPathPattern(shapeStore, zeroOrMorePathObjects[0]));
+                }else if (oneOrMorePathObjects[0]) {
+                    p = new OneOrMorePathItem(this.constructPathPattern(shapeStore, oneOrMorePathObjects[0]));
+                } else if (zeroOrOnePathObjects[0]) {
+                    p = new ZeroOrOnePathItem(this.constructPathPattern(shapeStore, zeroOrOnePathObjects[0]));
+                } else if (inversePathObjects[0]){
+                    p = new InversePathItem(this.constructPathPattern(shapeStore, inversePathObjects[0]));
+                } else if (alternativePathObjects[0]){
+                    p = new AlternativePathItem(this.constructPathPattern(shapeStore, alternativePathObjects[0]));
+                } else {
+                    //didn’t find a type on this blank node: this should not happen
+                    console.error("Unexpected case: no shacl list item type on this sh:path");
+                }
+            } else {
+                //This is a named node, and therefore it is a predicate item
+                p = new PredicateItem(listItem);
+            }
+            result.push(p);
+        }
+        return new PathPattern(result);
+    }
+
     /**
      * 
      * @param shapeStore 
@@ -45,14 +139,17 @@ export class ShapesGraph {
 
         let propertyId:string;
         let path = shapeStore.getObjects(propertyShapeId, 'http://www.w3.org/ns/shacl#path')[0];
-        //check the path now to see whether we should add it on this level, or on a deeper or higher level.
+        //Process the path now and make sure there’s a match function
         if (path) {
             //Only support predicate paths for now TODO
-            let pathArray = this.rdfListToArray(shapeStore, path);
-            if (pathArray.length > 1) {
-                console.error("Sequence or other paths not yet supported");
+            let pathPattern = this.constructPathPattern(shapeStore, path);
+            if (pathPattern.pathItems.length > 1 || ! (pathPattern.pathItems[0] instanceof PredicateItem)) {
+                console.error("Sequence or other paths not yet supported!!!");
+                console.log(pathPattern);
+                //shape.paths.push(pathPattern);
+                return true;
             } else {
-                propertyId = pathArray[0].value;
+                propertyId = pathPattern.pathItems[0].value.value;
             }
         
             let minCount = shapeStore.getObjects(propertyShapeId, "http://www.w3.org/ns/shacl#minCount");
@@ -161,15 +258,7 @@ export class ShapesGraph {
                 // Try to process it as a property shape
                 //for every andList found, iterate through it and try to preprocess the property shape, if doesn’t work, preprocess as a nodeshape again
                 for (let and of this.rdfListToArray(shapeStore, andList)) {
-                    //this.preprocessShape(shapeStore, and, shape);
-                    //TODO: Why does this work? Does it actually work??
-                    let success = this.preprocessPropertyShape(shapeStore, and, shape);
-                    if (!success) {
-                        //This wasn’t a property shape:
-                        // - now it can possibly again be a nodeshape, and then it means that nodeshape needs to also be processed every time this one is encountered. I’d add all required properties here as well.
-                        // - it can also be a nested or/and/xone-clause → then the preprocessNodeShape just needs to be called again on this one ( x AND ( Y AND Z ) <=> x and Y and Z)
-                        this.preprocessNodeShape(shapeStore, and, shape);
-                    }
+                    this.preprocessShape(shapeStore, and, shape);
                 }
                 
             }

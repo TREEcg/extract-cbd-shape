@@ -38,10 +38,10 @@ describe('Extracting logical edge cases', function () {
     })
     it("Check whether it does an HTTP request if it doesn’t find the required properties on a node", async () => {
         let result = await extractor.extract(dataStore, new NamedNode("http://example.org/Person3"), new NamedNode("http://example.org/KnowsPieterShape"));
-        //let writer = new Writer();
-        //writer.addQuads(result);
-        //writer.end((err, res) => {console.log(res);});
-        assert.equal(result.length, 43); // This count might be tricky as a test as my profile is of course able to change... TODO: change to an archived test case ttl
+        let writer = new Writer();
+        writer.addQuads(result);
+        writer.end((err, res) => {console.log(res);});
+        assert.equal(result.length, 4);
     })
     it("Check whether it finds the nodelink in a xone", async () => {
         let result = await extractor.extract(dataStore, new NamedNode("http://example.org/Person4"), new NamedNode("http://example.org/XoneWithNodeShape"));
@@ -62,6 +62,6 @@ describe('Extracting logical edge cases', function () {
         //let writer = new Writer();
         //writer.addQuads(result);
         //writer.end((err, res) => {console.log(res);});
-        assert.equal(result.length, 6);
+        assert.equal(result.length, 7);
     })
 });

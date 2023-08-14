@@ -37,7 +37,7 @@ This is an extension of CBD. It extracts:
 
 If no triples were found based on CBD, it does an HTTP request to the entity’s IRI (fallback to IRI dereferencing)
 
-Next, it takes _hints_ (it does not guarantee a result that validates) from an optional SHACL shapes graph:
+Next, it takes _hints_ (it does not guarantee a result that validates) from an optional SHACL shapes graph. It only uses the parts relevant for discovery for the [SHACL Core Constraint Components](https://www.w3.org/TR/shacl/#core-components). It does not support SPARQL or Javascript.
  1. Checks if the Shape is deactivated first
  2. Processes `sh:xone`, `sh:or` and `sh:and` (but doesn’t process `sh:not` -- See https://www.w3.org/TR/shacl/#core-components-logical):
      * For `sh:or` and `sh:and` (in worst-case, `sh:or` is also the `sh:and` case and therefore -- in order to be logically sound --, for discovery, they are logically the same): it just adds all properties of the entire list to the required properties list.
@@ -70,5 +70,3 @@ Note: as we must process `sh:or` in the same way as a `sh:and` to be logically s
 
 TODO:
  * Process sh:path properly
- * Second iteration when processing xone after dereferencing when no matches in a xone list were found.
- * More test cases for logic cases
