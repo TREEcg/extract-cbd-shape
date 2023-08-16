@@ -38,9 +38,9 @@ describe('Extracting logical edge cases', function () {
     })
     it("Check whether it does an HTTP request if it doesn’t find the required properties on a node", async () => {
         let result = await extractor.extract(dataStore, new NamedNode("http://example.org/Person3"), new NamedNode("http://example.org/KnowsPieterShape"));
-        let writer = new Writer();
-        writer.addQuads(result);
-        writer.end((err, res) => {console.log(res);});
+        //let writer = new Writer();
+        //writer.addQuads(result);
+        //writer.end((err, res) => {console.log(res);});
         assert.equal(result.length, 4);
     })
     it("Check whether it finds the nodelink in a xone", async () => {
@@ -59,9 +59,9 @@ describe('Extracting logical edge cases', function () {
     })
     it("Check whether a circular XONE shape works", async () => {
         let result = await extractor.extract(dataStore, new NamedNode("http://example.org/Person6"), new NamedNode("http://example.org/CircularXoneShape"));
-        //let writer = new Writer();
-        //writer.addQuads(result);
-        //writer.end((err, res) => {console.log(res);});
+        let writer = new Writer();
+        writer.addQuads(result);
+        writer.end((err, res) => {console.log(res);});
         assert.equal(result.length, 7);
     })
 });

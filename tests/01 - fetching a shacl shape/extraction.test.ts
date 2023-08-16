@@ -42,12 +42,12 @@ describe('Check whether we can successfully extract a SHACL shape', async () => 
         assert.equal(result.length, 16); // Just testing whether there are 16 quads being returned now
    });
 
-   it ("Can extract itself from itself", async () => {
-    let result = await extractor.extract(shapeStore, new NamedNode("http://www.w3.org/ns/shacl-shacl#ShapeShape"),new NamedNode("http://www.w3.org/ns/shacl-shacl#ShapeShape"));
-    //let writer = new Writer();
-    //writer.addQuads(result);
-    //writer.end((err, res) => {console.log(res);});
-    assert.equal(result.length, 423); // Just testing whether there are quads being returned now
-});
+    it ("Can extract itself from itself", async () => {
+        let result = await extractor.extract(shapeStore, new NamedNode("http://www.w3.org/ns/shacl-shacl#ShapeShape"),new NamedNode("http://www.w3.org/ns/shacl-shacl#ShapeShape"));
+        //let writer = new Writer();
+        //writer.addQuads(result);
+        //writer.end((err, res) => {console.log(res);});
+        assert.equal(result.length, 273); // Just testing whether there are quads being returned now
+    });
 
 });

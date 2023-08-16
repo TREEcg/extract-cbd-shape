@@ -332,7 +332,7 @@ shsh:ShapesListShape
 
 # A path of blank node path syntax, used to simulate recursion
 _:PathPath
-	sh:alternativePath (
+	sh:alternativePath ( ## THIS CAUSES TROUBLE
 		( [ sh:zeroOrMorePath rdf:rest ] rdf:first )
 		( sh:alternativePath [ sh:zeroOrMorePath rdf:rest ] rdf:first )
 		sh:inversePath
