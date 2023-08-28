@@ -1,0 +1,191 @@
+## This is an application profile for what the Extract CBD Shape algorithm expects for a shape
+##
+## Adapted from https://www.w3.org/TR/shacl/#shacl-shacl
+##
+@prefix :  <https://raw.githubusercontent.com/pietercolpaert/extract-cbd-shape/main/extract-cbd-shape-ap.ttl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix shsh: <http://www.w3.org/ns/shacl-shacl#> .
+
+<> rdfs:label "SHACL shape for the shape expected by the Extract CBD Shape algorithm"@en ;
+   rdfs:description "Adapted from <http://www.w3.org/ns/shacl-shacl>"@en .
+
+:ShapeShape
+	a sh:NodeShape ;
+	rdfs:label "Shape shape"@en ;
+	rdfs:comment "A shape that can be used to CBD extract SHACL shapes."@en ;
+	# Shapes are either node shapes or property shapes
+	sh:xone ( :NodeShapeShape :PropertyShapeShape ) .
+	
+:NodeShapeShape
+	a sh:NodeShape ;
+    ### We expect a sh:property to always refer to a property shape. In case it doesn’t it’s because it will have conditionals.
+    sh:or ( 
+        [
+		    sh:path sh:property;
+		    sh:node :PropertyShapeShape ;
+            sh:minCount 1
+	    ] 
+        [
+		    sh:path sh:and ;
+		    sh:node :ShapesListShape ;        # and-node
+            sh:minCount 1
+	    ]
+	    [
+		    sh:path sh:or ;
+		    sh:node :ShapesListShape ;        # or-node
+            sh:minCount 1
+	    ]
+	    [
+		    sh:path sh:xone ;
+		    sh:node :ShapesListShape ;        # xone-node
+            sh:minCount 1
+	    ]
+     ) .
+    
+:PropertyShapeShape
+	a sh:NodeShape ;
+	sh:property [
+		sh:path sh:path ;
+		sh:maxCount 1 ;                 # path-maxCount
+		sh:minCount 1 ;                 # PropertyShape-path-minCount
+		sh:node shsh:PathShape ;        # path-node
+	] ;
+    # We added this to indicate that a property will refer to a NodeShape through sh:node
+    sh:property [
+        sh:path sh:node ;
+        sh:node :NodeShapeShape ;
+    ].
+
+# Values of sh:and, sh:or and sh:xone must be lists of shapes
+:ShapesListShape
+	a sh:NodeShape ;
+	sh:property [
+		sh:path ( [ sh:zeroOrMorePath rdf:rest ] rdf:first ) ;
+        sh:minCount 1 ;
+		sh:node :ShapeShape ;
+	] .
+
+### Bellow included for convenience: reused as-is from SHACL SHACL
+
+shsh:ListShape
+	a sh:NodeShape ;
+	rdfs:label "List shape"@en ;
+	rdfs:comment "A shape describing well-formed RDF lists. Currently does not check for non-recursion. This could be expressed using SHACL-SPARQL."@en ;
+	rdfs:seeAlso <https://www.w3.org/TR/shacl/#syntax-rule-SHACL-list> ;
+	sh:property [
+		sh:path [ sh:zeroOrMorePath rdf:rest ] ;
+		rdfs:comment "Each list member (including this node) must be have the shape shsh:ListNodeShape."@en ;
+		sh:hasValue rdf:nil ;
+		sh:node shsh:ListNodeShape ;
+	] .
+
+## Included for convenience - see shacl-shacl
+shsh:ListNodeShape
+	a sh:NodeShape ;
+	rdfs:label "List node shape"@en ;
+	rdfs:comment "Defines constraints on what it means for a node to be a node within a well-formed RDF list. Note that this does not check whether the rdf:rest items are also well-formed lists as this would lead to unsupported recursion."@en ;
+	sh:or ( [
+				sh:hasValue rdf:nil ;
+        		sh:property [
+					sh:path rdf:first ;
+					sh:maxCount 0 ;
+				] ;
+				sh:property [
+					sh:path rdf:rest ;
+					sh:maxCount 0 ;
+				] ;
+			]
+			[
+				sh:not [ sh:hasValue rdf:nil ] ;
+				sh:property [
+					sh:path rdf:first ;
+					sh:maxCount 1 ;
+					sh:minCount 1 ;
+				] ;
+				sh:property [
+					sh:path rdf:rest ;
+					sh:maxCount 1 ;
+					sh:minCount 1 ;
+				] ;
+			] ) .
+
+# A path of blank node path syntax, used to simulate recursion
+_:PathPath
+	sh:alternativePath (
+		( [ sh:zeroOrMorePath rdf:rest ] rdf:first )
+		( sh:alternativePath [ sh:zeroOrMorePath rdf:rest ] rdf:first )
+		sh:inversePath
+		sh:zeroOrMorePath
+		sh:oneOrMorePath
+		sh:zeroOrOnePath 
+	) .
+
+shsh:PathShape
+	a sh:NodeShape ;
+	rdfs:label "Path shape"@en ;
+	rdfs:comment "A shape that can be used to validate the syntax rules of well-formed SHACL paths."@en ;
+	rdfs:seeAlso <https://www.w3.org/TR/shacl/#property-paths> ;
+	sh:property [
+		sh:path [ sh:zeroOrMorePath _:PathPath ] ;
+		sh:node shsh:PathNodeShape ;
+	] .
+
+shsh:PathNodeShape
+	sh:xone (                           # path-metarule
+			[ sh:nodeKind sh:IRI ]          # 2.3.1.1: Predicate path
+			[ sh:nodeKind sh:BlankNode ;    # 2.3.1.2: Sequence path
+			  sh:node shsh:PathListWithAtLeast2Members ;
+			]
+			[ sh:nodeKind sh:BlankNode ;    # 2.3.1.3: Alternative path
+			  sh:closed true ;
+			  sh:property [
+			    sh:path sh:alternativePath ;
+			    sh:node shsh:PathListWithAtLeast2Members ;
+			    sh:minCount 1 ;
+			    sh:maxCount 1 ;
+			  ]
+			]
+			[ sh:nodeKind sh:BlankNode ;    # 2.3.1.4: Inverse path
+			  sh:closed true ;
+			  sh:property [
+			    sh:path sh:inversePath ;
+			    sh:minCount 1 ;
+			    sh:maxCount 1 ;
+			  ] 
+			]
+			[ sh:nodeKind sh:BlankNode ;    # 2.3.1.5: Zero-or-more path
+			  sh:closed true ;
+			  sh:property [
+			    sh:path sh:zeroOrMorePath ;
+			    sh:minCount 1 ;
+			    sh:maxCount 1 ;
+			  ] 
+			]
+			[ sh:nodeKind sh:BlankNode ;    # 2.3.1.6: One-or-more path
+			  sh:closed true ;
+			  sh:property [
+			    sh:path sh:oneOrMorePath ;
+			    sh:minCount 1 ;
+			    sh:maxCount 1 ;
+			  ] 
+			]
+			[ sh:nodeKind sh:BlankNode ;    # 2.3.1.7: Zero-or-one path
+			  sh:closed true ;
+			  sh:property [
+			    sh:path sh:zeroOrOnePath ;
+			    sh:minCount 1 ;
+			    sh:maxCount 1 ;
+			  ] 
+			]
+		) .
+
+shsh:PathListWithAtLeast2Members
+	a sh:NodeShape ;
+	sh:node shsh:ListShape ;
+	sh:property [
+		sh:path [ sh:oneOrMorePath rdf:rest ] ;
+		sh:minCount 2 ;    # 1 other list node plus rdf:nil
+	] .
