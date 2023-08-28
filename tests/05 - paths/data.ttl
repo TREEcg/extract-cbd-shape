@@ -8,3 +8,4 @@
 ex:A ex:p1 ex:B .
 ex:B ex:p1 ex:D .
 ex:B ex:p2 ex:C .
+ex:D ex:p2 ex:E .

@@ -49,7 +49,7 @@ export class PathPattern {
     
     /**
      * Converts it to a SPARQL property path for easy output
-     * @returns SPARQK property path string
+     * @returns SPARQL property path string
      */
     public toString () {
         let str = "";
@@ -58,10 +58,6 @@ export class PathPattern {
             str+= "(";
         }
         for (let item of this.pathItems) {
-            //If it’s not the first item, add a space
-            if (i!==0) {
-                str+=" ";
-            }
             if (item instanceof PredicateItem) {
                 str+= "<"+item.value.value+">";
             } else if (item instanceof InversePathItem) {
@@ -71,11 +67,11 @@ export class PathPattern {
                     str+= alternate.value.toString() + "|";
                 }
             } else if (item instanceof ZeroOrOnePathItem){
-                str+= item.value.toString() + "?";
+                str+= item.value.toString() + "? ";
             } else if (item instanceof ZeroOrMorePathItem){
-                str+= item.value.toString() + "*";
+                str+= item.value.toString() + "* ";
             } else if (item instanceof OneOrMorePathItem){
-                str+= item.value.toString() + "+";
+                str+= item.value.toString() + "+ ";
             }
             //if this is not the last item, we’re dealing with a sequence path, so add a slash for the next item
             if (i !== this.pathItems.length-1) {
@@ -88,6 +84,7 @@ export class PathPattern {
         }
         return str;
     }
+    
     public * match (store:Store, focusNode: Term, pathItems?:Array<PathItem>, currentPath?: Array<Quad>, inverse?:boolean): Generator<Array<Quad>> {
         //returns all real paths that match the path pattern starting from the focusNode        
         if (!currentPath) {
@@ -109,8 +106,9 @@ export class PathPattern {
                 quads = store.getQuads(null, pathItem.value, focusNode );
             for (let quad of quads) {
                 //Each of these is a possibility for more matches
-                let newCurrentPath = currentPath;
+                let newCurrentPath = [...currentPath];
                 newCurrentPath.push(quad);
+                // console.log(newCurrentPath, currentPath);
                 //If there are no elements left, we are yielding our result
                 if (pathItems.length === 1) {
                     yield newCurrentPath;
@@ -125,13 +123,13 @@ export class PathPattern {
                     }
                 }
             }
-            
         } else if (pathItem instanceof InversePathItem) {
             //Match everything inside, but add a flag inverse - then continue the sequence path, if there are more, and add the result here.
             //pathItem will be a new pathpattern, but we need to extract it with inverse true and make sure a new current path is created for every result
             let inverseMatches = this.match(store, focusNode, pathItem.value.pathItems, currentPath, true);
             //For every match, add it to a currentPath and continue the sequence
-            for (let match of Array.from(inverseMatches)) {
+            let inverseMatchesArray = Array.from(inverseMatches);
+            for (let match of  inverseMatchesArray) {
                 let newCurrentPath = [...currentPath, ...match]; // create a copy and concat with the path from the matches
                 //If there are no elements left in the rest of the sequence path, we are yielding our result
                 if (pathItems.length === 1) {
@@ -139,6 +137,7 @@ export class PathPattern {
                 } else {
                     //Otherwise, we need to handle the rest of the sequence path by starting from our last focusnode and path
                     //Also pass the current inverse in case we’re already in an inverse. Would be really weird, but hey, who are we to judge anyone’s shape
+                    // ???? Should we get the last element’s object or subject here????
                     let restMatches = this.match(store, match[match.length-1].object, pathItems.slice(1), newCurrentPath, inverse);
                     let restMatch = restMatches.next();
                     while (!restMatch.done) {
@@ -174,21 +173,24 @@ export class NodeLink {
 export class Shape {
     nodeLinks: Array<NodeLink>;
     requiredPaths: Array<PathPattern> ;
-    xone: Array<Array<Shape>>; //the first match, then stop
+    orLists: Array<Array<Shape>>;
     constructor () {
         //All properties will be added, but if a required property is not available, then we need to further look it up
         this.requiredPaths = [];
         //If there’s a nodelink through one of the properties, I want to know what other shape to look up in the shapesgraph from there
         this.nodeLinks = [];
-        this.xone = [];
+        this.orLists = [];
     }
-    getNodeLinkQuads (id:Term, store:Store, focusNode: Term) {
-        for (let nodeLink of this.nodeLinks) {
-            if (nodeLink.pathPattern.match(store, focusNode)) {
+}
 
-            }
-        }
-    }
+export class EvaluatedOrShape extends Shape {
+    nodeLinks: Array<NodeLink>;
+    //If this invalid is true, we know for sure it is invalid. If it is false, we are unsure, as we didn’t fully validate it.
+    invalid : boolean;
+    constructor () {
+        super();
+        this.invalid = false;
+    }   
 }
 
 export class ShapesGraph {
@@ -274,10 +276,7 @@ export class ShapesGraph {
             shape.nodeLinks.push(new NodeLink(pathPattern, nodeLink[0].value));
         }
         //TODO: Can Nodelinks appear in conditionals from here? Probably they can? (same comment as ↑)
-        
         return true; // Success: the property shape has been processed    
-        
-        
     }
     
     /**
@@ -304,19 +303,19 @@ export class ShapesGraph {
             this.preprocessPropertyShape(shapeStore, prop, shape);
         }
         
-        //process sh:and and sh:or on shapeId: just add all IDs to this array
+        // process sh:and: just add all IDs to this array
         // Process everything you can find nested in AND or OR clauses
         // Reason why we must process OR and AND in the same way for discovery is provided in the README.md
-        for (let andList of shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#and").concat( shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#or"))) {
+        for (let andList of shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#and")) {
             // Try to process it as a property shape
             //for every andList found, iterate through it and try to preprocess the property shape, if doesn’t work, preprocess as a nodeshape again
             for (let and of this.rdfListToArray(shapeStore, andList)) {
                 this.preprocessShape(shapeStore, and, shape);
             }
         }
-        //Process zero or more possibly recursive sh:xone lists
-        for (let xoneList of shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#xone")) {
-            shape.xone.push(this.rdfListToArray(shapeStore, xoneList).map((val): Shape => {
+        //Process zero or more sh:xone and sh:or lists in the same way
+        for (let xoneOrOrList of shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#xone").concat( shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#or"))) {
+            shape.orLists.push(this.rdfListToArray(shapeStore, xoneOrOrList).map((val): Shape => {
                     let newShape = new Shape();
                     this.preprocessShape(shapeStore, val, newShape);
                     //Add this one to the shapesgraph

@@ -24,14 +24,16 @@ let entityquads = await extractor.extract(store, entityId, shapeId);
 
 ## Test it
 
-Tests and examples provided in the [tests](tests/) library
+Tests and examples provided in the [tests](tests/) library. Run them using mocha which can be invoked using `npm test`
 
 ## Algorithm and limitations
 
 This is an extension of CBD. It extracts:
  1. all quads with subject this entity, and their blank node triples (recursively)
  2. all quads with a named graph matching the entity we’re looking up
- 3. _all RDF reification quads (TODO)_ (Included in the original CBD)
+
+To be discussed:
+ 3. _Should it also extract all RDF reification quads?_ (Included in the original CBD)
  4. _Should it also extract all singleton properties?_
  5. _Should it also extract RDF* annnotations?_
 
@@ -39,34 +41,13 @@ If no triples were found based on CBD, it does an HTTP request to the entity’s
 
 Next, it takes _hints_ (it does not guarantee a result that validates) from an optional SHACL shapes graph. It only uses the parts relevant for discovery for the [SHACL Core Constraint Components](https://www.w3.org/TR/shacl/#core-components). It does not support SPARQL or Javascript.
  1. Checks if the Shape is deactivated first
- 2. Processes `sh:xone`, `sh:or` and `sh:and` (but doesn’t process `sh:not` -- See https://www.w3.org/TR/shacl/#core-components-logical):
-     * For `sh:or` and `sh:and` (in worst-case, `sh:or` is also the `sh:and` case and therefore -- in order to be logically sound --, for discovery, they are logically the same): it just adds all properties of the entire list to the required properties list.
-     * For `sh:xone`: Two iterations are necessary in worst case:
-         - Iterate over the list
-         - The first match that is found is processed, the rest is ignored
-         - If nothing was however found, it starts over, but dereferences the node that needs to be found.
+ 2. All links to nodes that are given, in conditionals or not, are added to the shape’s NodeLinks array. The paths matched by the nodelinks will be processed on that matching namednode in the data
  3. Processes all `sh:property` links to property shapes. Only marks a property as required if `sh:minCount` > 0. It does not validate cardinalities.
- 4. It processes the full `sh:path` and includes the triples necessary to reach the path.
- 5. Won’t process `sh:value` and `sh:QualifiedValueShapes`: if it provides a wrong item, that’s the data publisher’s fault
- 6. ISSUE: Doesn’t (yet?) process `ex:node sh:class ex:S` as `ex:node sh:property [ sh:path ( rdf:type [sh:zeroOrMorePath rdfs:subClassOf ]); sh:value ex:S ; sh:minCount 1 ;]` -- But we should probably look into doing this, although entailment regimes might make this task complex, and we said we wouldn’t process sh:value... 
- 
+ 4. Processes the conditionals `sh:xone`, `sh:or` and `sh:and` (but doesn’t process `sh:not` -- See https://www.w3.org/TR/shacl/#core-components-logical):
+     * `sh:and` doesn’t have much effect: all nodelinks and all required paths will be processed
+     * `sh:xone` and `sh:or`: in both cases, at least one item must match at least one quad for all required paths. If not, it will do an HTTP request to the current namednode. It’s thus becomes less likely an HTTP will be performed with an `sh:xone` or `sh:or` involved: if one item’s condition of required paths has been fulfilled, it doesn’t search further. This is a design trade-off: we don’t allow more complex SHACL constraints (more complex than checking the required paths) to trigger HTTP requests. 
+ 4. It processes full `sh:path` and __includes the quads necessary to reach their targets__.
 
-A nodeshape is just an array of property shapes.
-
-Features from SHACL we’re ignoring and limitations:
- * Target selection: in this case, the NodeShape and entity from where to start need to be provided by the user of the library
- * Constraints: as it’s not the goal to provide a valid shape per se, but to describe the entity while taking hint from the shape, we ignore all property constraints.
- * Circular shapes that can explode: Person → knows → Person → knows → Person → etc. Can we warn the shape designer somehow when a shape gets processed into a circular reference?
-
-e.g.:
-```turtle
-[] sh:property [
-    sh:path ex:knows
-    sh:or ( [sh:class foaf:Person] [sh:class schema:Person])
-] .
-```
-
-Note: as we must process `sh:or` in the same way as a `sh:and` to be logically sound, it can easily blow up the number of HTTP requests the extraction algorithm is going to do. In order to avoid this, we propose SHACL shape builders to prioritize the use of `sh:xone`, where we can be sure that no other required properties will be used.
-
-TODO:
- * Process sh:path properly
+It won’t:
+ 1. Process more complex validation instructions that are part of SHACL such as `sh:class`, inLanguage, pattern, value, qualified value shapes, etc. It is the data publisher’s responsibility to provide valid data, or it is the responsibility of the user of the library to validate the quads afterwards.
+ 2. Do automatic target selection based on e.g., targetClass: you need to set the target.

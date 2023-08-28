@@ -16,7 +16,7 @@ describe('Test whether the SHACL template is well extracted based on paths', fun
         
     })
     it("Check whether sequence paths are correctly represented", async () => {
-        console.log(shapesGraph.shapes.get('http://example.org/SequencePathShape'));
+        //console.log(shapesGraph.shapes.get('http://example.org/SequencePathShape'));
         assert(shapesGraph.shapes.get('http://example.org/SequencePathShape'));
     })
     

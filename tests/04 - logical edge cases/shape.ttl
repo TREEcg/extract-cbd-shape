@@ -9,7 +9,6 @@ ex:Shape
 	a sh:NodeShape ;         
     sh:and ( ex:PersonShape  ).               # AND the Person shape needs to be taken into account as well
 
-
 ex:KnowsPieterShape 
 	a sh:NodeShape ;
 	sh:property [
@@ -62,7 +61,8 @@ ex:XoneWithNodeShape a sh:NodeShape ;
 	] [
 		sh:property [
 			sh:path ex:qualifiedName ;
-			sh:node ex:QualifiedNameShape
+			sh:node ex:QualifiedNameShape;
+			sh:minCount 1 
 		] 
 	]) .
 
@@ -139,3 +139,7 @@ ex:TriggersHTTPShape a sh:NodeShape ;
 
 ### Should give a tempalte like this:
 ### { xone : [{ xone : { requiredProperties: qualifiedName, nodeLinks Map {"ex:qualifiedName" → "QualifiedNameShape"} } } ]}
+
+
+
+### TODO: also test conditionals where actually nothing should happen as not all options are required properties.
