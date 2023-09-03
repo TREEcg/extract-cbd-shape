@@ -33,13 +33,16 @@ This is an extension of CBD. It extracts:
  2. all quads with a named graph matching the entity we’re looking up
 
 To be discussed:
- 3. _Should it also extract all RDF reification quads?_ (Included in the original CBD)
- 4. _Should it also extract all singleton properties?_
- 5. _Should it also extract RDF* annnotations?_
+ 1. _Should it also extract all RDF reification quads?_ (Included in the original CBD)
+ 2. _Should it also extract all singleton properties?_
+ 3. _Should it also extract RDF* annnotations?_
 
 If no triples were found based on CBD, it does an HTTP request to the entity’s IRI (fallback to IRI dereferencing)
 
-Next, it takes _hints_ (it does not guarantee a result that validates) from an optional SHACL shapes graph. It only uses the parts relevant for discovery for the [SHACL Core Constraint Components](https://www.w3.org/TR/shacl/#core-components). It does not support SPARQL or Javascript.
+Next, it takes _hints_ (it does not guarantee a result that validates) from an optional SHACL shapes graph. It only uses the parts relevant for discovery from the [SHACL Core Constraint Components](https://www.w3.org/TR/shacl/#core-components). It does not support SPARQL or Javascript.
+
+### Creating the Shape Template from SHACL
+
  1. Checks if the Shape is deactivated first
  2. All links to nodes that are given, in conditionals or not, are added to the shape’s NodeLinks array. The paths matched by the nodelinks will be processed on that matching namednode in the data
  3. Processes all `sh:property` links to property shapes. Only marks a property as required if `sh:minCount` > 0. It does not validate cardinalities.
@@ -51,3 +54,37 @@ Next, it takes _hints_ (it does not guarantee a result that validates) from an o
 It won’t:
  1. Process more complex validation instructions that are part of SHACL such as `sh:class`, inLanguage, pattern, value, qualified value shapes, etc. It is the data publisher’s responsibility to provide valid data, or it is the responsibility of the user of the library to validate the quads afterwards.
  2. Do automatic target selection based on e.g., targetClass: you need to set the target.
+
+
+### Creating the Shape Template from ShEx
+
+_TODO_
+
+### Processing the Shape Template
+
+The Shape template looks like this:
+
+```javascript
+Shape {
+    requiredPaths: Path[], // Can trigger an HTTP request if not set
+    optionalPaths: Path[], // Also include the deeper down paths, if they are set
+    nodelinks: NodeLink[], // If this path is set, we need to re-do the algorithm on that named node with the shape linked in the nodelink.
+    atLeastOneLists: [ Shape[] ]  // Each atLeastOneList is an array of at least one shape with one or more required paths that must be set, or it will trigger an HTTP request.
+}
+NodeLink {
+    shape: Shape,
+    path: Path
+}
+```
+
+The algorithm then works as follows:
+
+First focus node = tree:member object
+ * Start from focus node. If shape isn’t closed, apply CBD.
+ * If this is a named node and it wasn’t requested before:
+    - test if all required properties are set, if not do an HTTP request, if yes, ↓
+    - test if at least one of each list in the atLeastOneLists was set. If not, do an HTTP request.
+ * Visit all paths (required, optional, nodelinks and recursively the shapes in the atLeastOneLists if their required paths are set) paths and add all quads necessary to reach the targets to the result
+ * For the results of nodelinks, if the target is a named node, set it as a focus node and repeat this algorithm with that nodelink’s shape as a shape
+
+When the shape is open, we can take into account some triples are already going to be found by CBD and can be ommitted.

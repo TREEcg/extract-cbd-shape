@@ -1,166 +1,7 @@
 import { NamedNode, Quad, Store, Term, BlankNode } from "n3";
+import { AlternativePathItem, InversePathItem, OneOrMorePathItem, PathItem, PathPattern, PredicateItem, ZeroOrMorePathItem, ZeroOrOnePathItem } from "./Path";
 
-export class Property {   
-    node?: Shape;
-    constructor() {
-    }
-}
-
-export abstract class PathItem {
-    value: PathPattern|NamedNode|Array<PathPattern>;
-    constructor (value:PathPattern|NamedNode|Array<PathPattern>){
-        this.value = value;
-    }
-}
-
-export class PredicateItem extends PathItem{
-    constructor (value:NamedNode){
-        super(value);
-    }
-}
-export class AlternativePathItem extends PathItem{
-    constructor (value: Array<PathPattern>) {
-        super(value)
-    }
-}
-export class InversePathItem extends PathItem{
-    constructor (value:PathPattern|NamedNode){
-        super(value);
-    }
-}
-
-export class ZeroOrMorePathItem extends PathItem{
-    
-}
-
-export class OneOrMorePathItem extends PathItem{
-    
-}
-
-export class ZeroOrOnePathItem extends PathItem{
-    
-}
-
-export class PathPattern {
-    pathItems:Array<PathItem>;
-    constructor (pathItems: Array<PathItem>) {
-        this.pathItems = pathItems;
-    }
-    
-    /**
-     * Converts it to a SPARQL property path for easy output
-     * @returns SPARQL property path string
-     */
-    public toString () {
-        let str = "";
-        let i = 0;
-        if (this.pathItems.length > 1) {
-            str+= "(";
-        }
-        for (let item of this.pathItems) {
-            if (item instanceof PredicateItem) {
-                str+= "<"+item.value.value+">";
-            } else if (item instanceof InversePathItem) {
-                str+= "^" + item.value.toString();
-            } else if (item instanceof AlternativePathItem) {
-                for (let alternate of item.value) {
-                    str+= alternate.value.toString() + "|";
-                }
-            } else if (item instanceof ZeroOrOnePathItem){
-                str+= item.value.toString() + "? ";
-            } else if (item instanceof ZeroOrMorePathItem){
-                str+= item.value.toString() + "* ";
-            } else if (item instanceof OneOrMorePathItem){
-                str+= item.value.toString() + "+ ";
-            }
-            //if this is not the last item, we’re dealing with a sequence path, so add a slash for the next item
-            if (i !== this.pathItems.length-1) {
-                str += "/";
-            }
-            i++;
-        }
-        if (this.pathItems.length > 1) {
-            str+= ")";
-        }
-        return str;
-    }
-    
-    public * match (store:Store, focusNode: Term, pathItems?:Array<PathItem>, currentPath?: Array<Quad>, inverse?:boolean): Generator<Array<Quad>> {
-        //returns all real paths that match the path pattern starting from the focusNode        
-        if (!currentPath) {
-            currentPath = [];
-        }
-        if (!pathItems) {
-            pathItems = this.pathItems;
-        }
-        //Work out each item, building further
-        //and concatenate it with the rest of all possible solutions of the rest. Yield solutions one by one if it’s the last element in the array
-        let pathItem = pathItems[0];
-        
-        if (pathItem instanceof PredicateItem) {
-            //Look up the quad, on the focus node in the store, if one or more exists, loop through them, add them to possible yielded solutions, and continue
-            let quads = [];
-            if (!inverse)
-                quads = store.getQuads(focusNode, pathItem.value );
-            else 
-                quads = store.getQuads(null, pathItem.value, focusNode );
-            for (let quad of quads) {
-                //Each of these is a possibility for more matches
-                let newCurrentPath = [...currentPath];
-                newCurrentPath.push(quad);
-                // console.log(newCurrentPath, currentPath);
-                //If there are no elements left, we are yielding our result
-                if (pathItems.length === 1) {
-                    yield newCurrentPath;
-                } else {
-                    //Go deeper and yield the results of the function in here
-                    let newFocusNode = inverse?quad.subject:quad.object;
-                    let restMatches = this.match(store, newFocusNode, pathItems.slice(1), currentPath)
-                    let restMatch = restMatches.next();
-                    while (!restMatch.done) {
-                        yield restMatch.value;
-                        restMatch = restMatches.next();
-                    }
-                }
-            }
-        } else if (pathItem instanceof InversePathItem) {
-            //Match everything inside, but add a flag inverse - then continue the sequence path, if there are more, and add the result here.
-            //pathItem will be a new pathpattern, but we need to extract it with inverse true and make sure a new current path is created for every result
-            let inverseMatches = this.match(store, focusNode, pathItem.value.pathItems, currentPath, true);
-            //For every match, add it to a currentPath and continue the sequence
-            let inverseMatchesArray = Array.from(inverseMatches);
-            for (let match of  inverseMatchesArray) {
-                let newCurrentPath = [...currentPath, ...match]; // create a copy and concat with the path from the matches
-                //If there are no elements left in the rest of the sequence path, we are yielding our result
-                if (pathItems.length === 1) {
-                    yield newCurrentPath;
-                } else {
-                    //Otherwise, we need to handle the rest of the sequence path by starting from our last focusnode and path
-                    //Also pass the current inverse in case we’re already in an inverse. Would be really weird, but hey, who are we to judge anyone’s shape
-                    // ???? Should we get the last element’s object or subject here????
-                    let restMatches = this.match(store, match[match.length-1].object, pathItems.slice(1), newCurrentPath, inverse);
-                    let restMatch = restMatches.next();
-                    while (!restMatch.done) {
-                        yield restMatch.value;
-                        restMatch = restMatches.next();
-                    }
-                }
-            }
-        } else if(pathItem instanceof ZeroOrOnePathItem) {
-            console.error('No support yet for Zero Or One path');
-        } else if (pathItem instanceof OneOrMorePathItem) {
-            console.error('No support yet for One or More path');
-        } else if (pathItem instanceof ZeroOrMorePathItem){
-            console.error('No support yet for Zero Or More path');
-            
-        } else if (pathItem instanceof AlternativePathItem) {
-            console.error('No support yet for Alternative path');
-        }
-        //All potential matches we need to further study...
-        
-    }
-}
-
+//TODO: split this file up between Shape functionality and SHACL to our Shape class conversion steps. Also introduce a ShEx to Shape Template
 export class NodeLink {
     public pathPattern : PathPattern;
     public link: string;
@@ -171,26 +12,20 @@ export class NodeLink {
 }
 
 export class Shape {
+    closed: boolean;
     nodeLinks: Array<NodeLink>;
     requiredPaths: Array<PathPattern> ;
-    orLists: Array<Array<Shape>>;
+    optionalPaths: Array<PathPattern>;
+    atLeastOneLists: Array<Array<Shape>>;
     constructor () {
         //All properties will be added, but if a required property is not available, then we need to further look it up
         this.requiredPaths = [];
         //If there’s a nodelink through one of the properties, I want to know what other shape to look up in the shapesgraph from there
         this.nodeLinks = [];
-        this.orLists = [];
+        this.atLeastOneLists = [];
+        this.optionalPaths = [];
+        this.closed = false; //default value
     }
-}
-
-export class EvaluatedOrShape extends Shape {
-    nodeLinks: Array<NodeLink>;
-    //If this invalid is true, we know for sure it is invalid. If it is false, we are unsure, as we didn’t fully validate it.
-    invalid : boolean;
-    constructor () {
-        super();
-        this.invalid = false;
-    }   
 }
 
 export class ShapesGraph {
@@ -259,13 +94,16 @@ export class ShapesGraph {
         if (!path) {
             return false; //this isn’t a property shape...
         }
-        //Only support predicate paths for now TODO
+
         let pathPattern = this.constructPathPattern(shapeStore, path);
         
         let minCount = shapeStore.getObjects(propertyShapeId, "http://www.w3.org/ns/shacl#minCount");
         
         if ((minCount[0] && minCount[0].value !== "0") || required) {
             shape.requiredPaths.push(pathPattern);
+        } else {
+            //TODO: don’t include node links?
+            shape.optionalPaths.push(pathPattern);
         }
         // **TODO**: will the sh:or, sh:xone, sh:and, etc. be of use here? It won’t contain any more information about possible properties?
         // Maybe to potentially point to another node, xone a datatype?
@@ -315,12 +153,14 @@ export class ShapesGraph {
         }
         //Process zero or more sh:xone and sh:or lists in the same way
         for (let xoneOrOrList of shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#xone").concat( shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#or"))) {
-            shape.orLists.push(this.rdfListToArray(shapeStore, xoneOrOrList).map((val): Shape => {
-                    let newShape = new Shape();
-                    this.preprocessShape(shapeStore, val, newShape);
-                    //Add this one to the shapesgraph
-                    return newShape;
-                }));
+            let atLeastOneList : Array<Shape> = this.rdfListToArray(shapeStore, xoneOrOrList).map((val): Shape => {
+                let newShape = new Shape();
+                //Create a new shape and process as usual -- but mind that we don’t trigger a circular shape here...
+                this.preprocessShape(shapeStore, val, newShape);
+                return newShape;
+                //Add this one to the shapesgraph
+            });
+            shape.atLeastOneLists.push(atLeastOneList);
         }
         //And finally, we’re just ignoring sh:not. Don’t process this one
         

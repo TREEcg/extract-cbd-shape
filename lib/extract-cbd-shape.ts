@@ -1,5 +1,6 @@
 import rdfDereference, { RdfDereferencer } from "rdf-dereference";
-import { EvaluatedOrShape, PathPattern, PredicateItem, Shape, ShapesGraph } from "./Shape";
+import { NodeLink, Shape, ShapesGraph } from "./Shape";
+import { PathPattern, PathResult, PredicateItem } from "./Path"
 import { Store, NamedNode, Quad, Term, BlankNode} from "n3";
 
 /**
@@ -43,13 +44,13 @@ export class CBDShapeExtractor {
      * @returns Promise of a quad array of the described entity
      */
     public async extract (store: Store, id: Term, shapeId?:Term): Promise<Array<Quad>> {
-        let result = (await this.extractRecursively(store, id, shapeId?shapeId.value:null, []))
+        let result = (await this.extractRecursively(store, id, shapeId?shapeId.value:null, [], []))
         .concat(store.getQuads(null,null,null,id));// also add the quads where the named graph matches the current id
         if (result.length === 0) {
             //Dereference and try again to extract them from the store
             console.error('Dereferencing ' + id.value + " as there were no quads found at all");
             await this.loadQuadStreamInStore(store, (await this.dereferencer.dereference(id.value)).data);
-            result = (await this.extractRecursively(store, id, shapeId?shapeId.value:null, []))
+            result = (await this.extractRecursively(store, id, shapeId?shapeId.value:null, [], [id]))
                                 .concat(store.getQuads(null,null,null,id));
         }
         //When returning the quad array, remove duplicate triples as CBD, required properties, etc. could have added multiple times the same triple
@@ -59,140 +60,145 @@ export class CBDShapeExtractor {
     }
 
     /**
-     * Processes orLists:
-     *  - per orList, it checks all items. For all items, it concatenates the nodelinks to one result: these are all possibilities that may be considered
-     *  - per orList, it checks whether at least 1 match has been found based on the required properties. If not, an HTTP request should be triggered
+     * Will check whether all required paths work
      * @param store 
-     * @param currentEntityId 
      * @param shape 
-     * @returns A promise
+     * @param focusNode 
+     * @returns 
      */
-    private async orListsToShapeWithoutOrLists(store: Store, currentEntityId: Term, shape:Shape): Promise<EvaluatedOrShape> {
-        let result: EvaluatedOrShape = new EvaluatedOrShape();
-        //The variable checking whether all OrLists were valid
-        let allOrListsValid = true;
-        //Process all orLists
-        for (let orList of shape.orLists) {
-            //Check nodelists first and add them to the result
-            let atLeastOne = false;
-            for (let orItem of orList) {
-                //If an orItem has an orList inside, process and flatten it again first
-                let evaluatedOrShape = new EvaluatedOrShape();
-                if (orItem.orLists.length > 0) {
-                    evaluatedOrShape = await this.orListsToShapeWithoutOrLists(store, currentEntityId, orItem);
-                }
-                //Add all nodeLinks on a big pile in the results object /// TODO -- this can probably already be done beforehand and we only need to check requiredproperties?
-                result.nodeLinks = result.nodeLinks.concat(orItem.nodeLinks).concat(evaluatedOrShape.nodeLinks);
-                let allRequiredPathsSet = true;
-                for (let requiredPath of orItem.requiredPaths) {
-                    let matches = requiredPath.match(store, currentEntityId);
-                    let match = matches.next();
-                    //Check whether one or more exist
-                    if (match.value) {
-                        //Check if the property is set, if not, change the allRequiredPathsSet to false and break out of this loop as this won’t be a match
-                        allRequiredPathsSet = false;
-                        break;
-                    }
-                }
-                //Now we need to check whether this orItem validates. This can be check based on what evaluatedOrShape gives us something and whether the required paths on this one work.
-                if (!evaluatedOrShape.invalid && allRequiredPathsSet) {
-                    atLeastOne = true;
-                }
-            }
-            if (!atLeastOne) {
-                allOrListsValid = false;
+    private validRequiredPaths (store: Store, shape:Shape, focusNode: Term): boolean {
+        for (let path of shape.requiredPaths) {
+            let matchIterator = path.match(store, focusNode);
+            if (!matchIterator.next().value) {
+                return false;
             }
         }
-        if (!allOrListsValid)
-            result.invalid = true;
-        return result;
+        return true;
     }
 
-    private async extractRecursively (store: Store, id: Term, shapeId:string, extracted: Array<string>): Promise<Array<Quad>> {
+    /**
+     * Given a shape, it will check whether all atLeastOneLists validate
+     * @param store 
+     * @param shape 
+     * @param focusNode 
+     * @returns 
+     */
+    private validAtLeastOneLists (store: Store, shape:Shape, focusNode: Term): boolean {
+        for (let list of shape.atLeastOneLists) {
+            let atLeastOne = false;
+            for (let item of list) {
+                if (this.validRequiredPaths(store, item, focusNode) && this.validAtLeastOneLists(store, item, focusNode)) {
+                    atLeastOne = true;
+                    break;
+                }
+            }
+            if (!atLeastOne)
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * Fills the extraPaths and extraNodeLinks parameters with the ones from valid items in the atLeastOneLists
+     * @param store 
+     * @param shape 
+     * @param id 
+     * @param extraPaths 
+     * @param extraNodeLinks 
+     */
+    private recursivelyProcessAtLeastOneLists(store:Store, shape:Shape, id: Term, extraPaths: Array<PathPattern>, extraNodeLinks: Array<NodeLink>) {
+        for (let list of shape.atLeastOneLists) {
+            for (let item of list) {
+                if (this.validRequiredPaths(store, item, id) && this.validAtLeastOneLists(store, item, id)) {
+                    extraPaths.push(... item.requiredPaths);
+                    extraPaths.push(... item.optionalPaths);
+                    extraNodeLinks.push(... item.nodeLinks);
+                    this.recursivelyProcessAtLeastOneLists(store, item, id, extraPaths, extraNodeLinks);
+                }
+            }
+        }
+    }
+
+    private async extractRecursively (store: Store, id: Term, shapeId:string | Shape, extracted: Array<string>, dereferenced: Array<string>): Promise<Array<Quad>> {
         //If it has already been extracted, don’t extract it again: prevents cycles
         if (extracted.includes(id.value)) {
             return [];
         }
-        let dereferenced = false;
         extracted.push(id.value);
         let result: Quad[] = [];
         let shape: Shape;
-        let orResultShape = new EvaluatedOrShape(); 
-        //First, let’s check whether all required paths on this node are available. If not, we’re going to have to do an HTTP request to the current one
-        if (shapeId && this.shapesGraph) {
+        if (shapeId instanceof Shape) {
+            shape = shapeId;
+        } else if (shapeId && this.shapesGraph)
             shape = this.shapesGraph.shapes.get(shapeId);
-            let processedPaths : Array<PathPattern> = [];
-            //Process the orlist
-            if (shape.orLists.length > 0) {
-                orResultShape = await this.orListsToShapeWithoutOrLists(store,id,shape);
-                if (orResultShape.invalid && !dereferenced) {
-                    console.error('Dereferencing ' + id.value + " as none of the OR or XONE conditions were met");
-                    await this.loadQuadStreamInStore(store, (await this.dereferencer.dereference(id.value)).data);
-                    //We will not retry the algorithm again, because the nodelinks are already processed as a whole anyway.
-                    dereferenced = true;
-                }
-            }
-            
-            for (let path of shape.requiredPaths) {    
-                let matches = path.match(store, id);
-                let match = matches.next();
-                if (!match.value && !dereferenced) { // apparently there are no (1 or more) matches at all with this required Path
-                    //Need to do an extra HTTP request, probably want to log this somehow (TODO)
-                    console.error('Dereferencing ' + id.value + " as required path " + path + " wasn’t set");
-                    await this.loadQuadStreamInStore(store, (await this.dereferencer.dereference(id.value)).data);
-                    //recheck all matches now
-                    matches = path.match(store, id);
-                    match = matches.next();
-                    // Only do this once, because why would we do this more often?
-                    dereferenced = true;
-                } 
-                if (match.value && !(path.pathItems.length === 1 && path.pathItems[0] instanceof PredicateItem)){
-                    //Only adds the found quads to the result if it’s not a predicate path, because these are going to be found by CBD (next step) anyway
-                    // And don’t add the first quad because this quad is going to be certainly found by CBD as well
-                    match.value.shift();
-                    result = result.concat(match.value); //should we remove blank nodes, as these are also going to be found by CBD?
-                    // And do this for all matches that were found
-                    while (!match.done) {
-                        match.value.shift();
-                        result = result.concat(match.value);
-                        match = matches.next();
-                    }
-                }
-                processedPaths.push(path);
-            }
-            //Next, let’s find all nodelinks, and add all paths that are not going to be found by CBD, and process them again with this algorithm.
-            for (let nodeLink of shape.nodeLinks.concat(orResultShape.nodeLinks)) {
-                //Find all matches with the path
-                let matches = nodeLink.pathPattern.match(store, id);
-                let match = matches.next();
-                while (!match.done) {
-                    //Follow the nodelink → of the match of course
-                    let nodeLinkPathQuads: Array<Quad> = match.value;
-                    //If the found object in the path is a namednode, let’s do the extract recursively again
-                    let object = nodeLinkPathQuads[nodeLinkPathQuads.length-1].object;
-                    //Only check namednodes: blank nodes are already further checked anyway
-                    result = result.concat(await this.extractRecursively(store, object, nodeLink.link, extracted));
-                    if (!(nodeLink.pathPattern.pathItems.length === 1 && nodeLink.pathPattern.pathItems[0] instanceof PredicateItem)) {
-                        nodeLinkPathQuads.shift()
-                        result.concat(nodeLinkPathQuads);
-                    }
-                    match = matches.next();
-                }
+
+        // First, let’s check whether we need to do an HTTP request:
+        //  -- first, this id:Term needs to be an instanceof NamedNode - because otherwise we have nothing to dereference
+        //  --- Next, we can check the required paths
+        //  ----If all paths are set, only then we should also check the atLeastOneLists and check whether it contains a list where none items have set their required properties.
+        if (id instanceof NamedNode && shape) {
+            //Check required paths and lazy evaluate the atLeastOneLists
+            if (!(this.validRequiredPaths(store,shape,id) && this.validAtLeastOneLists(store,shape,id))) {
+                //Need to do an extra HTTP request, probably want to log this somehow (TODO)
+                console.error('Dereferencing ' + id.value + " as required paths were not set (or all conditionals were not met)");
+                await this.loadQuadStreamInStore(store, (await this.dereferencer.dereference(id.value)).data);
+                dereferenced.push(id.value);
             }
         }
 
-        //Now, just perform CBD and we’re done
+        // Next, on our newly fetched data,
+        // we’ll need to process all paths of the shape. If the shape is open, we’re going to do CBD afterwards, so let’s omit paths with only a PredicatePath when the shape is open
+        if (shape) {
+            //For all valid items in the atLeastOneLists, process the required path, optional paths and nodelinks. Do the same for the atLeastOneLists inside these options.
+            let extraPaths = [];
+            let extraNodeLinks = [];
+
+            //Process atLeastOneLists in extraPaths and extra NodeLinks
+            this.recursivelyProcessAtLeastOneLists(store, shape, id, extraPaths, extraNodeLinks);
+            
+            //TODO: if the shape is open and thus CBD is going to take place, remove the first element from the quads list of the matches.
+            for (let path of shape.requiredPaths.concat(shape.optionalPaths,extraPaths)) {
+                if (shape.closed || !(path.pathItems.length === 1 && path.pathItems[0] instanceof PredicateItem )) {
+                    result = result.concat(...Array.from(path.match(store, id))); //concat all quad paths in the results
+                }
+            }
+            for (let nodeLink of shape.nodeLinks.concat(extraNodeLinks)) {
+                let matches = Array.from(nodeLink.pathPattern.match(store, id));
+                for (let match of matches) {
+                    result = result.concat(await this.extractRecursively(store, match.target, nodeLink.link, extracted, dereferenced));
+                }
+                if (shape.closed || !(nodeLink.pathPattern.pathItems.length === 1 && nodeLink.pathPattern.pathItems[0] instanceof PredicateItem )) {
+                    result = result.concat(...matches.map((item:PathResult) => { return item.path} )); //concat all quad paths in the results
+                }
+            }
+
+        }
+        //Perform CBD and we’re done, except on the condition there’s a shape defined and it’s closed
+        if (!(shape && shape.closed)) {
+            this.CBD(result, store, id, extracted);
+        }
+        return result;
+    }
+
+    /**
+     * Performs Concise Bounded Description: extract star-shape and recurses over the blank nodes
+     * @param result 
+     * @param store 
+     * @param id 
+     * @param extracted
+     */
+    public async CBD (result: Quad[], store: Store, id: Term, extracted: Array<string>) {
         const quads = store.getQuads(id,null,null,null);
         //Iterate over the quads, add them to the result and check whether we should further get other quads based on blank nodes or the SHACL shape
         for (const q of quads) {
             result.push(q);
             // Conditionally get more quads: if it’s a not yet extracted blank node
             if (q.object instanceof BlankNode && !extracted.includes(q.object.value)) {
-                result = result.concat(await this.extractRecursively(store, q.object, null, extracted));
+                //only perform CBD again recursively on the blank node
+                await this.CBD(result, store, q.object, extracted);
                 extracted.push(q.object);
             }
         }
-
-        return result;
+        //Should we also take into account RDF* and/or RDF reification systems here?
     }
 }

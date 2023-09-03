@@ -16,11 +16,11 @@ describe('Test shape template of the logical edge cases', function () {
         
     })
     it("Check whether a circular Xone shape works", async () => {
-        //console.log(shapesGraph.shapes.get('http://example.org/CircularXoneShape').orLists.flat(10));//.xone[0][0].xone[0][0]);
-        assert(shapesGraph.shapes.get('http://example.org/TriggersHTTPShape').orLists[0][0].orLists[0][0].nodeLinks.length > 0);
+        //console.log(shapesGraph.shapes.get('http://example.org/CircularXoneShape').atLeastOneLists.flat(10));//.xone[0][0].xone[0][0]);
+        assert(shapesGraph.shapes.get('http://example.org/TriggersHTTPShape').atLeastOneLists[0][0].atLeastOneLists[0].length > 0);
     })
     it("Check whether the XONE condition works 2 levels deep", async () => {
-        //console.log(shapesGraph.shapes.get('http://example.org/TriggersHTTPShape').orLists[0][0].orLists.flat(10));//.xone[0][0].xone[0][0]);
-        assert(shapesGraph.shapes.get('http://example.org/TriggersHTTPShape').orLists[0][0].orLists[0][0].nodeLinks.length > 0);
+        //console.log(shapesGraph.shapes.get('http://example.org/TriggersHTTPShape').atLeastOneLists[0][0].atLeastOneLists.flat(10));//.xone[0][0].xone[0][0]);
+        assert(shapesGraph.shapes.get('http://example.org/TriggersHTTPShape').atLeastOneLists[0][0].atLeastOneLists[0].length > 0);
     })
 });
