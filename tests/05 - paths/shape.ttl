@@ -28,6 +28,7 @@ ex:SequenceAndInversePathShape a sh:NodeShape ;
 
  # Double inverse path
 ex:DoubleInversePathShape a sh:NodeShape ;
+    sh:closed true;
     sh:property [
         sh:path ([sh:inversePath [sh:inversePath ex:p1 ] ]) ;
         sh:minCount 1

@@ -183,7 +183,10 @@ export class CBDShapeExtractor {
 
         //Perform CBD and we’re done, except on the condition there’s a shape defined and it’s closed
         if (!(shape && shape.closed)) {
+            //console.log(shape.closed)
             this.CBD(result, store, id, extracted);
+        } else {
+            console.error("CLOSED SHAPE");
         }
         return result;
     }

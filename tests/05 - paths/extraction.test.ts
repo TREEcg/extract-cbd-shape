@@ -37,10 +37,10 @@ describe('Check whether paths trigger the right extraction process', function ()
         assert.equal(result.length, 1);
     })
     it("Test a double inverse path", async () => {
-        let result = await extractor.extract(dataStore, new NamedNode("http://example.org/B"), new NamedNode("http://example.org/InversePathShape"));
-        /*let writer = new Writer();
+        let result = await extractor.extract(dataStore, new NamedNode("http://example.org/B"), new NamedNode("http://example.org/DoubleInversePathShape"));
+        let writer = new Writer();
         writer.addQuads(result);
-        writer.end((err, res) => {console.log(res);});*/
+        writer.end((err, res) => {console.log(res);});
         assert.equal(result.length, 1);
     })
     it("Test an inverse with a sequence path combo", async () => {

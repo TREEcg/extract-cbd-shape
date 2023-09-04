@@ -135,6 +135,12 @@ export class ShapesGraph {
     * @param shape 
     */
     protected preprocessNodeShape(shapeStore: Store, nodeShapeId: string, shape: Shape) {
+        //Check if it’s closed or open
+        let closedIndicator: Term = shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#closed")[0];
+        if (closedIndicator && closedIndicator.value === "true") {
+            shape.closed = true;
+        }
+
         //Process properties if it has any
         let properties = shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#property");
         for (let prop of properties) {
@@ -142,16 +148,15 @@ export class ShapesGraph {
         }
         
         // process sh:and: just add all IDs to this array
-        // Process everything you can find nested in AND or OR clauses
-        // Reason why we must process OR and AND in the same way for discovery is provided in the README.md
+        // Process everything you can find nested in AND clauses
         for (let andList of shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#and")) {
             // Try to process it as a property shape
-            //for every andList found, iterate through it and try to preprocess the property shape, if doesn’t work, preprocess as a nodeshape again
+            //for every andList found, iterate through it and try to preprocess the property shape
             for (let and of this.rdfListToArray(shapeStore, andList)) {
                 this.preprocessShape(shapeStore, and, shape);
             }
         }
-        //Process zero or more sh:xone and sh:or lists in the same way
+        //Process zero or more sh:xone and sh:or lists in the same way -- explanation in README why they can be handled in the same way
         for (let xoneOrOrList of shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#xone").concat( shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#or"))) {
             let atLeastOneList : Array<Shape> = this.rdfListToArray(shapeStore, xoneOrOrList).map((val): Shape => {
                 let newShape = new Shape();
