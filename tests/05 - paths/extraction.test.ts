@@ -4,8 +4,6 @@ import {CBDShapeExtractor} from '../../lib/extract-cbd-shape';
 import rdfDereference from 'rdf-dereference';
 
 describe('Check whether paths trigger the right extraction process', function () {
-    this.timeout(25000); 
-
     let shapeStore = new Store();
     let extractor;
     let dataStore = new Store();
@@ -24,9 +22,9 @@ describe('Check whether paths trigger the right extraction process', function ()
     })
     it("Test sequence path", async () => {
         let result = await extractor.extract(dataStore, new NamedNode("http://example.org/B"), new NamedNode("http://example.org/SequencePathShape"));
-        let writer = new Writer();
+        /*let writer = new Writer();
         writer.addQuads(result);
-        writer.end((err, res) => {console.log(res);});
+        writer.end((err, res) => {console.log(res);});*/
         assert.equal(result.length, 3);
     })
     it("Test an inverse path", async () => {
@@ -38,9 +36,9 @@ describe('Check whether paths trigger the right extraction process', function ()
     })
     it("Test a double inverse path", async () => {
         let result = await extractor.extract(dataStore, new NamedNode("http://example.org/B"), new NamedNode("http://example.org/DoubleInversePathShape"));
-        let writer = new Writer();
+        /*let writer = new Writer();
         writer.addQuads(result);
-        writer.end((err, res) => {console.log(res);});
+        writer.end((err, res) => {console.log(res);});*/
         assert.equal(result.length, 1);
     })
     it("Test an inverse with a sequence path combo", async () => {
@@ -52,9 +50,23 @@ describe('Check whether paths trigger the right extraction process', function ()
     })
     it("Test a zeroOrMore path", async () => {
         let result = await extractor.extract(dataStore, new NamedNode("http://example.org/A"), new NamedNode("http://example.org/ZeroOrMorePathShape"));
-        let writer = new Writer();
+        //let writer = new Writer();
+        //writer.addQuads(result);
+        //writer.end((err, res) => {console.error(res);});
+        assert.equal(result.length, 2);
+    })
+    it("Test a oneOrMore path", async () => {
+        let result = await extractor.extract(dataStore, new NamedNode("http://example.org/A"), new NamedNode("http://example.org/OneOrMorePathShape"));
+        //let writer = new Writer();
+        //writer.addQuads(result);
+        //writer.end((err, res) => {console.error(res);});
+        assert.equal(result.length, 2);
+    })
+    it("Test a alternative path", async () => {
+        let result = await extractor.extract(dataStore, new NamedNode("http://example.org/B"), new NamedNode("http://example.org/AlternativePathShape"));
+        /*let writer = new Writer();
         writer.addQuads(result);
-        writer.end((err, res) => {console.error(res);});
+        writer.end((err, res) => {console.error(res);});*/
         assert.equal(result.length, 2);
     })
 });

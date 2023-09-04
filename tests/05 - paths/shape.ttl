@@ -41,3 +41,24 @@ ex:ZeroOrMorePathShape a sh:NodeShape ;
         sh:path ([sh:zeroOrMorePath ex:p1 ]) ;
         sh:minCount 1
     ] .
+
+ex:OneOrMorePathShape a sh:NodeShape ;
+    sh:closed true;
+    sh:property [
+        sh:path ([sh:oneOrMorePath ex:p1 ]) ;
+        sh:minCount 1
+    ] .
+
+ex:ZeroOrOnePathShape a sh:NodeShape ;
+    sh:closed true;
+    sh:property [
+        sh:path (ex:p1 [sh:zeroOrOnePath ex:p2 ]) ;
+        sh:minCount 1
+    ] .
+
+ex:AlternativePathShape a sh:NodeShape ;
+    sh:closed true;
+    sh:property [
+        sh:path ([sh:alternativePath (ex:p1 ex:p2)]) ;
+        sh:minCount 1
+    ] .

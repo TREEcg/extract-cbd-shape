@@ -47,13 +47,12 @@ describe('Test whether the Patterns are correctly matched', function () {
         //console.log(shapesGraph.shapes.get('http://example.org/SequencePathShape'));
         //console.log(shapesGraph.shapes.get('http://example.org/SequencePathShape').requiredPaths[0].toString());
         let match1 = shapesGraph.shapes.get('http://example.org/SequencePathShape').requiredPaths[0].match(store, new NamedNode("http://example.org/A")).next().value;
-        //console.log(match1. );
         //assert(shapesGraph.shapes.get('http://example.org/SequencePathShape').requiredPaths[0].match(store, new NamedNode("http://example.org/A")));
         
     })
     it("Check whether a double inverse is correctly matched", async () => {
         //console.log(shapesGraph.shapes.get('http://example.org/SequencePathShape'));
-        console.log(shapesGraph.shapes.get('http://example.org/DoubleInversePathShape').requiredPaths[0].toString());
+        //console.log(shapesGraph.shapes.get('http://example.org/DoubleInversePathShape').requiredPaths[0].toString());
         let match1 = shapesGraph.shapes.get('http://example.org/DoubleInversePathShape').requiredPaths[0].match(store, new NamedNode("http://example.org/A")).next().value;
         //console.log(match1. );
         //assert(shapesGraph.shapes.get('http://example.org/SequencePathShape').requiredPaths[0].match(store, new NamedNode("http://example.org/A")));
