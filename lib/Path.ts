@@ -142,7 +142,6 @@ export class PathPattern {
                 } else {
                     //Otherwise, we need to handle the rest of the sequence path by starting from our last focusnode and path
                     //Also pass the current inverse in case we’re already in an inverse. Would be really weird, but hey, who are we to judge anyone’s shape
-                    // ???? Should we get the last element’s object or subject here????
                     let restMatches = this.match(store, match.target,pathItems.slice(1), newCurrentPath, inverse);//inverse?match.path[match.path.length-1].object:match.path[match.path.length-1].subject, pathItems.slice(1), newCurrentPath, inverse);
                     let restMatch = restMatches.next();
                     while (!restMatch.done) {
@@ -152,16 +151,93 @@ export class PathPattern {
                 }
             }
         } else if(pathItem instanceof ZeroOrOnePathItem) {
-            console.error('No support yet for Zero Or One path');
+            //Already add one of the certain matches: the current path with the current focusnode
+            let matches = [new PathResult(currentPath, focusNode)];
+            //Now also add more matches based on the results from the inner zerooronepaths value pathItems 
+            let onePathMatches = this.match(store, focusNode, pathItem.value.pathItems, currentPath, inverse); 
+            for (let match of matches.concat(Array.from(onePathMatches))) {
+                let newCurrentPath = [...currentPath, ...match.path]; // create a copy and concat with the path from the matches
+                //If there are no elements left in the rest of the sequence path, we are yielding our result
+                if (pathItems.length === 1) {
+                    if (newCurrentPath.length > 0)
+                        yield new PathResult(newCurrentPath, match.target);
+                } else {
+                    //Otherwise, we need to handle the rest of the sequence path by starting from our last focusnode and path
+                    let restMatches = this.match(store, match.target,pathItems.slice(1), newCurrentPath, inverse);
+                    let restMatch = restMatches.next();
+                    while (!restMatch.done) {
+                        if (restMatch.value.path.length > 0)
+                            yield restMatch.value;
+                        restMatch = restMatches.next();
+                    }
+                }
+            }
         } else if (pathItem instanceof OneOrMorePathItem) {
-            console.error('No support yet for One or More path');
+            let onePathMatchesArray = Array.from(this.match(store, focusNode, pathItem.value.pathItems, currentPath, inverse));
+            while (onePathMatchesArray.length > 0) {
+                for (let match of onePathMatchesArray) {
+                    let newCurrentPath = [...currentPath, ...match.path]; // create a copy and concat with the path from the matches
+                    //If there are no elements left in the rest of the sequence path, we are yielding our result
+                    if (pathItems.length === 1) {
+                        yield new PathResult(newCurrentPath, match.target);
+                    } else {
+                        //Otherwise, we need to handle the rest of the sequence path by starting from our last focusnode and path
+                        let restMatches = this.match(store, match.target,pathItems.slice(1), newCurrentPath, inverse);
+                        let restMatch = restMatches.next();
+                        while (!restMatch.done) {
+                            yield restMatch.value;
+                            restMatch = restMatches.next();
+                        }
+                    }
+                    onePathMatchesArray = Array.from(this.match(store, match.target, pathItem.value.pathItems, newCurrentPath, inverse));
+                }
+            }
         } else if (pathItem instanceof ZeroOrMorePathItem){
-            console.error('No support yet for Zero Or More path');
-            
+            let matches = [new PathResult(currentPath, focusNode)];
+            let onePathMatchesArray = Array.from(this.match(store, focusNode, pathItem.value.pathItems, currentPath, inverse)).concat(matches);//And concat the zero possibility to the first run
+            while (onePathMatchesArray.length > 0) {
+                for (let match of onePathMatchesArray) {
+                    let newCurrentPath = [...currentPath, ...match.path]; // create a copy and concat with the path from the matches
+                    //If there are no elements left in the rest of the sequence path, we are yielding our result
+                    if (pathItems.length === 1) {
+                        if (newCurrentPath.length > 0)
+                            yield new PathResult(newCurrentPath, match.target);
+                    } else {
+                        //Otherwise, we need to handle the rest of the sequence path by starting from our last focusnode and path
+                        let restMatches = this.match(store, match.target,pathItems.slice(1), newCurrentPath, inverse);
+                        let restMatch = restMatches.next();
+                        while (!restMatch.done) {
+                            if (restMatch.value.path.length > 0)
+                                yield restMatch.value;
+                            restMatch = restMatches.next();
+                        }
+                    }
+                    onePathMatchesArray = Array.from(this.match(store, match.target, pathItem.value.pathItems, newCurrentPath, inverse));
+                }
+            }
         } else if (pathItem instanceof AlternativePathItem) {
-            console.error('No support yet for Alternative path');
+            //This forks the thing to everything in the list of the alternativePathItem
+            for (let pathPattern of pathItem.value) {
+                let subMatchesArray = Array.from(this.match(store, focusNode, pathPattern.pathItems, currentPath, inverse));//And concat the zero possibility to the first run
+                for (let match of subMatchesArray) {
+                    let newCurrentPath = [...currentPath, ...match.path];
+                    if (pathItems.length === 1) {
+                        if (newCurrentPath.length > 0) {
+                            yield new PathResult(newCurrentPath, match.target);
+                        } else {
+                            //Otherwise, we need to handle the rest of the sequence path by starting from our last focusnode and path
+                            let restMatches = this.match(store, match.target,pathItems.slice(1), newCurrentPath, inverse);
+                            let restMatch = restMatches.next();
+                            while (!restMatch.done) {
+                                if (restMatch.value.path.length > 0)
+                                    yield restMatch.value;
+                                restMatch = restMatches.next();
+                            }
+                        }
+                    }
+                }
+            }
         }
         //All potential matches we need to further study are further processed in the recursive function
-        
     }
 }

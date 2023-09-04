@@ -50,4 +50,11 @@ describe('Check whether paths trigger the right extraction process', function ()
         writer.end((err, res) => {console.error(res);});*/
         assert.equal(result.length, 2);
     })
+    it("Test a zeroOrMore path", async () => {
+        let result = await extractor.extract(dataStore, new NamedNode("http://example.org/A"), new NamedNode("http://example.org/ZeroOrMorePathShape"));
+        let writer = new Writer();
+        writer.addQuads(result);
+        writer.end((err, res) => {console.error(res);});
+        assert.equal(result.length, 2);
+    })
 });

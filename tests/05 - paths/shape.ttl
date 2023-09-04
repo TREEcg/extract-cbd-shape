@@ -33,3 +33,11 @@ ex:DoubleInversePathShape a sh:NodeShape ;
         sh:path ([sh:inversePath [sh:inversePath ex:p1 ] ]) ;
         sh:minCount 1
     ] .
+
+# Zero or More path
+ex:ZeroOrMorePathShape a sh:NodeShape ;
+    sh:closed true;
+    sh:property [
+        sh:path ([sh:zeroOrMorePath ex:p1 ]) ;
+        sh:minCount 1
+    ] .
