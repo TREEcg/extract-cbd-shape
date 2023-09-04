@@ -156,23 +156,31 @@ export class CBDShapeExtractor {
             //Process atLeastOneLists in extraPaths and extra NodeLinks
             this.recursivelyProcessAtLeastOneLists(store, shape, id, extraPaths, extraNodeLinks);
             
-            //TODO: if the shape is open and thus CBD is going to take place, remove the first element from the quads list of the matches.
             for (let path of shape.requiredPaths.concat(shape.optionalPaths,extraPaths)) {
                 if (shape.closed || !(path.pathItems.length === 1 && path.pathItems[0] instanceof PredicateItem )) {
-                    result = result.concat(...Array.from(path.match(store, id))); //concat all quad paths in the results
+                    result = result.concat(...Array.from(path.match(store, id)).map((pathResult: PathResult) => {
+                        //if the shape is open and thus CBD is going to take place, remove the first element from the quads list of the matches, if the subject of that first item is the focusnode (otherwise the first element was a reverse path)
+                        if (!shape.closed && pathResult.path[0].subject.value === id.value)
+                            pathResult.path.shift();
+                        return pathResult.path;
+                    })); //concat all quad paths in the results
                 }
             }
+
             for (let nodeLink of shape.nodeLinks.concat(extraNodeLinks)) {
                 let matches = Array.from(nodeLink.pathPattern.match(store, id));
                 for (let match of matches) {
+                    //remove the first path element if the shape is open and if the subject of the first element is the current id, as it’s going to be found by CBD
+                    if (!shape.closed && match.path[0].subject.value === id.value)
+                        match.path.shift();
                     result = result.concat(await this.extractRecursively(store, match.target, nodeLink.link, extracted, dereferenced));
                 }
                 if (shape.closed || !(nodeLink.pathPattern.pathItems.length === 1 && nodeLink.pathPattern.pathItems[0] instanceof PredicateItem )) {
                     result = result.concat(...matches.map((item:PathResult) => { return item.path} )); //concat all quad paths in the results
                 }
             }
-
         }
+
         //Perform CBD and we’re done, except on the condition there’s a shape defined and it’s closed
         if (!(shape && shape.closed)) {
             this.CBD(result, store, id, extracted);

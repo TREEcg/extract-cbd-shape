@@ -1,12 +1,6 @@
 import { NamedNode, Quad, Store, Term, BlankNode } from "n3";
 import {Shape} from "./Shape";
 
-export class Property {
-    node?: Shape;
-    constructor() {
-    }
-}
-
 export abstract class PathItem {
     value: PathPattern|NamedNode|Array<PathPattern>;
     constructor (value:PathPattern|NamedNode|Array<PathPattern>){
@@ -117,15 +111,16 @@ export class PathPattern {
             for (let quad of quads) {
                 //Each of these is a possibility for more matches
                 let newCurrentPath = [...currentPath];
+
                 newCurrentPath.push(quad);
                 // console.log(newCurrentPath, currentPath);
                 //If there are no elements left, we are yielding our result
+                let newFocusNode = inverse?quad.subject:quad.object;
                 if (pathItems.length === 1) {
-                    yield new PathResult(newCurrentPath, inverse?newCurrentPath[newCurrentPath.length-1].subject:newCurrentPath[newCurrentPath.length-1].object);
+                    yield new PathResult(newCurrentPath, newFocusNode);
                 } else {
                     //Go deeper and yield the results of the function in here
-                    let newFocusNode = inverse?quad.subject:quad.object;
-                    let restMatches = this.match(store, newFocusNode, pathItems.slice(1), currentPath)
+                    let restMatches = this.match(store, newFocusNode, pathItems.slice(1), newCurrentPath)
                     let restMatch = restMatches.next();
                     while (!restMatch.done) {
                         yield restMatch.value;
@@ -136,19 +131,19 @@ export class PathPattern {
         } else if (pathItem instanceof InversePathItem) {
             //Match everything inside, but add a flag inverse - then continue the sequence path, if there are more, and add the result here.
             //pathItem will be a new pathpattern, but we need to extract it with inverse true and make sure a new current path is created for every result
-            let inverseMatches = this.match(store, focusNode, pathItem.value.pathItems, currentPath, true);
+            let inverseMatches = this.match(store, focusNode, pathItem.value.pathItems, currentPath, !inverse); //!inverse → change the inversion as a double inverse should also work
             //For every match, add it to a currentPath and continue the sequence
-            let inverseMatchesArray = Array.from(inverseMatches);
-            for (let match of inverseMatchesArray) {
+            for (let match of Array.from(inverseMatches)) {
+                let newFocusNode = match.target;
                 let newCurrentPath = [...currentPath, ...match.path]; // create a copy and concat with the path from the matches
                 //If there are no elements left in the rest of the sequence path, we are yielding our result
                 if (pathItems.length === 1) {
-                    yield new PathResult(newCurrentPath, inverse?newCurrentPath[newCurrentPath.length-1].subject:newCurrentPath[newCurrentPath.length-1].object);;
+                    yield new PathResult(newCurrentPath, match.target);
                 } else {
                     //Otherwise, we need to handle the rest of the sequence path by starting from our last focusnode and path
                     //Also pass the current inverse in case we’re already in an inverse. Would be really weird, but hey, who are we to judge anyone’s shape
                     // ???? Should we get the last element’s object or subject here????
-                    let restMatches = this.match(store, match.path[match.path.length-1].object, pathItems.slice(1), newCurrentPath, inverse);
+                    let restMatches = this.match(store, match.target,pathItems.slice(1), newCurrentPath, inverse);//inverse?match.path[match.path.length-1].object:match.path[match.path.length-1].subject, pathItems.slice(1), newCurrentPath, inverse);
                     let restMatch = restMatches.next();
                     while (!restMatch.done) {
                         yield restMatch.value;
@@ -166,7 +161,7 @@ export class PathPattern {
         } else if (pathItem instanceof AlternativePathItem) {
             console.error('No support yet for Alternative path');
         }
-        //All potential matches we need to further study are further processed in the for-loop
+        //All potential matches we need to further study are further processed in the recursive function
         
     }
 }

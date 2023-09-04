@@ -25,3 +25,10 @@ ex:SequenceAndInversePathShape a sh:NodeShape ;
         sh:path ([sh:inversePath ex:p2 ] ex:p1 ) ;
         sh:minCount 1
     ] .
+
+ # Double inverse path
+ex:DoubleInversePathShape a sh:NodeShape ;
+    sh:property [
+        sh:path ([sh:inversePath [sh:inversePath ex:p1 ] ]) ;
+        sh:minCount 1
+    ] .
