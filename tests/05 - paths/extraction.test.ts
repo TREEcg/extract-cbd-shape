@@ -69,4 +69,12 @@ describe('Check whether paths trigger the right extraction process', function ()
         writer.end((err, res) => {console.error(res);});*/
         assert.equal(result.length, 2);
     })
+
+    it("Test inverse and alternate together", async () => {
+        let result = await extractor.extract(dataStore, new NamedNode("http://example.org/B"), new NamedNode("http://example.org/AllTogetherPathShape"));
+        /*let writer = new Writer();
+        writer.addQuads(result);
+        writer.end((err, res) => {console.error(res);});*/
+        assert.equal(result.length, 2);
+    });
 });
