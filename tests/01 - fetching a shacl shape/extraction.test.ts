@@ -44,9 +44,9 @@ describe('Check whether we can successfully extract a SHACL shape', async () => 
 
     it ("Can extract itself from itself", async () => {
         let result = await extractor.extract(shapeStore, new NamedNode("http://www.w3.org/ns/shacl-shacl#ShapeShape"),new NamedNode("http://www.w3.org/ns/shacl-shacl#ShapeShape"));
-        //let writer = new Writer();
-        //writer.addQuads(result);
-        //writer.end((err, res) => {console.log(res);});
+        /*let writer = new Writer();
+        writer.addQuads(result);
+        writer.end((err, res) => {console.log(res);});*/
 
         //TODO: Didn’t yet calculate how many actually should be returned here... Just assumed this number is correct...
         assert.equal(result.length, 268); // Just testing whether there are quads being returned now

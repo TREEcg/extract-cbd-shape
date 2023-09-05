@@ -17,23 +17,26 @@ async function main () {
         //A shape type has been set!
         if(process.argv[3] === 'shape') {
             //Use our own shape extractor shape
+            shapeId = "https://raw.githubusercontent.com/pietercolpaert/extract-cbd-shape/main/extract-cbd-shape-ap.ttl#ShapeShape";
+
             let readStream = (await rdfDereference.dereference("./extract-cbd-shape-ap.ttl", { localFiles: true })).data;
             await new Promise ((resolve, reject) => {
                 shapeStore.import(readStream).on("end",resolve)
                 .on("error", reject);
             });
-            if (process.argv[4]) {
-                shapeId = process.argv[4];
-            } else {
-                console.error("ShapeIRI needed as third argument");
-                process.exit(1);
-            }
+        } else if (process.argv[3]) {
+            shapeId = process.argv[3];
+            let readStream = (await rdfDereference.dereference(shapeId)).data;
+            await new Promise ((resolve, reject) => {
+                shapeStore.import(readStream).on("end",resolve)
+                .on("error", reject);
+            });
         }
     }
     let extractor = new CBDShapeExtractor(shapeStore);
     console.error('Processing shape ' + shapeId + ' from this shape: ', extractor.shapesGraph);
     let writer = new Writer();
-    let quads = await extractor.extract(new Store(), new NamedNode(entity), shapeId);
+    let quads = await extractor.extract(new Store(), new NamedNode(entity), new NamedNode(shapeId));
     writer.addQuads(quads);
     writer.end((err, res) => {console.log(res);});
 }
