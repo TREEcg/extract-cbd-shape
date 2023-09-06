@@ -26,65 +26,81 @@ let entityquads = await extractor.extract(store, entityId, shapeId);
 
 Tests and examples provided in the [tests](tests/) library. Run them using mocha which can be invoked using `npm test`
 
-## Algorithm and limitations
+## The extraction algorithm ##
 
-This is an extension of CBD. It extracts:
+This is an extension of [CBD](https://www.w3.org/submissions/CBD/). It extracts:
  1. all quads with subject this entity, and their blank node triples (recursively)
  2. all quads with a named graph matching the entity we’re looking up
+ 3. It takes hints from a Shape Template (see ↓)
 
 To be discussed:
  1. _Should it also extract all RDF reification quads?_ (Included in the original CBD)
  2. _Should it also extract all singleton properties?_
  3. _Should it also extract RDF* annnotations?_
 
-If no triples were found based on CBD, it does an HTTP request to the entity’s IRI (fallback to IRI dereferencing)
+The first focus node is set by the user.
+ 1a. If a shape is set, create a shape template and execute the shape template extraction algorithm
+ 1b. If no shape was set, extract all quads with subject the focus node, and recursively include its blank nodes (see also [CBD](https://www.w3.org/submissions/CBD/))
+ 2. Extract all quads with the graph matching the focus node
+ 3. When no quads were extracted from 1 and 2, a client MUST dereference the focus node and re-execute 1 and 2.
 
-Next, it takes _hints_ (it does not guarantee a result that validates) from an optional SHACL shapes graph. It only uses the parts relevant for discovery from the [SHACL Core Constraint Components](https://www.w3.org/TR/shacl/#core-components). It does not support SPARQL or Javascript.
+### Shape Template extraction ###
 
-### Creating the Shape Template from SHACL
+The Shape Template is a structure that looks as follows:
 
- 1. Checks if the Shape is deactivated first
- 2. All links to nodes that are given, in conditionals or not, are added to the shape’s NodeLinks array. The paths matched by the nodelinks will be processed on that matching namednode in the data
- 3. Processes all `sh:property` links to property shapes. Only marks a property as required if `sh:minCount` > 0. It does not validate cardinalities.
- 4. Processes the conditionals `sh:xone`, `sh:or` and `sh:and` (but doesn’t process `sh:not` -- See https://www.w3.org/TR/shacl/#core-components-logical):
-     * `sh:and` doesn’t have much effect: all nodelinks and all required paths will be processed
-     * `sh:xone` and `sh:or`: in both cases, at least one item must match at least one quad for all required paths. If not, it will do an HTTP request to the current namednode. It’s thus becomes less likely an HTTP will be performed with an `sh:xone` or `sh:or` involved: if one item’s condition of required paths has been fulfilled, it doesn’t search further. This is a design trade-off: we don’t allow more complex SHACL constraints (more complex than checking the required paths) to trigger HTTP requests. 
- 4. It processes full `sh:path` and __includes the quads necessary to reach their targets__.
+```typescript
+class ShapeTemplate {
+    closed: boolean;
+    requiredPaths: Path[];
+    optionalPaths: Path[];
+    nodelinks: NodeLink[];
+    atLeastOneLists: [ Shape[] ];
+}
+class NodeLink {
+    shape: ShapeTemplate;
+    path: Path;
+}
+```
+
+Paths in the shape templates are [SHACL Property Paths](https://www.w3.org/TR/shacl/#property-paths).
+
+A Shape Template has
+ * __Closed:__ A boolean telling whether it’s closed or not. If it’s open, a client MUST extract all quads, after a potential HTTP request to the focus node, with subject the focus node, and recursively include its blank nodes (see also [CBD](https://www.w3.org/submissions/CBD/))
+ * __Required paths:__ MUST trigger an HTTP request if the member does not have this path. All quads from paths, after a potential HTTP request, matching this required path MUST be added to the Member set.
+ * __Optional paths:__ All quads from paths, after a potential HTTP request, matching this path MUST be added to the Member set.
+ * __Node Links:__ A nodelink contains a reference to another Shape Template, as well as a path. All quads, after a potential HTTP request, matching this path MUST be added to the Member set. The targets MUST be processed again using the shape template extraction algorithm on that 
+ * __atLeastOneLists__: Each atLeastOneList is an array of at least one shape with one or more required paths and atLeastOneLists that must be set. If none of the shapes match, it will trigger an HTTP request. Only the quads from paths matching valid shapes are included in the Member.
+
+Note: Certain quads are going to be matched by the algorithm multiple times. Each quad will of course be part of the member only once.
+
+This results in this algorithm:
+ 1. If it is open, a client MUST extract all quads, after a potential HTTP request to the focus node, with subject the focus node, and recursively include its blank nodes (see also [CBD](https://www.w3.org/submissions/CBD/))
+ 2. If the current focus node is a named node and it was not requested before:
+    - test if all required paths are set, if not do an HTTP request, if they are set, then,
+    - test if at least one of each list in the atLeastOneLists was set. If not, do an HTTP request.
+ 3. Visit all paths (required, optional, nodelinks and recursively the shapes in the atLeastOneLists if the shape is valid) paths and add all quads necessary to reach the targets to the result
+ 4. For the results of nodelinks, if the target is a named node, set it as a focus node and repeat this algorithm with that nodelink’s shape as a shape
+
+### Generating a shape template from SHACL ###
+
+If there’s a shape set, the SHACL shape MUST be processed towards a Shape Template as follows:
+
+ 1. Checks if the shape is deactivated (`:S sh:deactivated true`), if it is, don’t continue
+ 2. Check if the shape is closed (`:S sh:closed true`), set the closed boolean to true.
+ 3. All `sh:property` elements with an `sh:node` link are added to the shape’s NodeLinks array
+ 4. Add all properties with `sh:minCount` > 0 to the Required Paths array, and all others to the optional paths.
+ 5. Processes the [conditionals](https://www.w3.org/TR/shacl/#core-components-logical) `sh:xone`, `sh:or` and `sh:and` (but doesn’t process `sh:not`):
+    - `sh:and`: all properties on that shape template MUST be merged with the current shape template
+    - `sh:xone` and `sh:or`: in both cases, at least one item must match at least one quad for all required paths. If not, it will do an HTTP request to the current namednode.
+
+Note: The way we process SHACL shapes into Shape Template is important to understand in order to know when an HTTP request will be triggered when designing SHACL shapes. A cardinality constraint not being exactly matched or a `sh:pattern` not being respected will not trigger an HTTP request, and instead just add the invalid quads to the Member. This is a design choice: we only define triggers for HTTP request from the SHACL shape to come to a complete set of quads describing the member the data publisher pointed at using `tree:member`.
+
+Note: it only takes _hints_ (it does not guarantee a result that validates) from an optional SHACL shapes graph. It only uses the parts relevant for discovery from the [SHACL Core Constraint Components](https://www.w3.org/TR/shacl/#core-components). It does not support SPARQL or Javascript.
 
 It won’t:
  1. Process more complex validation instructions that are part of SHACL such as `sh:class`, inLanguage, pattern, value, qualified value shapes, etc. It is the data publisher’s responsibility to provide valid data, or it is the responsibility of the user of the library to validate the quads afterwards.
  2. Do automatic target selection based on e.g., targetClass: you need to set the target.
 
-
 ### Creating the Shape Template from ShEx
 
 _TODO_
-
-### Processing the Shape Template
-
-The Shape template looks like this:
-
-```javascript
-Shape {
-    requiredPaths: Path[], // Can trigger an HTTP request if not set
-    optionalPaths: Path[], // Also include the deeper down paths, if they are set
-    nodelinks: NodeLink[], // If this path is set, we need to re-do the algorithm on that named node with the shape linked in the nodelink.
-    atLeastOneLists: [ Shape[] ]  // Each atLeastOneList is an array of at least one shape with one or more required paths that must be set, or it will trigger an HTTP request.
-}
-NodeLink {
-    shape: Shape,
-    path: Path
-}
-```
-
-The algorithm then works as follows:
-
-First focus node = tree:member object
- * Start from focus node. If shape isn’t closed, apply CBD.
- * If this is a named node and it wasn’t requested before:
-    - test if all required properties are set, if not do an HTTP request, if yes, ↓
-    - test if at least one of each list in the atLeastOneLists was set. If not, do an HTTP request.
- * Visit all paths (required, optional, nodelinks and recursively the shapes in the atLeastOneLists if their required paths are set) paths and add all quads necessary to reach the targets to the result
- * For the results of nodelinks, if the target is a named node, set it as a focus node and repeat this algorithm with that nodelink’s shape as a shape
-
-When the shape is open, we can take into account some triples are already going to be found by CBD and can be ommitted.
