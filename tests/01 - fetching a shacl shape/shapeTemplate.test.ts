@@ -1,6 +1,5 @@
-import { assert } from "chai";
-import {Store, NamedNode, Writer, Term, Parser, StreamParser} from "n3";
-import {Shape, ShapesGraph} from '../../lib/Shape';
+import {Store} from "n3";
+import {ShapesGraph} from '../../lib/Shape';
 import rdfDereference from 'rdf-dereference';
 
 describe('Test shape template of the SHACL SHACL', function () {

@@ -1,5 +1,5 @@
 import { NamedNode, Quad, Store, Term, BlankNode } from "n3";
-import {Shape} from "./Shape";
+import {ShapeTemplate} from "./Shape";
 
 export abstract class PathItem {
     value: PathPattern|NamedNode|Array<PathPattern>;

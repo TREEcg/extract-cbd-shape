@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import {Store, NamedNode, Writer, Term, Parser, StreamParser} from "n3";
-import {Shape, ShapesGraph} from '../../lib/Shape';
+import {ShapeTemplate, ShapesGraph} from '../../lib/Shape';
 import rdfDereference from 'rdf-dereference';
 
 describe('Test whether the SHACL template is well extracted based on paths', function () {

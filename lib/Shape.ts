@@ -11,12 +11,12 @@ export class NodeLink {
     }
 }
 
-export class Shape {
+export class ShapeTemplate {
     closed: boolean;
     nodeLinks: Array<NodeLink>;
     requiredPaths: Array<PathPattern> ;
     optionalPaths: Array<PathPattern>;
-    atLeastOneLists: Array<Array<Shape>>;
+    atLeastOneLists: Array<Array<ShapeTemplate>>;
     constructor () {
         //All properties will be added, but if a required property is not available, then we need to further look it up
         this.requiredPaths = [];
@@ -30,7 +30,7 @@ export class Shape {
 
 export class ShapesGraph {
     
-    shapes: Map<string, Shape>;
+    shapes: Map<string, ShapeTemplate>;
     
     constructor (shapeStore: Store) {
         this.shapes = this.initializeFromStore(shapeStore);
@@ -82,7 +82,7 @@ export class ShapesGraph {
     * @param shape 
     * @returns false if it wasn’t a property shape
     */
-    protected preprocessPropertyShape(shapeStore: Store, propertyShapeId: Term, shape: Shape, required? : boolean): boolean {
+    protected preprocessPropertyShape(shapeStore: Store, propertyShapeId: Term, shape: ShapeTemplate, required? : boolean): boolean {
         //Skip if shape has been deactivated
         let deactivated = shapeStore.getObjects(propertyShapeId, "http://www.w3.org/ns/shacl#deactivated");
         if (deactivated.length > 0 && deactivated[0].value === "true") {
@@ -124,7 +124,7 @@ export class ShapesGraph {
     * @param shape 
     * @returns 
     */
-    preprocessShape(shapeStore: Store, shapeId: string, shape: Shape) {
+    preprocessShape(shapeStore: Store, shapeId: string, shape: ShapeTemplate) {
         return this.preprocessPropertyShape(shapeStore, shapeId, shape)?true: this.preprocessNodeShape(shapeStore, shapeId, shape);
     }
     
@@ -134,7 +134,7 @@ export class ShapesGraph {
     * @param nodeShapeId 
     * @param shape 
     */
-    protected preprocessNodeShape(shapeStore: Store, nodeShapeId: string, shape: Shape) {
+    protected preprocessNodeShape(shapeStore: Store, nodeShapeId: string, shape: ShapeTemplate) {
         //Check if it’s closed or open
         let closedIndicator: Term = shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#closed")[0];
         if (closedIndicator && closedIndicator.value === "true") {
@@ -158,8 +158,8 @@ export class ShapesGraph {
         }
         //Process zero or more sh:xone and sh:or lists in the same way -- explanation in README why they can be handled in the same way
         for (let xoneOrOrList of shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#xone").concat( shapeStore.getObjects(nodeShapeId, "http://www.w3.org/ns/shacl#or"))) {
-            let atLeastOneList : Array<Shape> = this.rdfListToArray(shapeStore, xoneOrOrList).map((val): Shape => {
-                let newShape = new Shape();
+            let atLeastOneList : Array<ShapeTemplate> = this.rdfListToArray(shapeStore, xoneOrOrList).map((val): ShapeTemplate => {
+                let newShape = new ShapeTemplate();
                 //Create a new shape and process as usual -- but mind that we don’t trigger a circular shape here...
                 this.preprocessShape(shapeStore, val, newShape);
                 return newShape;
@@ -175,7 +175,7 @@ export class ShapesGraph {
     * 
     * @param nodeShape is an N3.Store with the quads of the SHACL shape
     */
-    initializeFromStore (shapeStore: Store): Map<NamedNode, Shape> {
+    initializeFromStore (shapeStore: Store): Map<NamedNode, ShapeTemplate> {
         //get all named nodes of entities that are sh:ShapeNodes which we’ll recognize through their use of sh:property (we’ll find other relevant shape nodes later on)
         //TODO: This is a limitation though: we only support NodeShapes with at least one sh:property set? Other NodeShapes in this context are otherwise just meaningless?
         const shapeNodes = shapeStore.getSubjects("http://www.w3.org/ns/shacl#property")
@@ -187,7 +187,7 @@ export class ShapesGraph {
             .filter((value: Term, index: number, array: Array<Term>) => {return array.indexOf(value) === index;});
         let shapes = new Map();
         for (let shapeId of shapeNodes) {
-            let shape = new Shape();
+            let shape = new ShapeTemplate();
             //Don’t process if shape is deactivated
             let deactivated = shapeStore.getObjects(shapeId, "http://www.w3.org/ns/shacl#deactivated");
             if (!(deactivated.length > 0 && deactivated[0].value === "true")) {

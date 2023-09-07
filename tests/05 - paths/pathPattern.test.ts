@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import {Store, NamedNode, Writer, Term, Parser, StreamParser} from "n3";
-import {Shape, ShapesGraph} from '../../lib/Shape';
+import {ShapeTemplate, ShapesGraph} from '../../lib/Shape';
 import {PathPattern} from "../../lib/Path";
 import rdfDereference from 'rdf-dereference';
 

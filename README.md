@@ -11,7 +11,6 @@ The algorithm is inspired by, and an in-between between [CBD](https://www.w3.org
 ## Use it
 
 ```bash
-## Package not yet available on NPM
 npm install extract-cbd-shape
 ```
 

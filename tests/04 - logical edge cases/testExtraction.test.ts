@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import {Store, NamedNode, Writer, Term, Parser, StreamParser} from "n3";
-import {CBDShapeExtractor} from '../../lib/extract-cbd-shape';
+import {CBDShapeExtractor} from '../../lib/CBDShapeExtractor';
 import rdfDereference from 'rdf-dereference';
 
 describe('Extracting logical edge cases', function () {

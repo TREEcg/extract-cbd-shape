@@ -1,5 +1,5 @@
 import * as process from 'process';
-import { CBDShapeExtractor } from '../lib/extract-cbd-shape';
+import { CBDShapeExtractor } from '../lib/CBDShapeExtractor';
 import {Store, Writer, NamedNode} from 'n3';
 import rdfDereference from 'rdf-dereference';
 
