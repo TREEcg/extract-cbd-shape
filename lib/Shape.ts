@@ -1,4 +1,5 @@
-import { BlankNode, NamedNode, Quad, Store, Term } from "n3";
+import { BlankNode, Store } from "n3";
+import { Term } from "@rdfjs/types";
 import { createTermNamespace, RDF } from "@treecg/types";
 import {
   AlternativePath,

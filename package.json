@@ -22,6 +22,7 @@
     "rdf-dereference": "^2.1.0"
   },
   "devDependencies": {
+    "@rdfjs/types": "^1.1.0",
     "@types/chai": "^4.3.5",
     "@types/mocha": "^10.0.1",
     "@types/n3": "^1.16.1",

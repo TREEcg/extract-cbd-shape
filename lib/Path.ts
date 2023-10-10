@@ -1,4 +1,5 @@
-import { Quad, Store, Term } from "n3";
+import { Quad, Term } from "@rdfjs/types";
+import { Store } from "n3";
 
 export interface Path {
   toString(): string;
@@ -22,7 +23,7 @@ export class PredicatePath implements Path {
   }
 
   *match(
-    store: Store<Quad, Quad, Quad, Quad>,
+    store: Store,
     focusNode: Term,
     inverse: boolean = false,
   ): Generator<PathResult, any, unknown> {
@@ -68,7 +69,7 @@ export class SequencePath implements Path {
   }
 
   *match(
-    store: Store<Quad, Quad, Quad, Quad>,
+    store: Store,
     focusNode: Term,
     inverse: boolean = false,
   ): Generator<PathResult, any, unknown> {
@@ -88,7 +89,7 @@ export class AlternativePath implements Path {
   }
 
   *match(
-    store: Store<Quad, Quad, Quad, Quad>,
+    store: Store,
     focusNode: Term,
     inverse: boolean = false,
   ): Generator<PathResult, any, unknown> {
@@ -110,7 +111,7 @@ export class InversePath implements Path {
   }
 
   *match(
-    store: Store<Quad, Quad, Quad, Quad>,
+    store: Store,
     focusNode: Term,
     inverse: boolean = false,
   ): Generator<PathResult, any, unknown> {
@@ -154,7 +155,7 @@ export abstract class MultiPath implements Path {
   }
 
   *match(
-    store: Store<Quad, Quad, Quad, Quad>,
+    store: Store,
     focusNode: Term,
     inverse: boolean = false,
   ): Generator<PathResult> {

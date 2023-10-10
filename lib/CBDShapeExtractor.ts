@@ -1,7 +1,8 @@
 import rdfDereference, { RdfDereferencer } from "rdf-dereference";
 import { NodeLink, ShapesGraph, ShapeTemplate } from "./Shape";
 import { Path, PathResult } from "./Path";
-import { BlankNode, Quad, Store, Term } from "n3";
+import { BlankNode, Store } from "n3";
+import { Quad, Term } from "@rdfjs/types";
 
 /**
  * Usage:
