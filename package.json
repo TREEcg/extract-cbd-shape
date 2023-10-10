@@ -5,7 +5,7 @@
   "main": "dist/lib/extract-cbd-shape.js",
   "types": "dist/lib/extract-cbd-shape.d.ts",
   "scripts": {
-    "test": "mocha tests/*",
+    "test": "mocha",
     "build": "tsc"
   },
   "keywords": [
@@ -17,12 +17,14 @@
   "author": "Pieter Colpaert",
   "license": "MIT",
   "dependencies": {
+    "@treecg/types": "^0.4.5",
     "n3": "^1.17.0",
     "rdf-dereference": "^2.1.0"
   },
   "devDependencies": {
     "@types/chai": "^4.3.5",
     "@types/mocha": "^10.0.1",
+    "@types/n3": "^1.16.1",
     "@types/sinon": "^10.0.16",
     "chai": "^4.3.7",
     "mocha": "^10.2.0",

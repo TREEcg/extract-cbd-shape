@@ -7,7 +7,7 @@ describe("Extracting logical edge cases", function () {
   this.timeout(25000);
 
   let shapeStore = new Store();
-  let extractor;
+  let extractor: CBDShapeExtractor;
   let dataStore = new Store();
   before(async () => {
     let readStream = (

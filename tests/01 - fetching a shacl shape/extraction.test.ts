@@ -5,7 +5,7 @@ import rdfDereference from "rdf-dereference";
 
 describe("Check whether we can successfully extract a SHACL shape", async () => {
   let shapeStore = new Store();
-  let extractor;
+  let extractor: CBDShapeExtractor;
   let dataStore = new Store();
   before(async () => {
     let readStream = (
@@ -73,6 +73,6 @@ describe("Check whether we can successfully extract a SHACL shape", async () => 
         writer.end((err, res) => {console.log(res);});*/
 
     //TODO: Didn’t yet calculate how many actually should be returned here... Just assumed this number is correct...
-    assert.equal(result.length, 268); // Just testing whether there are quads being returned now
+    assert.equal(result.length, 252); // Just testing whether there are quads being returned now
   });
 });

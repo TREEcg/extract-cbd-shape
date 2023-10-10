@@ -5,7 +5,7 @@ import rdfDereference from "rdf-dereference";
 
 describe("Check whether paths trigger the right extraction process", function () {
   let shapeStore = new Store();
-  let extractor;
+  let extractor: CBDShapeExtractor;
   let dataStore = new Store();
   before(async () => {
     let readStream = (
