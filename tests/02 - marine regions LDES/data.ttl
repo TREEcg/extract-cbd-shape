@@ -1,220 +1,226 @@
-@prefix tree: <https://w3id.org/tree#> .
-@prefix ldes: <https://w3id.org/ldes#> .
-@prefix dc: <http://purl.org/dc/terms/> .
-@prefix sh: <http://www.w3.org/ns/shacl#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
-@prefix gsp: <http://www.opengis.net/ont/geosparql#> .
-@prefix dcat: <http://www.w3.org/ns/dcat#> .
-@prefix mr: <http://marineregions.org/ns/ontology#> .
-@prefix schema: <https://schema.org/> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix tree: <https://w3id.org/tree#>.
+@prefix ldes: <https://w3id.org/ldes#>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix sh: <http://www.w3.org/ns/shacl#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+@prefix gsp: <http://www.opengis.net/ont/geosparql#>.
+@prefix dcat: <http://www.w3.org/ns/dcat#>.
+@prefix mr: <http://marineregions.org/ns/ontology#>.
+@prefix schema: <https://schema.org/>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
 
-<http://marineregions.org/feed?page=2023-07-24T14%3A00%3A00Z%2F2023-07-24T15%3A00%3A00Z>
-  a tree:Node ;
-  tree:relation [ tree:node <http://marineregions.org/feed?page=2023-07-26T14%3A00%3A00Z%2F2023-07-26T15%3A00%3A00Z> ], [ tree:node <http://marineregions.org/feed?page=2023-06-20T12%3A00%3A00Z%2F2023-06-20T13%3A00%3A00Z> ] ;
+<http://marineregions.org/feed?page=2023-07-24T14%3A00%3A00Z%2F2023-07-24T15%3A00%3A00Z> a tree:Node;
+  tree:relation [ tree:node <http://marineregions.org/feed?page=2023-07-26T14%3A00%3A00Z%2F2023-07-26T15%3A00%3A00Z> ],
+    [ tree:node <http://marineregions.org/feed?page=2023-06-20T12%3A00%3A00Z%2F2023-06-20T13%3A00%3A00Z> ];
   ldes:retentionPolicy [
-    a ldes:LatestVersionSubset ;
-    ldes:amount 1 ;
-    ldes:versionKey ( dc:isVersionOf )
-  ] .
+    a ldes:LatestVersionSubset;
+    ldes:amount 1;
+    ldes:versionKey ( dc:isVersionOf );
+  ].
 
-<http://marineregions.org/feed>
-  a ldes:EventStream ;
+<http://marineregions.org/feed> a ldes:EventStream;
   tree:shape [
-    a sh:NodeShape ;
-    sh:nodeKind sh:IRI ;
+    a sh:NodeShape;
+    sh:nodeKind sh:IRI;
     sh:property [
-      sh:datatype xsd:dateTime ;
-      sh:minCount 1 ;
-      sh:path dc:modified
+      sh:datatype xsd:dateTime;
+      sh:minCount 1;
+      sh:path dc:modified;
     ], [
-      sh:minCount 1 ;
-      sh:nodeKind sh:IRI ;
-      sh:path dc:isVersionOf
+      sh:minCount 1;
+      sh:nodeKind sh:IRI;
+      sh:path dc:isVersionOf;
     ], [ sh:path skos:note ], [ sh:path skos:historyNote ], [
-      sh:datatype gsp:wktLiteral ;
-      sh:maxCount 1 ;
-      sh:minCount 1 ;
-      sh:path dcat:centroid
+      sh:datatype gsp:wktLiteral;
+      sh:maxCount 1;
+      sh:minCount 1;
+      sh:path dcat:centroid;
     ], [
-      sh:datatype gsp:wktLiteral ;
-      sh:maxCount 1 ;
-      sh:minCount 0 ;
-      sh:path dcat:bbox
+      sh:datatype gsp:wktLiteral;
+      sh:maxCount 1;
+      sh:minCount 0;
+      sh:path dcat:bbox;
     ], [
-      sh:minCount 0 ;
-      sh:nodekind sh:IRI ;
-      sh:path mr:hasGeometry
-    ], [
-      sh:minCount 0 ;
+      sh:minCount 0;
+      sh:nodekind sh:IRI;
+      sh:path mr:hasGeometry;
       sh:node [
-        a sh:NodeShape ;
-        sh:nodeKind sh:IRI ;
+        a sh:NodeShape;
         sh:property [
-          sh:class schema:PropertyValue ;
-          sh:maxCount 1 ;
-          sh:minCount 1 ;
-          sh:path schema:identifier
+          sh:path gsp:asWKT;
+          sh:minCount 1;
+        ];
+      ];
+    ], [
+      sh:minCount 0;
+      sh:node [
+        a sh:NodeShape;
+        sh:nodeKind sh:IRI;
+        sh:property [
+          sh:class schema:PropertyValue;
+          sh:maxCount 1;
+          sh:minCount 1;
+          sh:path schema:identifier;
         ], [
-          sh:maxCount 1 ;
-          sh:minCount 1 ;
-          sh:nodeKind sh:IRI ;
-          sh:path schema:url
-        ]
-      ] ;
-      sh:path skos:exactMatch
+          sh:maxCount 1;
+          sh:minCount 1;
+          sh:nodeKind sh:IRI;
+          sh:path schema:url;
+        ];
+      ];
+      sh:path skos:exactMatch;
     ], [
-      sh:datatype rdf:langString ;
-      sh:minCount 1 ;
-      sh:path skos:prefLabel
+      sh:datatype rdf:langString;
+      sh:minCount 1;
+      sh:path skos:prefLabel;
     ], [
-      sh:datatype rdf:langString ;
-      sh:minCount 0 ;
-      sh:path skos:altLabel
+      sh:datatype rdf:langString;
+      sh:minCount 0;
+      sh:path skos:altLabel;
     ], [
-      sh:class mr:MRGeoObject ;
-      sh:minCount 0 ;
-      sh:nodeKind sh:IRI ;
-      sh:path mr:isRelatedTo
-    ] ;
-    sh:targetClass mr:MRGeoObject
-  ] ;
-  tree:view <http://marineregions.org/feed?page=2023-07-24T14%3A00%3A00Z%2F2023-07-24T15%3A00%3A00Z> ;
-  tree:member <http://marineregions.org/mrgid/4212?t=1690208097>, <http://marineregions.org/mrgid/7513?t=1690208097>, <http://marineregions.org/mrgid/7531?t=1690208097>, <http://marineregions.org/mrgid/7492?t=1690208097>, <http://marineregions.org/mrgid/7210?t=1690208097>, <http://marineregions.org/mrgid/5069?t=1690208097>, <http://marineregions.org/mrgid/7523?t=1690208097>, <http://marineregions.org/mrgid/7164?t=1690208097>, <http://marineregions.org/mrgid/57068?t=1690208097>, <http://marineregions.org/mrgid/6985?t=1690208097>, <http://marineregions.org/mrgid/7834?t=1690208097>, <http://marineregions.org/mrgid/35746?t=1690208097>, <http://marineregions.org/mrgid/7236?t=1690208097>, <http://marineregions.org/mrgid/7172?t=1690208097>, <http://marineregions.org/mrgid/34798?t=1690208097>, <http://marineregions.org/mrgid/57044?t=1690208097>, <http://marineregions.org/mrgid/24806?t=1690208097>, <http://marineregions.org/mrgid/7511?t=1690208097>, <http://marineregions.org/mrgid/5267?t=1690208097>, <http://marineregions.org/mrgid/7875?t=1690208097>, <http://marineregions.org/mrgid/4833?t=1690208097>, <http://marineregions.org/mrgid/6403?t=1690208097>, <http://marineregions.org/mrgid/4365?t=1690208097>, <http://marineregions.org/mrgid/57518?t=1690208097>, <http://marineregions.org/mrgid/5227?t=1690208097>, <http://marineregions.org/mrgid/7486?t=1690208097>, <http://marineregions.org/mrgid/24815?t=1690208097>, <http://marineregions.org/mrgid/57073?t=1690208097>, <http://marineregions.org/mrgid/7152?t=1690208097>, <http://marineregions.org/mrgid/24983?t=1690208097>, <http://marineregions.org/mrgid/26689?t=1690208097>, <http://marineregions.org/mrgid/7216?t=1690208097>, <http://marineregions.org/mrgid/24966?t=1690208097>, <http://marineregions.org/mrgid/5261?t=1690208097> .
+      sh:class mr:MRGeoObject;
+      sh:minCount 0;
+      sh:nodeKind sh:IRI;
+      sh:path mr:isRelatedTo;
+    ];
+    sh:targetClass mr:MRGeoObject;
+  ];
+  tree:view <http://marineregions.org/feed?page=2023-07-24T14%3A00%3A00Z%2F2023-07-24T15%3A00%3A00Z>;
+  tree:member <http://marineregions.org/mrgid/4212?t=1690208097>,
+    <http://marineregions.org/mrgid/7513?t=1690208097>,
+    <http://marineregions.org/mrgid/7531?t=1690208097>,
+    <http://marineregions.org/mrgid/7492?t=1690208097>,
+    <http://marineregions.org/mrgid/7210?t=1690208097>,
+    <http://marineregions.org/mrgid/5069?t=1690208097>,
+    <http://marineregions.org/mrgid/7523?t=1690208097>,
+    <http://marineregions.org/mrgid/7164?t=1690208097>,
+    <http://marineregions.org/mrgid/57068?t=1690208097>,
+    <http://marineregions.org/mrgid/6985?t=1690208097>,
+    <http://marineregions.org/mrgid/7834?t=1690208097>,
+    <http://marineregions.org/mrgid/35746?t=1690208097>,
+    <http://marineregions.org/mrgid/7236?t=1690208097>,
+    <http://marineregions.org/mrgid/7172?t=1690208097>,
+    <http://marineregions.org/mrgid/34798?t=1690208097>,
+    <http://marineregions.org/mrgid/57044?t=1690208097>,
+    <http://marineregions.org/mrgid/24806?t=1690208097>,
+    <http://marineregions.org/mrgid/7511?t=1690208097>,
+    <http://marineregions.org/mrgid/5267?t=1690208097>,
+    <http://marineregions.org/mrgid/7875?t=1690208097>,
+    <http://marineregions.org/mrgid/4833?t=1690208097>,
+    <http://marineregions.org/mrgid/6403?t=1690208097>,
+    <http://marineregions.org/mrgid/4365?t=1690208097>,
+    <http://marineregions.org/mrgid/57518?t=1690208097>,
+    <http://marineregions.org/mrgid/5227?t=1690208097>,
+    <http://marineregions.org/mrgid/7486?t=1690208097>,
+    <http://marineregions.org/mrgid/24815?t=1690208097>,
+    <http://marineregions.org/mrgid/57073?t=1690208097>,
+    <http://marineregions.org/mrgid/7152?t=1690208097>,
+    <http://marineregions.org/mrgid/24983?t=1690208097>,
+    <http://marineregions.org/mrgid/26689?t=1690208097>,
+    <http://marineregions.org/mrgid/7216?t=1690208097>,
+    <http://marineregions.org/mrgid/24966?t=1690208097>,
+    <http://marineregions.org/mrgid/5261?t=1690208097>.
 
-<http://marineregions.org/mrgid/4212?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/4212> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/4212?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/4212>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/7513?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/7513> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/7513?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/7513>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/7531?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/7531> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/7531?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/7531>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/7492?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/7492> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/7492?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/7492>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/7210?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/7210> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/7210?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/7210>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/5069?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/5069> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/5069?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/5069>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/7523?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/7523> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/7523?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/7523>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/7164?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/7164> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/7164?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/7164>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/57068?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/57068> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/57068?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/57068>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/6985?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/6985> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/6985?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/6985>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/7834?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/7834> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/7834?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/7834>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/35746?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/35746> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/35746?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/35746>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/7236?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/7236> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/7236?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/7236>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/7172?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/7172> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/7172?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/7172>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/34798?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/34798> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/34798?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/34798>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/57044?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/57044> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/57044?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/57044>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/24806?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/24806> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/24806?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/24806>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/7511?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/7511> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/7511?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/7511>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/5267?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/5267> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/5267?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/5267>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/7875?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/7875> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/7875?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/7875>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/4833?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/4833> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/4833?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/4833>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/6403?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/6403> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/6403?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/6403>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/4365?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/4365> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/4365?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/4365>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/57518?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/57518> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/57518?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/57518>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/5227?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/5227> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/5227?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/5227>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/7486?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/7486> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/7486?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/7486>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/24815?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/24815> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/24815?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/24815>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/57073?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/57073> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/57073?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/57073>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/7152?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/7152> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/7152?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/7152>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/24983?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/24983> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/24983?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/24983>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/26689?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/26689> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/26689?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/26689>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/7216?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/7216> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/7216?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/7216>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/24966?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/24966> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/24966?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/24966>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
 
-<http://marineregions.org/mrgid/5261?t=1690208097>
-  dc:isVersionOf <http://marineregions.org/mrgid/5261> ;
-  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime .
+<http://marineregions.org/mrgid/5261?t=1690208097> dc:isVersionOf <http://marineregions.org/mrgid/5261>;
+  dc:modified "2023-07-24T14:14:57Z"^^xsd:dateTime.
+

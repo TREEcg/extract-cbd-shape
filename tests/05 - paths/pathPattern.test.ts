@@ -1,10 +1,5 @@
 import { assert } from "chai";
-import {
-  DataFactory,
-  NamedNode,
-  Store,
-
-} from "n3";
+import { DataFactory, NamedNode, Store } from "n3";
 import { ShapesGraph } from "../../lib/Shape";
 import rdfDereference from "rdf-dereference";
 const { namedNode } = DataFactory;
