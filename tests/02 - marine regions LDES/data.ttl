@@ -45,13 +45,6 @@
       sh:minCount 0;
       sh:nodekind sh:IRI;
       sh:path mr:hasGeometry;
-      sh:node [
-        a sh:NodeShape;
-        sh:property [
-          sh:path gsp:asWKT;
-          sh:minCount 1;
-        ];
-      ];
     ], [
       sh:minCount 0;
       sh:node [
