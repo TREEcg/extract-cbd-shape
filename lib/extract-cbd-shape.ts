@@ -1,9 +1,5 @@
 import { CBDShapeExtractor } from "./CBDShapeExtractor";
-import * as Shape from "./Shape";
-import * as Path from "./Path";
+import * as shape from "./Shape";
+import * as path from "./Path";
 
-export {
-    CBDShapeExtractor,
-    Shape,
-    Path
-}
+export { CBDShapeExtractor, path, shape };
