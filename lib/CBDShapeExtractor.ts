@@ -44,12 +44,14 @@ export class CBDShapeExtractor {
    * @param store The N3 Store loaded with a set of initial quads
    * @param id The entity to be described/extracted
    * @param shapeId The optional SHACL NodeShape identifier
+   * @param graphsToIgnore The optional parameter of graph to ignore when other entities are mentioned in the current context
    * @returns Promise of a quad array of the described entity
    */
   public async extract(
     store: Store,
     id: Term,
     shapeId?: Term,
+    graphsToIgnore?: Array<Term>
   ): Promise<Array<Quad>> {
     let result = (
       await this.extractRecursively(store, id, [], [], shapeId)
