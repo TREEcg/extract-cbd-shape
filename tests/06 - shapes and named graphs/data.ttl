@@ -8,7 +8,7 @@
 
 ex:C a tree:Collection ;
     tree:shape ex:Shape ;
-    tree:member ex:M1v1 ex:M1v2 .
+    tree:member ex:M1v1, ex:M1v2 .
 
 ex:M1v1 ex:subject ex:M1 .
 ex:M1v2 ex:subject ex:M1 .

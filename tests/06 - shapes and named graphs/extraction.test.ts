@@ -31,7 +31,7 @@ describe("Check whether paths trigger the right extraction process", function ()
       dataStore,
       new NamedNode("http://example.org/M1v1"),
       new NamedNode("http://example.org/Shape"),
-      dataStore.getObjects(null, "https://w3id.org/tree#member",null)
+      [new NamedNode("http://example.org/M1v2")] //Other members in the current context
     );
     // It should only have 2 quads: one outside of the named graph, and one in the named graph that is not part of the other named graphs
     assert.equal(result.length, 2);
