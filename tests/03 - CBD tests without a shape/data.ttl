@@ -36,8 +36,3 @@ ex:Activity1 {
     ex:Object1 a ex:StreetName ;
         ex:label "Station street" .
 }
-
-ex:Activity2 {
-    ex:Object1 a ex:StreetName ;
-        ex:label "Station square" .
-}

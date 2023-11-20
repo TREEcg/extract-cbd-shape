@@ -44,15 +44,21 @@ export class CBDShapeExtractor {
    * @param store The N3 Store loaded with a set of initial quads
    * @param id The entity to be described/extracted
    * @param shapeId The optional SHACL NodeShape identifier
+   * @param graphsToIgnore The optional parameter of graph to ignore when other entities are mentioned in the current context
    * @returns Promise of a quad array of the described entity
    */
   public async extract(
     store: Store,
     id: Term,
     shapeId?: Term,
+    graphsToIgnore?: Array<Term>
   ): Promise<Array<Quad>> {
+    //First extract everything except for something within the graphs to ignore, or within the graph of the current entity, as that’s going to be added anyway later on
+    let dontExtractFromGraph: Array<string> = (graphsToIgnore? graphsToIgnore:[]).map((item) => {
+      return item.value;
+    });
     let result = (
-      await this.extractRecursively(store, id, [], [], shapeId)
+      await this.extractRecursively(store, id, [], [], dontExtractFromGraph, shapeId)
     ).concat(store.getQuads(null, null, null, id)); // also add the quads where the named graph matches the current id
     if (result.length === 0) {
       //Dereference and try again to extract them from the store
@@ -64,7 +70,7 @@ export class CBDShapeExtractor {
         (await this.dereferencer.dereference(id.value)).data,
       );
       result = (
-        await this.extractRecursively(store, id, [], [id.value], shapeId)
+        await this.extractRecursively(store, id, [], [id.value], dontExtractFromGraph, shapeId)
       ).concat(store.getQuads(null, null, null, id));
     }
 
@@ -81,9 +87,10 @@ export class CBDShapeExtractor {
     store: Store,
     shape: ShapeTemplate,
     focusNode: Term,
+    graphsToIgnore: Array<string>
   ): boolean {
     for (let path of shape.requiredPaths) {
-      let matchIterator = path.match(store, focusNode);
+      let matchIterator = path.match(store, focusNode, graphsToIgnore);
       if (matchIterator.next().done) {
         return false;
       }
@@ -98,13 +105,14 @@ export class CBDShapeExtractor {
     store: Store,
     shape: ShapeTemplate,
     focusNode: Term,
+    graphsToIgnore: Array<string>
   ): boolean {
     for (let list of shape.atLeastOneLists) {
       let atLeastOne = false;
       for (let item of list) {
         if (
-          this.validRequiredPaths(store, item, focusNode) &&
-          this.validAtLeastOneLists(store, item, focusNode)
+          this.validRequiredPaths(store, item, focusNode, graphsToIgnore) &&
+          this.validAtLeastOneLists(store, item, focusNode, graphsToIgnore)
         ) {
           atLeastOne = true;
           break;
@@ -126,12 +134,13 @@ export class CBDShapeExtractor {
     id: Term,
     extraPaths: Array<Path>,
     extraNodeLinks: Array<NodeLink>,
+    graphsToIgnore: Array<string>
   ) {
     for (let list of shape.atLeastOneLists) {
       for (let item of list) {
         if (
-          this.validRequiredPaths(store, item, id) &&
-          this.validAtLeastOneLists(store, item, id)
+          this.validRequiredPaths(store, item, id, graphsToIgnore) &&
+          this.validAtLeastOneLists(store, item, id, graphsToIgnore)
         ) {
           extraPaths.push(...item.requiredPaths);
           extraPaths.push(...item.optionalPaths);
@@ -142,6 +151,7 @@ export class CBDShapeExtractor {
             id,
             extraPaths,
             extraNodeLinks,
+            graphsToIgnore,
           );
         }
       }
@@ -153,7 +163,8 @@ export class CBDShapeExtractor {
     id: Term,
     extracted: Array<Term>,
     dereferenced: Array<string>,
-    shapeId?: Term | ShapeTemplate,
+    graphsToIgnore: Array<string>,
+    shapeId?: Term | ShapeTemplate
   ): Promise<Array<Quad>> {
     //If it has already been extracted, don’t extract it again: prevents cycles
     if (extracted.find((x) => x.equals(id))) {
@@ -177,8 +188,8 @@ export class CBDShapeExtractor {
       //Check required paths and lazy evaluate the atLeastOneLists
       if (
         !(
-          this.validRequiredPaths(store, shape, id) &&
-          this.validAtLeastOneLists(store, shape, id)
+          this.validRequiredPaths(store, shape, id, graphsToIgnore) &&
+          this.validAtLeastOneLists(store, shape, id, graphsToIgnore)
         )
       ) {
         //Need to do an extra HTTP request, probably want to log this somehow (TODO)
@@ -210,13 +221,14 @@ export class CBDShapeExtractor {
         id,
         extraPaths,
         extraNodeLinks,
+        graphsToIgnore,
       );
 
       for (let path of shape.requiredPaths.concat(
         shape.optionalPaths,
         extraPaths,
       )) {
-        let pathQuads = Array.from(path.match(store, id))
+        let pathQuads = Array.from(path.match(store, id, graphsToIgnore))
           .map((pathResult: PathResult) => {
             //if the shape is open and thus CBD is going to take place, remove the first element from the quads list of the matches, if the subject of that first item is the focusnode (otherwise the first element was a reverse path)
             if (
@@ -241,7 +253,7 @@ export class CBDShapeExtractor {
       }
 
       for (let nodeLink of shape.nodeLinks.concat(extraNodeLinks)) {
-        let matches = Array.from(nodeLink.pathPattern.match(store, id));
+        let matches = Array.from(nodeLink.pathPattern.match(store, id, graphsToIgnore));
         for (let match of matches) {
           result.push(
             ...(await this.extractRecursively(
@@ -249,12 +261,13 @@ export class CBDShapeExtractor {
               match.target,
               extracted,
               dereferenced,
+              graphsToIgnore,
               nodeLink.link,
             )),
           );
         }
 
-        let pathQuads = Array.from(nodeLink.pathPattern.match(store, id))
+        let pathQuads = Array.from(nodeLink.pathPattern.match(store, id, graphsToIgnore))
           .map((pathResult: PathResult) => {
             //if the shape is open and thus CBD is going to take place, remove the first element from the quads list of the matches, if the subject of that first item is the focusnode (otherwise the first element was a reverse path)
             if (
@@ -281,7 +294,7 @@ export class CBDShapeExtractor {
 
     //Perform CBD and we’re done, except on the condition there’s a shape defined and it’s closed
     if (!(shape && shape.closed)) {
-      this.CBD(result, store, id, extracted);
+      this.CBD(result, store, id, extracted, graphsToIgnore);
     }
     return result;
   }
@@ -298,10 +311,15 @@ export class CBDShapeExtractor {
     store: Store,
     id: Term,
     extracted: Array<Term>,
+    graphsToIgnore: Array<string>
   ) {
     const quads = store.getQuads(id, null, null, null);
     //Iterate over the quads, add them to the result and check whether we should further get other quads based on blank nodes or the SHACL shape
     for (const q of quads) {
+      //ignore quads in the graphs to ignore
+      if (graphsToIgnore?.includes(q.graph.value)) {
+        continue;
+      }
       result.push(q);
       // Conditionally get more quads: if it’s a not yet extracted blank node
       if (
@@ -309,7 +327,7 @@ export class CBDShapeExtractor {
         !extracted.find((x) => x.equals(q.object))
       ) {
         //only perform CBD again recursively on the blank node
-        await this.CBD(result, store, q.object, extracted);
+        await this.CBD(result, store, q.object, extracted, graphsToIgnore);
         extracted.push(q.object);
       }
     }
