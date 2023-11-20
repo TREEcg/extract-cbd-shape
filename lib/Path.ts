@@ -7,6 +7,7 @@ export interface Path {
   match(
     store: Store,
     focusNode: Term,
+    graphsToIgnore?: Array<string>,
     inverse?: boolean,
   ): Generator<PathResult>;
 }
@@ -25,6 +26,7 @@ export class PredicatePath implements Path {
   *match(
     store: Store,
     focusNode: Term,
+    graphsToIgnore: Array<string>,
     inverse: boolean = false,
   ): Generator<PathResult, any, unknown> {
     let quads = inverse
@@ -32,9 +34,11 @@ export class PredicatePath implements Path {
       : store.getQuads(focusNode, this.predicate, null, null);
 
     for (let quad of quads) {
-      //If there are no elements left, we are yielding our result
-      let newFocusNode = inverse ? quad.subject : quad.object;
-      yield new PathResult([quad], newFocusNode);
+      if (!graphsToIgnore.includes(quad.graph.value)) {
+        //If there are no elements left, we are yielding our result
+        let newFocusNode = inverse ? quad.subject : quad.object;
+        yield new PathResult([quad], newFocusNode);
+      }
     }
   }
 }
@@ -52,15 +56,16 @@ export class SequencePath implements Path {
     index: number,
     path: Quad[],
     target: Term,
+    graphsToIgnore: Array<string>
   ): Generator<PathResult> {
     if (index === this.sequence.length) {
       yield new PathResult(path.slice(), target);
       return;
     }
 
-    for (const found of this.sequence[index].match(store, target, inverse)) {
+    for (const found of this.sequence[index].match(store, target, graphsToIgnore, inverse)) {
       const newPath = [...path, ...found.path];
-      yield* this.matchNext(store, inverse, index + 1, newPath, found.target);
+      yield* this.matchNext(store, inverse, index + 1, newPath, found.target, graphsToIgnore);
     }
   }
 
@@ -71,9 +76,10 @@ export class SequencePath implements Path {
   *match(
     store: Store,
     focusNode: Term,
+    graphsToIgnore: Array<string>,
     inverse: boolean = false,
   ): Generator<PathResult, any, unknown> {
-    yield* this.matchNext(store, inverse, 0, [], focusNode);
+    yield* this.matchNext(store, inverse, 0, [], focusNode, graphsToIgnore);
   }
 }
 
@@ -91,10 +97,11 @@ export class AlternativePath implements Path {
   *match(
     store: Store,
     focusNode: Term,
+    graphsToIgnore: Array<string>,
     inverse: boolean = false,
   ): Generator<PathResult, any, unknown> {
     for (const alt of this.alternatives) {
-      yield* alt.match(store, focusNode, inverse);
+      yield* alt.match(store, focusNode, graphsToIgnore, inverse);
     }
   }
 }
@@ -113,9 +120,10 @@ export class InversePath implements Path {
   *match(
     store: Store,
     focusNode: Term,
+    graphsToIgnore: Array<string>,
     inverse: boolean = false,
   ): Generator<PathResult, any, unknown> {
-    yield* this.path.match(store, focusNode, !inverse);
+    yield* this.path.match(store, focusNode, graphsToIgnore, !inverse);
   }
 }
 
@@ -136,11 +144,12 @@ export abstract class MultiPath implements Path {
     inverse: boolean,
     path: Quad[],
     target: Term,
+    graphsToIgnore: Array<string>
   ): Generator<PathResult> {
     // Please no off by one error
     if (!!this.maxCount && index > this.maxCount) return;
 
-    for (const res of this.path.match(store, target, inverse)) {
+    for (const res of this.path.match(store, target, graphsToIgnore, inverse)) {
       if (this.filter(index, res)) {
         yield new PathResult([...path, ...res.path], res.target);
       }
@@ -150,6 +159,7 @@ export abstract class MultiPath implements Path {
         inverse,
         [...path, ...res.path],
         res.target,
+        graphsToIgnore
       );
     }
   }
@@ -157,9 +167,10 @@ export abstract class MultiPath implements Path {
   *match(
     store: Store,
     focusNode: Term,
+    graphsToIgnore: Array<string>,
     inverse: boolean = false,
   ): Generator<PathResult> {
-    yield* this.matchNext(0, store, inverse, [], focusNode);
+    yield* this.matchNext(0, store, inverse, [], focusNode, graphsToIgnore);
   }
 }
 

@@ -18,8 +18,14 @@ npm install extract-cbd-shape
 import {CBDShapeExtractor} from "extract-cbd-shape";
 // ...
 let extractor = new CBDShapeExtractor(shapesGraph);
-let entityquads = await extractor.extract(store, entityId, shapeId);
+let entityquads = await extractor.extract(store, entityId, shapeId, graphsToIgnore);
 ```
+
+ * The shapesGraph is an N3.Store that contains the quads of a shape
+ * The store is an N3.Store containing the quads in the current context (e.g., the quads parsed from an HTTP response, or a message received over a channel)
+ * The entityId is the IRI of the entity to extract from the current context
+ * The Shape ID is the IRI of the NodeShape in the shapesGraph to start from
+ * The graphToIgnore are the namedgraphs in the current context (the store) to disregard when extracting the member
 
 ## Test it
 

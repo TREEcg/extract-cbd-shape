@@ -54,7 +54,7 @@ describe("Test whether the Patterns are correctly matched", function () {
   it("Check whether sequence paths are correctly matched", async () => {
     let match1 = shapesGraph.shapes
       .get(namedNode("http://example.org/SequencePathShape"))!
-      .requiredPaths[0].match(store, new NamedNode("http://example.org/A"))
+      .requiredPaths[0].match(store, new NamedNode("http://example.org/A"), [])
       .next().value;
     //assert(shapesGraph.shapes.get('http://example.org/SequencePathShape').requiredPaths[0].match(store, new NamedNode("http://example.org/A")));
   });
@@ -62,7 +62,7 @@ describe("Test whether the Patterns are correctly matched", function () {
   it("Check whether a double inverse is correctly matched", async () => {
     let match1 = shapesGraph.shapes
       .get(namedNode("http://example.org/DoubleInversePathShape"))!
-      .requiredPaths[0].match(store, new NamedNode("http://example.org/A"))
+      .requiredPaths[0].match(store, new NamedNode("http://example.org/A"), [])
       .next().value;
     //assert(shapesGraph.shapes.get('http://example.org/SequencePathShape').requiredPaths[0].match(store, new NamedNode("http://example.org/A")));
   });
