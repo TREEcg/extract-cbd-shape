@@ -41,10 +41,6 @@ let main = async function () {
     let extractorWithShape = new CBDShapeExtractor(shaclKBO);
     //console.log(shaclKBO.getQuads(null, null, null, null))
 
-    // Set same options for all tests
-    suite.minSamples = 50;
-    suite.maxTime = 2;
-
 
     /*  Test framework, 2 types of tests:
         Test Sample 13 quads
