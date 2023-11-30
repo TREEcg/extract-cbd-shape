@@ -3,13 +3,12 @@ const CBDShapeExtractor = require('../dist/lib/CBDShapeExtractor').CBDShapeExtra
 const Store = require('n3').Store;
 const rdfDereference = require('rdf-dereference').default;
 const NamedNode = require('n3').NamedNode;
-const ora = require("ora");
+
 
 let main = async function () {
-  var suite = new Benchmark.Suite;
+  let suite = new Benchmark.Suite;
   let kboData = new Store();
   let shaclKBO = new Store();
-
 
   //Load the quads from the file
   let kboDataStream = (
@@ -19,31 +18,32 @@ let main = async function () {
     )
   ).data;
 
-  await new Promise((resolve, reject) => {
-    kboData.import(kboDataStream).on("end", resolve).on("error", reject);
-  });
-  // console.error(kboData.getQuads(null, null, null, null));
-
-  //load the shacl shape
-
+  //load the shacl shape from the file
   let kboShaclStream = (
-    await rdfDereference.dereference(
-      "./tests/01 - fetching a shacl shape/shacl-shacl.ttl",
-      { localFiles: true },
-    )
+     await rdfDereference.dereference(
+         "./perf/resources/shacl-kbo.ttl",
+         // "./tests/06 - shapes and named graphs/shape.ttl",
+         { localFiles: true },
+      )
   ).data;
+
   await new Promise((resolve, reject) => {
-    kboData.import(kboShaclStream).on("end", resolve).on("error", reject);
+      kboData.import(kboDataStream).on("end", resolve).on("error", reject);
   });
 
-  // 
+  await new Promise((resolve, reject) => {
+    shaclKBO.import(kboShaclStream).on("end", resolve).on("error", reject);
+  });
+  // console.error(shaclKBO.getQuads(null, null, null, null));
+
+
   let extractor = new CBDShapeExtractor();
   let extractorWithShape = new CBDShapeExtractor(shaclKBO);
-
+  //console.log(shaclKBO.getQuads(null, null, null, null))
 
   // Set same options for all tests
-  suite.options.minSamples = 100;
-  suite.options.maxTime = 2;
+  suite.minSamples = 50;
+  suite.maxTime = 2;
 
 
 /*  Test framework, 2 types of tests:
@@ -78,7 +78,7 @@ let main = async function () {
              kboData,
              new NamedNode("https://kbopub.economie.fgov.be/kbo#0417199869.2022.11"),
          );
-         // console.error("Extract#CBDAndShape returned " + result.length + " quads.");
+         // console.error("Extract2#CBDAndNamedGraphs returned " + result.length + " quads.");
        })
 
 
@@ -89,20 +89,29 @@ let main = async function () {
             new NamedNode("https://kbopub.economie.fgov.be/kbo#0877248501.2022.11"),
             new NamedNode("https://kbopub.economie.fgov.be/kbo#LegalEntityShape")
         );
-        // console.error("Extract#CBDAndShape returned " + result.length + " quads.");
+          // console.error("Extract3#CBDAndSimpleShape " + result.length + " quads.");
       })
 
 
-      // CBD + named graphs + Simple shape that does not add any triples other than already present
+      // Extraction CBD + named graphs + Simple shape that does not add any triples other than already present
       .add('Extract4#CBDAndSimpleShapeAndNamedGraphs', async function () {
         let result = await extractorWithShape.extract(
             kboData,
             new NamedNode("https://kbopub.economie.fgov.be/kbo#0417199869.2022.11"),
-            new NamedNode("http://www.w3.org/ns/shacl-shacl#ShapeShape")
+            new NamedNode("https://kbopub.economie.fgov.be/kbo#LegalEntityShape")
         );
-        // console.error("Extract#CBDAndShape returned " + result.length + " quads.");
+        // console.error("Extract4#CBDAndSimpleShapeAndNamedGraphs " + result.length + " quads.");
       })
 
+      // Extraction Shape selecting specific property paths, but not too complex
+      .add('Extract5#CBDAndShaclExtended', async function () {
+          let result = await extractorWithShape.extract(
+              kboData,
+              new NamedNode("https://kbopub.economie.fgov.be/kbo#0877248501.2022.11"),
+              new NamedNode("https://kbopub.economie.fgov.be/kbo#LegalEntityShapeExtended")
+          );
+           // console.error("Extract5#CBDAndShaclExtended " + result.length + " quads.");
+      })
 
       // add listeners
   .on('cycle', function(event) {

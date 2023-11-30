@@ -5,7 +5,9 @@
 @prefix org: <http://www.w3.org/ns/org#> .
 @prefix terms: <http://purl.org/dc/terms/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:  <http://example.org/> .
 
+kbo:Owner0001 ex:own kbo:0877248501.2022.11.
 kbo:0877248501.2022.11 a legal:legalEntity,
         kbo:Enterprise ;
     terms:isVersionOf kbo:0877248501 ;
@@ -77,7 +79,6 @@ kbo:0417199869.2022.11 a legal:legalEntity,
         kbo:2008_68203 ;
     kbo:establishment kbo:2102213296 ;
     kbo:status kbo:Status_AC .
-
-
 kbo:2003_70203 a kbo:Activity .}
 
+#Extended SHACL

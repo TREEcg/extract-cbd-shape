@@ -1,7 +1,15 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix kbo: <https://kbopub.economie.fgov.be/kbo#> .
+@prefix geo: <http://www.opengis.net/ont/geosparql#> .
+@prefix legal: <http://www.w3.org/ns/legal#> .
+@prefix locn: <https://www.w3.org/ns/locn#> .
+@prefix org: <http://www.w3.org/ns/org#> .
+@prefix terms: <http://purl.org/dc/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+@prefix ex:  <http://example.org/> .
 
 # Shape for legal:legalEntity
 kbo:LegalEntityShape
@@ -13,7 +21,7 @@ kbo:LegalEntityShape
     ] ;
     sh:property [
         sh:path terms:isVersionOf ;
-        sh:maxCount 1 ;
+        sh:minCount 1 ;
     ] ;
     sh:property [
         sh:path legal:companyStatus ;
@@ -29,7 +37,7 @@ kbo:LegalEntityShape
     ] ;
     sh:property [
         sh:path legal:registeredAddress ;
-        sh:maxCount 1 ;
+        sh:minCount 1 ;
     ] ;
     sh:property [
         sh:path kbo:activity ;
@@ -37,11 +45,11 @@ kbo:LegalEntityShape
     ] ;
     sh:property [
         sh:path kbo:establishment ;
-        sh:maxCount 1 ;
+        sh:minCount 1 ;
     ] ;
     sh:property [
         sh:path kbo:status ;
-        sh:maxCount 1 ;
+        sh:minCount 1 ;
     ] .
 
 # Shape for locn:Address
@@ -51,12 +59,12 @@ kbo:AddressShape
     sh:property [
         sh:path geo:asWKT ;
         sh:datatype geo:wktLiteral ;
-        sh:maxCount 1 ;
+        sh:minCount 1 ;
     ] ;
     sh:property [
         sh:path kbo:addressType ;
         sh:in (kbo:TypeOfAddress_REGO kbo:TypeOfAddress_BAET) ;
-        sh:maxCount 1 ;
+        sh:minCount 1 ;
     ] ;
     sh:property [
         sh:path locn:fullAddress ;
@@ -64,15 +72,15 @@ kbo:AddressShape
     ] ;
     sh:property [
         sh:path locn:poBox ;
-        sh:maxCount 1 ;
+        sh:minCount 1 ;
     ] ;
     sh:property [
         sh:path locn:postCode ;
-        sh:maxCount 1 ;
+        sh:minCount 1 ;
     ] ;
     sh:property [
         sh:path locn:postName ;
-        sh:maxCount 1 ;
+        sh:minCount 1 ;
     ] .
 
 # Shape for kbo:Activity
@@ -81,11 +89,11 @@ kbo:ActivityShape
     sh:targetClass kbo:Activity ;
     sh:property [
         sh:path legal:companyActivity ;
-        sh:maxCount 1 ;
+        sh:minCount 1 ;
     ] ;
     sh:property [
         sh:path kbo:classification ;
-        sh:maxCount 1 ;
+        sh:minCount 1 ;
     ] .
 
 # Shape for org:Site
@@ -95,11 +103,11 @@ kbo:SiteShape
     sh:property [
         sh:path terms:issued ;
         sh:datatype xsd:date ;
-        sh:maxCount 1 ;
+        sh:minCount 1 ;
     ] ;
     sh:property [
         sh:path locn:Address ;
-        sh:maxCount 1 ;
+        sh:minCount 1 ;
     ] .
 
 # Shape for kbo:Code
@@ -108,9 +116,55 @@ kbo:CodeShape
     sh:targetClass kbo:Code ;
     sh:property [
         sh:path kbo:codeDescription ;
-        sh:maxCount 2 ;
+        sh:minCount 1 ;
     ] ;
     sh:property [
         sh:path kbo:codeValue ;
-        sh:maxCount 1 ;
+        sh:minCount 1 ;
     ] .
+
+
+# Shape for legal:legalEntity
+kbo:LegalEntityShapeExtended
+  a sh:NodeShape ;
+     sh:property [
+         sh:path rdf:type ;
+         sh:in (legal:legalEntity kbo:Enterprise) ;
+         sh:minCount 1 ;
+     ] ;
+     sh:property [
+         sh:path terms:isVersionOf ;
+         sh:minCount 1 ;
+     ] ;
+     sh:property [
+         sh:path legal:companyStatus ;
+         sh:in (kbo:JuridicalSituation_000) ;
+     ] ;
+     sh:property [
+         sh:path legal:companyType ;
+         sh:in (kbo:JuridicalForm_014) ;
+     ] ;
+     sh:property [
+         sh:path legal:legalName ;
+         sh:minCount 1 ;
+     ] ;
+     sh:property [
+         sh:path legal:registeredAddress ;
+         sh:minCount 1 ;
+     ] ;
+     sh:property [
+         sh:path kbo:activity ;
+         sh:minCount 1 ;
+     ] ;
+     sh:property [
+         sh:path kbo:establishment ;
+         sh:minCount 1 ;
+     ] ;
+     sh:property [
+         sh:path kbo:status ;
+         sh:minCount 1 ;
+     ];
+     sh:property [
+         sh:path [sh:inversePath ex:own ];
+         sh:minCount 1 ;
+     ].
