@@ -7,11 +7,11 @@ const NamedNode = require('n3').NamedNode;
 
 let main = async function () {
     let suite = new Benchmark.Suite;
-    let kboData = new Store();
-    let shaclKBO = new Store();
+    let memberData = new Store();
+    let shaclmember = new Store();
 
     //Load the quads from the file
-    let kboDataStream = (
+    let memberDataStream = (
         await rdfDereference.dereference(
             "./perf/resources/member.ttl",
             {localFiles: true},
@@ -19,27 +19,27 @@ let main = async function () {
     ).data;
 
     //load the shacl shape from the file
-    let kboShaclStream = (
+    let memberShaclStream = (
         await rdfDereference.dereference(
-            "./perf/resources/shacl-kbo.ttl",
+            "./perf/resources/shacl-member.ttl",
             // "./tests/06 - shapes and named graphs/shape.ttl",
             {localFiles: true},
         )
     ).data;
 
     await new Promise((resolve, reject) => {
-        kboData.import(kboDataStream).on("end", resolve).on("error", reject);
+        memberData.import(memberDataStream).on("end", resolve).on("error", reject);
     });
 
     await new Promise((resolve, reject) => {
-        shaclKBO.import(kboShaclStream).on("end", resolve).on("error", reject);
+        shaclmember.import(memberShaclStream).on("end", resolve).on("error", reject);
     });
-    // console.error(shaclKBO.getQuads(null, null, null, null));
+    // console.error(shaclmember.getQuads(null, null, null, null));
 
 
     let extractor = new CBDShapeExtractor();
-    let extractorWithShape = new CBDShapeExtractor(shaclKBO);
-    //console.log(shaclKBO.getQuads(null, null, null, null))
+    let extractorWithShape = new CBDShapeExtractor(shaclmember);
+    //console.log(shaclmember.getQuads(null, null, null, null))
 
 
     /* * Test extracting 10 members from a Collection with 10 different nodes
@@ -50,14 +50,33 @@ let main = async function () {
     //out-band tests
     //Extraction 10 members from a Collection with 10 different nodes
     suite
-        .add('Extract1#TenMemberCollection', async function () {
-            let result = await extractor.extract(
-                kboData,
-                new NamedNode("http://example.org/Community"),
-            );
-             // console.error("Extract1#TenMemberCollection " + result.length + " quads.");
-        })
+        .add('Extract1#ExtractionCollectionMembers', async function ExtractTenMemberCollection() {
+                const members = memberData.getQuads(null, "https://w3id.org/tree#member", null);
+                const result = new Store();
+                for (const member of members) {
+                    result.addQuads( await extractor.extract(
+                        memberData,
+                        member.object,
+                    ));
+                }
+                 // console.error("Extract1#ExtractionMember " + result.size + " quads.");
+            }
+        )
         //Extraction 10 members from 1 page, but each member is out of band
+        // .add('Extract1#ExtractionCollectionMembersOutBand', async function ExtractTenMemberCollection() {
+        //         const members = memberData.getQuads(null, "https://w3id.org/tree#member", null);
+        //         const result = new Store();
+        //         for (const member of members) {
+        //             let extract = await extractorWithShape.extract(
+        //                 memberData,
+        //                 member.object,
+        //                 new NamedNode("http://example.org/memberShape")
+        //             );
+        //             result.addQuads(extract);
+        //         }
+        //         console.error("Extract1#ExtractionMember " + result.size + " quads.");
+        //     }
+        // )
         //Extraction 10 members from 1 page, out of band, but each member has already a couple of triples in-band
         // add listeners
         .on('cycle', function (event) {

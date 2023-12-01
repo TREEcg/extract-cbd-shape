@@ -6,18 +6,11 @@
 
 ex:Community
     a tree:Collection ;
-    tree:member <https://pietercolpaert.be/#me>, <https://www.thundr.be/profile/laurens.ttl#me>,
-    <https://sven-lieber.org/profile/profile.ttl#me>.
+    tree:member <https://sven-lieber.org/profile#>, <https://ruben.verborgh.org/profile/>.
 
- <https://pietercolpaert.be/#me>
-    a foaf:Person ;
-    ex:memberOf ex:Community .
+ <https://sven-lieber.org/profile#>
+    a tree:Node.
 
- <https://www.thundr.be/profile/laurens.ttl#me>
-    a foaf:Person ;
-    ex:memberOf ex:Community .
-
- <https://sven-lieber.org/profile/profile.ttl#me>
-    a foaf:Person ;
-    ex:memberOf ex:Community .
+ <https://ruben.verborgh.org/profile/>
+    a tree:Node.
 

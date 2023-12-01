@@ -1,0 +1,13 @@
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix vcard:   <http://www.w3.org/2006/vcard/ns#> .
+@prefix con:     <http://www.w3.org/2000/10/swap/pim/contact#> .
+@prefix sh:      <http://www.w3.org/ns/shacl#> .
+@prefix ex:  <http://example.org/> .
+
+ex:memberShape a sh:NodeShape ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+    ].
