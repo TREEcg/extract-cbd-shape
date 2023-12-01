@@ -8,6 +8,6 @@
 
 ex:memberShape a sh:NodeShape ;
     sh:property [
-        sh:path rdfs:label ;
+        sh:path foaf:maker ;
         sh:minCount 1 ;
     ].

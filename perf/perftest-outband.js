@@ -63,20 +63,28 @@ let main = async function () {
             }
         )
         //Extraction 10 members from 1 page, but each member is out of band
-        // .add('Extract1#ExtractionCollectionMembersOutBand', async function ExtractTenMemberCollection() {
-        //         const members = memberData.getQuads(null, "https://w3id.org/tree#member", null);
-        //         const result = new Store();
-        //         for (const member of members) {
-        //             let extract = await extractorWithShape.extract(
-        //                 memberData,
-        //                 member.object,
-        //                 new NamedNode("http://example.org/memberShape")
-        //             );
-        //             result.addQuads(extract);
-        //         }
-        //         console.error("Extract1#ExtractionMember " + result.size + " quads.");
-        //     }
-        // )
+        .add('Extract2#ExtractionCollectionMembersOutBand', {
+        defer: true, // Enable asynchronous test
+        fn: async function ExtractTenMemberCollection(deferred) {
+            const members = memberData.getQuads(null, "https://w3id.org/tree#member", null);
+            const result = new Store();
+            for (const member of members) {
+                let extract = await extractorWithShape.extract(
+                    memberData,
+                    member.object,
+                    new NamedNode("http://example.org/memberShape")
+                );
+                // console.log(extract);
+                result.addQuads(extract);
+            }
+            // console.error("Extract2#ExtractionCollectionMembersOutBand " + result.size + " quads.");
+
+            // Resolve the deferred object to signal the end of the asynchronous test
+            deferred.resolve();
+        },
+        // Set the timeout for this specific test
+        time: 25000,
+    })
         //Extraction 10 members from 1 page, out of band, but each member has already a couple of triples in-band
         // add listeners
         .on('cycle', function (event) {

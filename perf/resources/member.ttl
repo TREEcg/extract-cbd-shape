@@ -1,16 +1,29 @@
 @prefix prov:    <http://www.w3.org/ns/prov#> .
-@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix tree:    <https://w3id.org/tree#> .
 @prefix ex:  <http://example.org/> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/>.
 
 ex:Community
     a tree:Collection ;
-    tree:member <https://sven-lieber.org/profile#>, <https://ruben.verborgh.org/profile/>.
+    tree:member <https://sven-lieber.org/profile#>, <https://ruben.verborgh.org/profile/>, <https://pietercolpaert.be/#me>, <https://www.bergnet.org/people/bergi/card>,
+    <https://julianrojas.org/#about-me>, <https://www.iamkonstantin.eu/>.
 
  <https://sven-lieber.org/profile#>
     a tree:Node.
 
  <https://ruben.verborgh.org/profile/>
+    a tree:Node.
+
+ <https://pietercolpaert.be/#me>
+    a tree:Node.
+
+  <https://www.bergnet.org/people/bergi/card>
+    a tree:Node.
+
+  <https://julianrojas.org/#about-me>
+    a tree:Node.
+
+  <https://www.iamkonstantin.eu/>
     a tree:Node.
 
