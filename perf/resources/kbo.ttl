@@ -7,7 +7,6 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix ex:  <http://example.org/> .
 
-kbo:Owner0001 ex:own kbo:0877248501.2022.11.
 kbo:0877248501.2022.11 a legal:legalEntity,
         kbo:Enterprise ;
     terms:isVersionOf kbo:0877248501 ;
@@ -82,3 +81,16 @@ kbo:0417199869.2022.11 a legal:legalEntity,
 kbo:2003_70203 a kbo:Activity .}
 
 #Extended SHACL
+kbo:Owner0001 ex:own kbo:0877248501.2023.11.
+kbo:0877248501.2023.11 a legal:legalEntity,
+        kbo:Enterprise ;
+    legal:companyStatus kbo:JuridicalSituation_000 ;
+    legal:companyType kbo:JuridicalForm_014 ;
+    legal:legalName "AEDIFICA" ;
+    legal:registeredAddress kbo:09e327511d79f1a1e594 ;
+    kbo:activity kbo:2003_70201,
+        kbo:2003_70203,
+        kbo:2008_68201,
+        kbo:2008_68203 ;
+    kbo:establishment kbo:2277343234 ;
+    kbo:status kbo:Status_AC .

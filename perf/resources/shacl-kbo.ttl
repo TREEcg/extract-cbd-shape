@@ -124,16 +124,12 @@ kbo:CodeShape
     ] .
 
 
-# Shape for legal:legalEntity
+# Shape for legal:legalEntity with SHCAL extended properties
 kbo:LegalEntityShapeExtended
   a sh:NodeShape ;
      sh:property [
          sh:path rdf:type ;
          sh:in (legal:legalEntity kbo:Enterprise) ;
-         sh:minCount 1 ;
-     ] ;
-     sh:property [
-         sh:path terms:isVersionOf ;
          sh:minCount 1 ;
      ] ;
      sh:property [
@@ -168,3 +164,52 @@ kbo:LegalEntityShapeExtended
          sh:path [sh:inversePath ex:own ];
          sh:minCount 1 ;
      ].
+
+
+  # Shape for kbo:Enterprise with SHCAL with conditions
+  kbo:LegalEntityShapeConditions
+    a sh:NodeShape ;
+       sh:property [
+           sh:path rdf:type ;
+           sh:in (legal:legalEntity kbo:Enterprise) ;
+           sh:minCount 1 ;
+       ] ;
+       sh:property [
+           sh:path legal:companyStatus ;
+           sh:in (kbo:JuridicalSituation_000) ;
+       ] ;
+       sh:property [
+           sh:path legal:companyType ;
+           sh:in (kbo:JuridicalForm_014) ;
+       ] ;
+       sh:property [
+           sh:path legal:legalName ;
+           sh:minCount 1 ;
+       ] ;
+       sh:property [
+           sh:path legal:registeredAddress ;
+           sh:minCount 1 ;
+       ] ;
+       sh:property [
+           sh:path kbo:activity ;
+           sh:minCount 1 ;
+       ] ;
+       sh:property [
+           sh:path kbo:establishment ;
+           sh:minCount 1 ;
+       ] ;
+       sh:property [
+           sh:path kbo:status ;
+           sh:minCount 1 ;
+       ];
+  sh:xone (
+  		[
+  			sh:xone (
+  				[
+  					sh:path [sh:inversePath ex:own ];
+                    sh:minCount 1 ;
+
+  				]
+  			)
+  		]
+  	) .

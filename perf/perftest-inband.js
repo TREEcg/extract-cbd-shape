@@ -3,13 +3,13 @@ const CBDShapeExtractor = require('../dist/lib/CBDShapeExtractor').CBDShapeExtra
 const Store = require('n3').Store;
 const rdfDereference = require('rdf-dereference').default;
 const NamedNode = require('n3').NamedNode;
-
+Benchmark.options.minSamples = 100;
 
 let main = async function () {
+
     let suite = new Benchmark.Suite;
     let kboData = new Store();
     let shaclKBO = new Store();
-
     //Load the quads from the file
     let kboDataStream = (
         await rdfDereference.dereference(
@@ -42,6 +42,10 @@ let main = async function () {
     //console.log(shaclKBO.getQuads(null, null, null, null))
 
 
+
+
+
+
     /*  Test framework, 2 types of tests:
         Test Sample 13 quads
         1. in-band only
@@ -51,12 +55,10 @@ let main = async function () {
        * CBD + named graphs + Simple shape that does not add any triples other than already present
        * Shape selecting specific property paths, but not too complex
        * Complex shape with conditionals
-       2. out of band tests
-       * Test extracting 10 members from a Collection with 10 different nodes
-       * Test extracting 10 members from 1 page, but each member is out of band
-       * Test extracting 10 members from 1 page, out of band, but each member has already a couple of triples in-band*/
+     */
 
 
+    //In-band tests - 13 quads
     //Extraction only star-shapes (CBD) + blank nodes to be extracted
     suite
         .add('Extract1#CBDAndBlankNode', async function () {
@@ -103,10 +105,20 @@ let main = async function () {
         .add('Extract5#CBDAndShaclExtended', async function () {
             let result = await extractorWithShape.extract(
                 kboData,
-                new NamedNode("https://kbopub.economie.fgov.be/kbo#0877248501.2022.11"),
+                new NamedNode("https://kbopub.economie.fgov.be/kbo#0877248501.2023.11"),
                 new NamedNode("https://kbopub.economie.fgov.be/kbo#LegalEntityShapeExtended")
             );
-            // console.error("Extract5#CBDAndShaclExtended " + result.length + " quads.");
+        //      console.error("Extract5#CBDAndShaclExtended " + result.length + " quads.");
+        })
+
+        //Extraction Complex shape with conditionals
+        .add('Extract6#CBDAndShaclExtendedComplex', async function () {
+            let result = await extractorWithShape.extract(
+                kboData,
+                new NamedNode("https://kbopub.economie.fgov.be/kbo#0877248501.2023.11"),
+                new NamedNode("https://kbopub.economie.fgov.be/kbo#LegalEntityShapeConditions")
+            );
+            // console.error("Extract6#CBDAndShaclExtendedComplex " + result.length + " quads.");
         })
 
         // add listeners

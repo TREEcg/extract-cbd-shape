@@ -1,0 +1,23 @@
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix tree:    <https://w3id.org/tree#> .
+@prefix ex:  <http://example.org/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+
+ex:Community
+    a tree:Collection ;
+    tree:member <https://pietercolpaert.be/#me>, <https://www.thundr.be/profile/laurens.ttl#me>,
+    <https://sven-lieber.org/profile/profile.ttl#me>.
+
+ <https://pietercolpaert.be/#me>
+    a foaf:Person ;
+    ex:memberOf ex:Community .
+
+ <https://www.thundr.be/profile/laurens.ttl#me>
+    a foaf:Person ;
+    ex:memberOf ex:Community .
+
+ <https://sven-lieber.org/profile/profile.ttl#me>
+    a foaf:Person ;
+    ex:memberOf ex:Community .
+
