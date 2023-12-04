@@ -126,7 +126,7 @@ let main = async function () {
           samples: test.stats.sample.length,
         };
       });
-      renderResults(results);
+      renderResults("inband", results);
     })
     // run async
     .run({ async: true });
