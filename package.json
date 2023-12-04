@@ -7,6 +7,7 @@
   "scripts": {
     "test": "mocha",
     "build": "tsc",
+    "data": "npm run build && node ./perf/outband-setup.js",
     "bench": "npm run build && node ./perf/perftest-inband.js && node ./perf/perftest-outband.js"
   },
   "keywords": [
