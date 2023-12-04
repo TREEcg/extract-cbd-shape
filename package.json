@@ -6,7 +6,8 @@
   "types": "dist/lib/extract-cbd-shape.d.ts",
   "scripts": {
     "test": "mocha",
-    "build": "tsc"
+    "build": "tsc",
+    "bench:inband": "npm run build && node ./perf/perftest-inband.js"
   },
   "keywords": [
     "CBD",
@@ -30,13 +31,11 @@
     "@types/sinon": "^10.0.16",
     "benchmark": "^2.1.4",
     "chai": "^4.3.7",
-    "microtime": "^3.1.1",
-    "mocha": "^10.2.0",
-    "ts-node": "^10.9.1",
     "chalk": "^4.1.2",
     "console-table-printer": "^2.10.0",
-    "microtime": "^3.0.0",
-    "ora": "^5.1.0"
-    
+    "microtime": "^3.1.1",
+    "mocha": "^10.2.0",
+    "ora": "^5.1.0",
+    "ts-node": "^10.9.1"
   }
 }
