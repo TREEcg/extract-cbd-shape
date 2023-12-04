@@ -1,9 +1,12 @@
 const Benchmark = require("benchmark");
-const CBDShapeExtractor =
-  require("../dist/lib/CBDShapeExtractor").CBDShapeExtractor;
 const Store = require("n3").Store;
 const rdfDereference = require("rdf-dereference").default;
 const NamedNode = require("n3").NamedNode;
+
+const CBDShapeExtractor =
+  require("../dist/lib/CBDShapeExtractor").CBDShapeExtractor;
+
+const { renderResults } = require("./render");
 Benchmark.options.minSamples = 100;
 
 let main = async function () {
@@ -115,11 +118,15 @@ let main = async function () {
     })
 
     // add listeners
-    .on("cycle", function (event) {
-      console.log(String(event.target));
-    })
     .on("complete", function () {
-      console.log("Fastest is " + String(this.filter("fastest").map("name")));
+      const results = this.map((test) => {
+        return {
+          name: test.name,
+          opsPerSecond: test.hz,
+          samples: test.stats.sample.length,
+        };
+      });
+      renderResults(results);
     })
     // run async
     .run({ async: true });
