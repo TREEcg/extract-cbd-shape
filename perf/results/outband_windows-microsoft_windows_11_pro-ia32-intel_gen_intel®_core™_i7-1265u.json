@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Extract1#ExtractionCollectionMembers",
+    "opsPerSecond": 483.26409064350196,
+    "samples": 85
+  },
+  {
+    "name": "Extract2#ExtractionMembersPartialOutBand",
+    "opsPerSecond": 387.07710999458146,
+    "samples": 80
+  },
+  {
+    "name": "Extract3#ExtractionMembersOutBand",
+    "opsPerSecond": 308.61335658917136,
+    "samples": 64
+  }
+]

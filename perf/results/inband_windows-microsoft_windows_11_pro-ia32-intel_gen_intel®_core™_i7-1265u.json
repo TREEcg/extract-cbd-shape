@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Extract3#CBDAndSimpleShape",
+    "opsPerSecond": 22545.26579842507,
+    "samples": 129
+  },
+  {
+    "name": "Extract1#CBDAndBlankNode",
+    "opsPerSecond": 94581.03984584502,
+    "samples": 130
+  }
+]

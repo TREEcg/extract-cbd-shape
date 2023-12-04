@@ -1,0 +1,10 @@
+@prefix rdfs:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ex:  <http://example.org/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+@prefix : <http://localhost:8080/member-4.ttl>.
+
+<http://localhost:8080/member-4.ttl>  a foaf:Person;
+foaf:givenName "member-4"@en;
+foaf:familyName "member-4"@en;
+rdfs:label "member"@en.
+:me foaf:knows <http://localhost:8080/member-5.ttl>.

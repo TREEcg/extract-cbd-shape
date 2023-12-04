@@ -11,62 +11,42 @@ ex:Community
     <http://localhost:8080/member-10.ttl>.
 
 <http://localhost:8080/member-1.ttl>
-    a tree:Node;
-    foaf:givenName "member-1"@en;
     foaf:familyName "member-1"@en;
     rdfs:label "member"@en.
 
 <http://localhost:8080/member-2.ttl>
-    a tree:Node;
-    foaf:givenName "member-2"@en;
     foaf:familyName "member-2"@en;
     rdfs:label "member"@en.
 
 <http://localhost:8080/member-3.ttl>
-    a tree:Node;
-    foaf:givenName "member-3"@en;
     foaf:familyName "member-3"@en;
     rdfs:label "member"@en.
 
 <http://localhost:8080/member-4.ttl>
-    a tree:Node;
-    foaf:givenName "member-4"@en;
     foaf:familyName "member-4"@en;
     rdfs:label "member"@en.
 
 <http://localhost:8080/member-5.ttl>
-    a tree:Node;
-    foaf:givenName "member-5"@en;
     foaf:familyName "member-5"@en;
     rdfs:label "member"@en.
 
 <http://localhost:8080/member-6.ttl>
-    a tree:Node;
-    foaf:givenName "member-6"@en;
     foaf:familyName "member-6"@en;
     rdfs:label "member"@en.
 
 <http://localhost:8080/member-7.ttl>
-    a tree:Node;
-    foaf:givenName "member-7"@en;
     foaf:familyName "member-7"@en;
     rdfs:label "member"@en.
 
  <http://localhost:8080/member-8.ttl>
-    a tree:Node;
-    foaf:givenName "member-8"@en;
     foaf:familyName "member-8"@en;
     rdfs:label "member"@en.
 
 <http://localhost:8080/member-9.ttl>
-    a tree:Node;
-    foaf:givenName "member-9"@en;
     foaf:familyName "member-9"@en;
     rdfs:label "member"@en.
 
 <http://localhost:8080/member-10.ttl>
-    a tree:Node;
-    foaf:givenName "member-10"@en;
     foaf:familyName "member-10"@en;
     rdfs:label "member"@en.
 

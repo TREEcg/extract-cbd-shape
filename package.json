@@ -19,6 +19,7 @@
   "license": "MIT",
   "dependencies": {
     "@treecg/types": "^0.4.5",
+    "jsdom": "^23.0.1",
     "n3": "^1.17.0",
     "rdf-dereference": "^2.1.0"
   },
@@ -32,8 +33,8 @@
     "benchmark": "^2.1.4",
     "chai": "^4.3.7",
     "mocha": "^10.2.0",
+    "rollup-plugin-polyfill-node": "^0.12.0",
     "systeminformation": "^5.21.20",
-		"rollup-plugin-polyfill-node": "^0.12.0",
     "ts-node": "^10.9.1"
   }
 }
