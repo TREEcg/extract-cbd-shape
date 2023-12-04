@@ -25,13 +25,11 @@
   let simpleShape = async (count: number) => {
     console.log("simple shape with", count, "iterations" )
       for(let i = 0; i < count; i ++ ) {
-        let result = await extractorWithShape.extract(
-          kboData,
-          new NamedNode("https://kbopub.economie.fgov.be/kbo#0877248501.2023.11"),
-          new NamedNode(
-           "https://kbopub.economie.fgov.be/kbo#LegalEntityShapeConditions"
-          )
-        );
+      let result = await extractorWithShape.extract(
+        kboData,
+        new NamedNode("https://kbopub.economie.fgov.be/kbo#0877248501.2022.11"),
+        new NamedNode("https://kbopub.economie.fgov.be/kbo#LegalEntityShape")
+      );
       }
   };
 
@@ -58,6 +56,7 @@
       shaclKBO.import(kboShaclStream).on("end", resolve).on("error", reject);
     });
 
+     extractorWithShape = new CBDShapeExtractor(shaclKBO);
   })
 </script>
 
