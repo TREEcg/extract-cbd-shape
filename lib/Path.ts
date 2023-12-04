@@ -9,7 +9,7 @@ export interface Path {
     focusNode: Term,
     graphsToIgnore?: Array<string>,
     inverse?: boolean,
-  ): Generator<PathResult>;
+  ): PathResult[];
 }
 
 export class PredicatePath implements Path {
@@ -23,23 +23,22 @@ export class PredicatePath implements Path {
     return `<${this.predicate.value}>`;
   }
 
-  *match(
+  match(
     store: Store,
     focusNode: Term,
     graphsToIgnore: Array<string>,
     inverse: boolean = false,
-  ): Generator<PathResult, any, unknown> {
+  ): PathResult[] {
     let quads = inverse
       ? store.getQuads(null, this.predicate, focusNode, null)
       : store.getQuads(focusNode, this.predicate, null, null);
 
-    for (let quad of quads) {
-      if (!graphsToIgnore.includes(quad.graph.value)) {
-        //If there are no elements left, we are yielding our result
-        let newFocusNode = inverse ? quad.subject : quad.object;
-        yield new PathResult([quad], newFocusNode);
-      }
-    }
+    return quads
+      .filter((q) => !graphsToIgnore.includes(q.graph.value))
+      .map((quad) => {
+        const newFocusNode = inverse ? quad.subject : quad.object;
+        return { path: [quad], target: newFocusNode };
+      });
   }
 }
 
@@ -56,16 +55,28 @@ export class SequencePath implements Path {
     index: number,
     path: Quad[],
     target: Term,
-    graphsToIgnore: Array<string>
+    graphsToIgnore: Array<string>,
   ): Generator<PathResult> {
     if (index === this.sequence.length) {
-      yield new PathResult(path.slice(), target);
+      yield { path: path.slice(), target };
       return;
     }
 
-    for (const found of this.sequence[index].match(store, target, graphsToIgnore, inverse)) {
+    for (const found of this.sequence[index].match(
+      store,
+      target,
+      graphsToIgnore,
+      inverse,
+    )) {
       const newPath = [...path, ...found.path];
-      yield* this.matchNext(store, inverse, index + 1, newPath, found.target, graphsToIgnore);
+      yield* this.matchNext(
+        store,
+        inverse,
+        index + 1,
+        newPath,
+        found.target,
+        graphsToIgnore,
+      );
     }
   }
 
@@ -73,13 +84,23 @@ export class SequencePath implements Path {
     return this.sequence.map((x) => x.toString()).join("/");
   }
 
-  *match(
+  match(
     store: Store,
     focusNode: Term,
     graphsToIgnore: Array<string>,
     inverse: boolean = false,
-  ): Generator<PathResult, any, unknown> {
-    yield* this.matchNext(store, inverse, 0, [], focusNode, graphsToIgnore);
+  ): PathResult[] {
+    let results: PathResult[] = [{ path: [], target: focusNode }];
+    for (const path of this.sequence) {
+      results = results.flatMap((res) => {
+        const nexts = path.match(store, res.target, graphsToIgnore, inverse);
+        return nexts.map((n) => ({
+          path: [...res.path, ...n.path],
+          target: n.target,
+        }));
+      });
+    }
+    return results;
   }
 }
 
@@ -94,15 +115,15 @@ export class AlternativePath implements Path {
     return this.alternatives.map((x) => x.toString()).join("|");
   }
 
-  *match(
+  match(
     store: Store,
     focusNode: Term,
     graphsToIgnore: Array<string>,
     inverse: boolean = false,
-  ): Generator<PathResult, any, unknown> {
-    for (const alt of this.alternatives) {
-      yield* alt.match(store, focusNode, graphsToIgnore, inverse);
-    }
+  ): PathResult[] {
+    return this.alternatives.flatMap((path) =>
+      path.match(store, focusNode, graphsToIgnore, inverse),
+    );
   }
 }
 
@@ -117,13 +138,13 @@ export class InversePath implements Path {
     return "^" + this.path.toString();
   }
 
-  *match(
+  match(
     store: Store,
     focusNode: Term,
     graphsToIgnore: Array<string>,
     inverse: boolean = false,
-  ): Generator<PathResult, any, unknown> {
-    yield* this.path.match(store, focusNode, graphsToIgnore, !inverse);
+  ): PathResult[] {
+    return this.path.match(store, focusNode, graphsToIgnore, !inverse);
   }
 }
 
@@ -144,14 +165,14 @@ export abstract class MultiPath implements Path {
     inverse: boolean,
     path: Quad[],
     target: Term,
-    graphsToIgnore: Array<string>
+    graphsToIgnore: Array<string>,
   ): Generator<PathResult> {
     // Please no off by one error
     if (!!this.maxCount && index > this.maxCount) return;
 
     for (const res of this.path.match(store, target, graphsToIgnore, inverse)) {
       if (this.filter(index, res)) {
-        yield new PathResult([...path, ...res.path], res.target);
+        yield { path: [...path, ...res.path], target: res.target };
       }
       yield* this.matchNext(
         index + 1,
@@ -159,18 +180,46 @@ export abstract class MultiPath implements Path {
         inverse,
         [...path, ...res.path],
         res.target,
-        graphsToIgnore
+        graphsToIgnore,
       );
     }
   }
 
-  *match(
+  match(
     store: Store,
     focusNode: Term,
     graphsToIgnore: Array<string>,
     inverse: boolean = false,
-  ): Generator<PathResult> {
-    yield* this.matchNext(0, store, inverse, [], focusNode, graphsToIgnore);
+  ): PathResult[] {
+    const out: PathResult[] = [];
+    let targets: PathResult[] = [{ path: [], target: focusNode }];
+
+    for (let i = 0; true; i++) {
+      if (this.maxCount && i > this.maxCount) break;
+      if (targets.length === 0) break;
+      const newTargets: PathResult[] = [];
+
+      for (const t of targets) {
+        for (const found of this.path.match(
+          store,
+          t.target,
+          graphsToIgnore,
+          inverse,
+        )) {
+          if (this.filter(i, found)) {
+            out.push({
+              path: [...t.path, ...found.path],
+              target: found.target,
+            });
+          }
+          newTargets.push(found);
+        }
+      }
+
+      targets = newTargets;
+    }
+
+    return out;
   }
 }
 
@@ -209,11 +258,7 @@ export class ZeroOrOnePath extends MultiPath {
   }
 }
 
-export class PathResult {
+export interface PathResult {
   path: Array<Quad>;
   target: Term;
-  constructor(path: Array<Quad>, target: Term) {
-    this.path = path;
-    this.target = target;
-  }
 }

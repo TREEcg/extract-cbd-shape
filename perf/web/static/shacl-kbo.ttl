@@ -1,0 +1,215 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix kbo: <https://kbopub.economie.fgov.be/kbo#> .
+@prefix geo: <http://www.opengis.net/ont/geosparql#> .
+@prefix legal: <http://www.w3.org/ns/legal#> .
+@prefix locn: <https://www.w3.org/ns/locn#> .
+@prefix org: <http://www.w3.org/ns/org#> .
+@prefix terms: <http://purl.org/dc/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+@prefix ex:  <http://example.org/> .
+
+# Shape for legal:legalEntity
+kbo:LegalEntityShape
+    a sh:NodeShape ;
+    sh:targetClass legal:legalEntity ;
+    sh:property [
+        sh:path rdf:type ;
+        sh:in (legal:legalEntity kbo:Enterprise) ;
+    ] ;
+    sh:property [
+        sh:path terms:isVersionOf ;
+        sh:minCount 1 ;
+    ] ;
+    sh:property [
+        sh:path legal:companyStatus ;
+        sh:in (kbo:JuridicalSituation_000) ;
+    ] ;
+    sh:property [
+        sh:path legal:companyType ;
+        sh:in (kbo:JuridicalForm_014) ;
+    ] ;
+    sh:property [
+        sh:path legal:legalName ;
+        sh:minCount 1 ;
+    ] ;
+    sh:property [
+        sh:path legal:registeredAddress ;
+        sh:minCount 1 ;
+    ] ;
+    sh:property [
+        sh:path kbo:activity ;
+        sh:minCount 1 ;
+    ] ;
+    sh:property [
+        sh:path kbo:establishment ;
+        sh:minCount 1 ;
+    ] ;
+    sh:property [
+        sh:path kbo:status ;
+        sh:minCount 1 ;
+    ] .
+
+# Shape for locn:Address
+kbo:AddressShape
+    a sh:NodeShape ;
+    sh:targetClass locn:Address ;
+    sh:property [
+        sh:path geo:asWKT ;
+        sh:datatype geo:wktLiteral ;
+        sh:minCount 1 ;
+    ] ;
+    sh:property [
+        sh:path kbo:addressType ;
+        sh:in (kbo:TypeOfAddress_REGO kbo:TypeOfAddress_BAET) ;
+        sh:minCount 1 ;
+    ] ;
+    sh:property [
+        sh:path locn:fullAddress ;
+        sh:minCount 1 ;
+    ] ;
+    sh:property [
+        sh:path locn:poBox ;
+        sh:minCount 1 ;
+    ] ;
+    sh:property [
+        sh:path locn:postCode ;
+        sh:minCount 1 ;
+    ] ;
+    sh:property [
+        sh:path locn:postName ;
+        sh:minCount 1 ;
+    ] .
+
+# Shape for kbo:Activity
+kbo:ActivityShape
+    a sh:NodeShape ;
+    sh:targetClass kbo:Activity ;
+    sh:property [
+        sh:path legal:companyActivity ;
+        sh:minCount 1 ;
+    ] ;
+    sh:property [
+        sh:path kbo:classification ;
+        sh:minCount 1 ;
+    ] .
+
+# Shape for org:Site
+kbo:SiteShape
+    a sh:NodeShape ;
+    sh:targetClass org:Site ;
+    sh:property [
+        sh:path terms:issued ;
+        sh:datatype xsd:date ;
+        sh:minCount 1 ;
+    ] ;
+    sh:property [
+        sh:path locn:Address ;
+        sh:minCount 1 ;
+    ] .
+
+# Shape for kbo:Code
+kbo:CodeShape
+    a sh:NodeShape ;
+    sh:targetClass kbo:Code ;
+    sh:property [
+        sh:path kbo:codeDescription ;
+        sh:minCount 1 ;
+    ] ;
+    sh:property [
+        sh:path kbo:codeValue ;
+        sh:minCount 1 ;
+    ] .
+
+
+# Shape for legal:legalEntity with SHCAL extended properties
+kbo:LegalEntityShapeExtended
+  a sh:NodeShape ;
+     sh:property [
+         sh:path rdf:type ;
+         sh:in (legal:legalEntity kbo:Enterprise) ;
+         sh:minCount 1 ;
+     ] ;
+     sh:property [
+         sh:path legal:companyStatus ;
+         sh:in (kbo:JuridicalSituation_000) ;
+     ] ;
+     sh:property [
+         sh:path legal:companyType ;
+         sh:in (kbo:JuridicalForm_014) ;
+     ] ;
+     sh:property [
+         sh:path legal:legalName ;
+         sh:minCount 1 ;
+     ] ;
+     sh:property [
+         sh:path legal:registeredAddress ;
+         sh:minCount 1 ;
+     ] ;
+     sh:property [
+         sh:path kbo:activity ;
+         sh:minCount 1 ;
+     ] ;
+     sh:property [
+         sh:path kbo:establishment ;
+         sh:minCount 1 ;
+     ] ;
+     sh:property [
+         sh:path kbo:status ;
+         sh:minCount 1 ;
+     ];
+     sh:property [
+         sh:path [sh:inversePath ex:own ];
+         sh:minCount 1 ;
+     ].
+
+
+  # Shape for kbo:Enterprise with SHCAL with conditions
+  kbo:LegalEntityShapeConditions
+    a sh:NodeShape ;
+       sh:property [
+           sh:path rdf:type ;
+           sh:in (legal:legalEntity kbo:Enterprise) ;
+           sh:minCount 1 ;
+       ] ;
+       sh:property [
+           sh:path legal:companyStatus ;
+           sh:in (kbo:JuridicalSituation_000) ;
+       ] ;
+       sh:property [
+           sh:path legal:companyType ;
+           sh:in (kbo:JuridicalForm_014) ;
+       ] ;
+       sh:property [
+           sh:path legal:legalName ;
+           sh:minCount 1 ;
+       ] ;
+       sh:property [
+           sh:path legal:registeredAddress ;
+           sh:minCount 1 ;
+       ] ;
+       sh:property [
+           sh:path kbo:activity ;
+           sh:minCount 1 ;
+       ] ;
+       sh:property [
+           sh:path kbo:establishment ;
+           sh:minCount 1 ;
+       ] ;
+       sh:property [
+           sh:path kbo:status ;
+           sh:minCount 1 ;
+       ];
+  sh:xone (
+  		[
+  			sh:xone (
+  				[
+  					sh:path [sh:inversePath ex:own ];
+                    sh:minCount 1 ;
+
+  				]
+  			)
+  		]
+  	) .

@@ -91,7 +91,7 @@ export class CBDShapeExtractor {
   ): boolean {
     for (let path of shape.requiredPaths) {
       let matchIterator = path.match(store, focusNode, graphsToIgnore);
-      if (matchIterator.next().done) {
+      if (matchIterator.length === 0) {
         return false;
       }
     }

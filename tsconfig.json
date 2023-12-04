@@ -9,6 +9,7 @@
     "exclude": [
       "tests",
       "node_modules",
-      "dist"
+      "dist",
+      "perf"
     ]
   }
