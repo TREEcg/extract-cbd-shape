@@ -16,6 +16,7 @@ ex:Geo a sh:NodeShape ;
         sh:path gsp:asWKT;
         sh:minCount 1
     ] .
+
 ex:shape a sh:NodeShape ;
     sh:nodeKind sh:IRI ;
     sh:property [

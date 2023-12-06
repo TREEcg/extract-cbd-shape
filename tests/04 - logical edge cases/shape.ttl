@@ -18,7 +18,7 @@ ex:KnowsPieterShape
 
 ex:PieterShape sh:property [
 	sh:minCount 1 ;
-	sh:path foaf:name 
+	sh:path ex:name 
 ].
 	
 ex:PersonShape
@@ -69,7 +69,7 @@ ex:XoneWithNodeShape a sh:NodeShape ;
 ex:QualifiedNameShape a sh:NodeShape ;
 	sh:property [
 		sh:minCount 1 ;
-		sh:path foaf:name ;
+		sh:path ex:name ;
 	], [
 		sh:path ex:validUntil ;
 		# ...
