@@ -5,7 +5,7 @@ import { CbdExtracted, Extracted } from "./CBDShapeExtractor";
 export interface Path {
   toString(): string;
 
-  found(cbd: CbdExtracted): CbdExtracted | undefined;
+  found(cbd: CbdExtracted, inverse?: boolean): CbdExtracted | undefined;
 
   match(
     store: Store,
@@ -27,8 +27,8 @@ export class PredicatePath implements Path {
     return `<${this.predicate.value}>`;
   }
 
-  found(cbd: CbdExtracted): CbdExtracted | undefined {
-    return cbd.enter(this.predicate);
+  found(cbd: CbdExtracted, inverse: boolean = false): CbdExtracted | undefined {
+    return cbd.enter(this.predicate, inverse);
   }
 
   match(
@@ -45,14 +45,7 @@ export class PredicatePath implements Path {
     ).filter((q) => !graphsToIgnore.includes(q.graph.value));
 
     if (quads.length > 0) {
-      let cbd: CbdExtracted;
-      if (inverse) {
-        const topology: Extracted = {};
-        topology[this.predicate.value] = extracted.topology;
-        cbd = new CbdExtracted(topology, extracted.cbdExtractedMap);
-      } else {
-        cbd = extracted.push(this.predicate);
-      }
+      let cbd: CbdExtracted = extracted.push(this.predicate, inverse);
 
       return quads.map((quad) => {
         const newFocusNode = inverse ? quad.subject : quad.object;
@@ -71,11 +64,11 @@ export class SequencePath implements Path {
     this.sequence = sequence;
   }
 
-  found(cbd: CbdExtracted): CbdExtracted | undefined {
+  found(cbd: CbdExtracted, inverse?: boolean): CbdExtracted | undefined {
     let current: CbdExtracted | undefined = cbd;
     for (const seq of this.sequence) {
       if (current) {
-        current = seq.found(current);
+        current = seq.found(current, inverse);
       }
     }
     return current;
@@ -126,9 +119,9 @@ export class AlternativePath implements Path {
     this.alternatives = alternatives;
   }
 
-  found(cbd: CbdExtracted): CbdExtracted | undefined {
+  found(cbd: CbdExtracted, inverse?: boolean): CbdExtracted | undefined {
     for (const option of this.alternatives) {
-      const maybe = option.found(cbd);
+      const maybe = option.found(cbd, inverse);
       if (maybe) return maybe;
     }
     return;
@@ -158,8 +151,8 @@ export class InversePath implements Path {
     this.path = path;
   }
 
-  found(cbd: CbdExtracted): CbdExtracted | undefined {
-    return;
+  found(cbd: CbdExtracted, inverse?: boolean): CbdExtracted | undefined {
+    return this.path.found(cbd, !inverse);
   }
 
   toString(): string {
@@ -254,10 +247,13 @@ export class OneOrMorePath extends MultiPath {
     return this.path.toString() + "+";
   }
 
-  found(cbd: CbdExtracted): CbdExtracted | undefined {
-    let newCbd = this.path.found(cbd);
-    while (newCbd) {
-      newCbd = this.path.found(newCbd);
+  found(cbd: CbdExtracted, inverse?: boolean): CbdExtracted | undefined {
+    let newCbd = this.path.found(cbd, inverse);
+    if (!newCbd) return;
+    let next = this.path.found(newCbd, inverse);
+    while (next) {
+      newCbd = next;
+      next = this.path.found(newCbd, inverse);
     }
 
     return newCbd;
@@ -274,14 +270,13 @@ export class ZeroOrMorePath extends MultiPath {
     return this.path.toString() + "*";
   }
 
-  found(cbd: CbdExtracted): CbdExtracted | undefined {
-    let lastCbd = cbd;
-    let newCbd = this.path.found(lastCbd);
-    while(newCbd) {
-      lastCbd = newCbd;
-      newCbd = this.path.found(newCbd);
+  found(cbd: CbdExtracted, inverse?: boolean): CbdExtracted | undefined {
+    let next = this.path.found(cbd, inverse);
+    while (next) {
+      cbd = next;
+      next = this.path.found(cbd, inverse);
     }
-    return lastCbd;
+    return cbd;
   }
 }
 
@@ -296,8 +291,8 @@ export class ZeroOrOnePath extends MultiPath {
     return this.path.toString() + "?";
   }
 
-  found(cbd: CbdExtracted): CbdExtracted | undefined {
-    return this.path.found(cbd) || cbd;
+  found(cbd: CbdExtracted, inverse?: boolean): CbdExtracted | undefined {
+    return this.path.found(cbd, inverse) || cbd;
   }
 }
 

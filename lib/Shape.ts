@@ -55,7 +55,6 @@ export class ShapeError {
       return this.errors[0].toString();
     } else {
       const sep = this.type == "and" ? " && " : " || ";
-      console.log("errors", this.errors);
       return "(" + this.errors.map((x) => x.toString()).join(sep) + ")";
     }
   }
@@ -182,8 +181,7 @@ export class ShapesGraph {
       );
       let inversePathObjects = shapeStore.getObjects(
         listItem,
-        SHACL.inversePath,
-        null,
+        SHACL.inversePath, null,
       );
       let alternativePathObjects = shapeStore.getObjects(
         listItem,

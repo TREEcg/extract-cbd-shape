@@ -74,9 +74,9 @@ export class CBDShapeExtractor {
       target: string,
       msg?: string,
     ) => Promise<Quad[]> = async (target: string, msg?: string) => {
+      const ms = msg ? ` (${msg})` : "";
+      console.error("Maybe dereferencing " + target + ms);
       if (dereferenced.indexOf(target) == -1) {
-        const ms = msg ? ` (${msg})` : "";
-        console.error("Dereferencing " + target + ms);
         dereferenced.push(target);
         await this.loadQuadStreamInStore(
           store,
@@ -204,7 +204,7 @@ export class CBDShapeExtractor {
         shape.optionalPaths,
         extraPaths,
       )) {
-        if (!path.found(extracted)) {
+        if (!path.found(extracted) || shape.closed) {
           let pathQuads = path
             .match(store, extracted, id, graphsToIgnore)
             .map((pathResult: PathResult) => {
@@ -241,12 +241,11 @@ export class CBDShapeExtractor {
         );
 
         // I don't know how to do this correctly, but this is not the way
-        const t = nodeLink.pathPattern.found(extracted);
         for (let match of matches) {
           await this.extractRecursively(
             store,
             match.target,
-            t || new CbdExtracted(),
+            match.cbdExtracted,
             graphsToIgnore,
             result,
             offline,
@@ -286,7 +285,10 @@ export class CBDShapeExtractor {
       //Check required paths and lazy evaluate the atLeastOneLists
       const problems = shape.requiredAreNotPresent(extracted);
       if (problems) {
-        throw new DereferenceNeeded(id.value, `not all paths are found (${problems.toString()})`);
+        throw new DereferenceNeeded(
+          id.value,
+          `not all paths are found (${problems.toString()})`,
+        );
       }
     }
   }
@@ -316,7 +318,7 @@ export class CBDShapeExtractor {
       }
       result.push(q);
 
-      const next = extractedStar.push(q.predicate);
+      const next = extractedStar.push(q.predicate, false);
 
       // Conditionally get more quads: if it’s a not yet extracted blank node
       if (
@@ -333,7 +335,12 @@ export class CBDShapeExtractor {
 }
 
 export type Extracted = {
-  [node: string]: Extracted;
+  forwards: {
+    [node: string]: Extracted;
+  };
+  backwards: {
+    [node: string]: Extracted;
+  };
 };
 
 export type ExtractReasons = {
@@ -346,10 +353,14 @@ export class CbdExtracted {
   cbdExtractedMap: RDFMap<ExtractReasons>;
 
   constructor(
-    topology: Extracted = {},
+    topology?: Extracted,
     cbdExtracted: RDFMap<ExtractReasons> = new RDFMap(),
   ) {
-    this.topology = topology;
+    if (topology) {
+      this.topology = topology;
+    } else {
+      this.topology = { forwards: {}, backwards: {} };
+    }
     this.cbdExtractedMap = cbdExtracted;
   }
 
@@ -375,16 +386,40 @@ export class CbdExtracted {
     return !!this.cbdExtractedMap.get(term)?.shape;
   }
 
-  push(term: Term): CbdExtracted {
-    if (!this.topology[term.value]) {
-      this.topology[term.value] = {};
+  push(term: Term, inverse: boolean): CbdExtracted {
+    if (inverse) {
+      if (!this.topology.backwards[term.value]) {
+        const ne: Extracted = {
+          forwards: {},
+          backwards: {},
+        };
+        ne.forwards[term.value] = this.topology;
+        this.topology.backwards[term.value] = ne;
+      }
+      return new CbdExtracted(
+        this.topology.backwards[term.value],
+        this.cbdExtractedMap,
+      );
+    } else {
+      if (!this.topology.forwards[term.value]) {
+        const ne: Extracted = {
+          forwards: {},
+          backwards: {},
+        };
+        ne.backwards[term.value] = this.topology;
+        this.topology.forwards[term.value] = ne;
+      }
+      return new CbdExtracted(
+        this.topology.forwards[term.value],
+        this.cbdExtractedMap,
+      );
     }
-
-    return new CbdExtracted(this.topology[term.value], this.cbdExtractedMap);
   }
 
-  enter(term: Term): CbdExtracted | undefined {
-    const out = this.topology[term.value];
+  enter(term: Term, inverse: boolean): CbdExtracted | undefined {
+    const out = inverse
+      ? this.topology.backwards[term.value]
+      : this.topology.forwards[term.value];
     if (out) {
       return new CbdExtracted(out, this.cbdExtractedMap);
     }
