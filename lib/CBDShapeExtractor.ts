@@ -137,17 +137,15 @@ export class CBDShapeExtractor {
   ) {
     for (let list of shape.atLeastOneLists) {
       for (let item of list) {
-        if (!item.requiredAreNotPresent(extracted)) {
-          extraPaths.push(...item.requiredPaths);
-          extraPaths.push(...item.optionalPaths);
-          extraNodeLinks.push(...item.nodeLinks);
-          this.recursivelyProcessAtLeastOneLists(
-            extracted,
-            item,
-            extraPaths,
-            extraNodeLinks,
-          );
-        }
+        extraPaths.push(...item.requiredPaths);
+        extraPaths.push(...item.optionalPaths);
+        extraNodeLinks.push(...item.nodeLinks);
+        this.recursivelyProcessAtLeastOneLists(
+          extracted,
+          item,
+          extraPaths,
+          extraNodeLinks,
+        );
       }
     }
   }
