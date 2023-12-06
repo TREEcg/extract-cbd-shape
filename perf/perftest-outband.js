@@ -168,7 +168,7 @@ let main = async function () {
             // console.log(extract);
             result.addQuads(extract);
           }
-          console.error("Extract3#ExtractionMembersOutBand " + result.size + " quads.");
+          // console.error("Extract3#ExtractionMembersOutBand " + result.size + " quads.");
         }, 25000); // Set the timeout for this specific benchmark
       })
 

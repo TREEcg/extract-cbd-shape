@@ -1,12 +1,32 @@
 [
   {
-    "name": "Extract3#CBDAndSimpleShape",
-    "opsPerSecond": 22545.26579842507,
+    "name": "Extract1#CBDAndBlankNode",
+    "opsPerSecond": 80171.81683447161,
     "samples": 129
   },
   {
-    "name": "Extract1#CBDAndBlankNode",
-    "opsPerSecond": 94581.03984584502,
+    "name": "Extract2#CBDAndNamedGraphs",
+    "opsPerSecond": 82357.30421992495,
+    "samples": 131
+  },
+  {
+    "name": "Extract3#CBDAndSimpleShape",
+    "opsPerSecond": 74717.2431331947,
+    "samples": 131
+  },
+  {
+    "name": "Extract4#CBDAndSimpleShapeAndNamedGraphs",
+    "opsPerSecond": 75149.57765340844,
     "samples": 130
+  },
+  {
+    "name": "Extract5#CBDAndShaclExtended",
+    "opsPerSecond": 53181.350167772594,
+    "samples": 129
+  },
+  {
+    "name": "Extract6#CBDAndShaclExtendedComplex",
+    "opsPerSecond": 54269.47136087252,
+    "samples": 128
   }
 ]

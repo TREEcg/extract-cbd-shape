@@ -1,0 +1,9 @@
+@prefix ex: <http://example.org/>.
+
+ex:important_point ex:x 12;
+  ex:y 42.
+
+ex:line ex:point [
+  ex:x 5;
+  ex:y 12;
+], ex:important_point.
