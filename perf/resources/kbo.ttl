@@ -21,49 +21,6 @@ kbo:0877248501.2022.11 a legal:legalEntity,
     kbo:establishment kbo:2277343234 ;
     kbo:status kbo:Status_AC .
 
-kbo:09e327511d79f1a1e594 a locn:Address ;
-    geo:asWKT "POINT (4.3835679 50.8397798)"^^geo:wktLiteral ;
-    kbo:addressType kbo:TypeOfAddress_REGO ;
-    locn:fullAddress "Belliardstraat 40, 1040 Etterbeek, Belgium" ;
-    locn:poBox "11" ;
-    locn:postCode "1040" ;
-    locn:postName "Etterbeek" .
-
-kbo:2003_70201 a kbo:Activity ;
-    legal:companyActivity kbo:Nace2003_70201 ;
-    kbo:classification kbo:Classification_MAIN .
-
-kbo:2003_70203 a kbo:Activity ;
-    legal:companyActivity kbo:Nace2003_70203 ;
-    kbo:classification kbo:Classification_SECO .
-
-kbo:2008_68201 a kbo:Activity ;
-    legal:companyActivity kbo:Nace2008_68201 ;
-    kbo:classification kbo:Classification_MAIN .
-
-kbo:2008_68203 a kbo:Activity ;
-    legal:companyActivity kbo:Nace2008_68203 ;
-    kbo:classification kbo:Classification_SECO .
-
-kbo:2277343234 a org:Site,
-        kbo:Establishment ;
-    terms:issued "2018-05-22"^^xsd:date ;
-    locn:Address kbo:6e3aaeedd7bd029f057b .
-
-kbo:6e3aaeedd7bd029f057b a locn:Address ;
-    geo:asWKT "POINT (4.3835679 50.8397798)"^^geo:wktLiteral ;
-    kbo:addressType kbo:TypeOfAddress_BAET ;
-    locn:fullAddress "Belliardstraat 40, 1040 Etterbeek, Belgium" ;
-    locn:poBox "None" ;
-    locn:postCode "1040" ;
-    locn:postName "Etterbeek" .
-
-kbo:Status_AC a kbo:Code ;
-    kbo:codeDescription "Actif"@FR,
-        "Actief"@NL ;
-    kbo:codeValue "AC" .
-
-
 #Named Graph
 kbo:0417199869.2022.11{
 kbo:0417199869.2022.11 a legal:legalEntity,
