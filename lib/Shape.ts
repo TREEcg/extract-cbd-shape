@@ -11,6 +11,7 @@ import {
   ZeroOrMorePath,
   ZeroOrOnePath,
 } from "./Path";
+import { CbdExtracted } from "./CBDShapeExtractor";
 
 const SHACL = createTermNamespace(
   "http://www.w3.org/ns/shacl#",
@@ -41,6 +42,25 @@ export class NodeLink {
   }
 }
 
+export class ShapeError {
+  type: "and" | "or";
+  errors: (ShapeError | Path)[] = [];
+  constructor(type: "and" | "or", errors: (ShapeError | Path)[] = []) {
+    this.type = type;
+    this.errors = errors;
+  }
+
+  toString(): string {
+    if (this.errors.length === 1) {
+      return this.errors[0].toString();
+    } else {
+      const sep = this.type == "and" ? " && " : " || ";
+      console.log("errors", this.errors);
+      return "(" + this.errors.map((x) => x.toString()).join(sep) + ")";
+    }
+  }
+}
+
 export class ShapeTemplate {
   closed: boolean;
   nodeLinks: Array<NodeLink>;
@@ -56,6 +76,57 @@ export class ShapeTemplate {
     this.atLeastOneLists = [];
     this.optionalPaths = [];
     this.closed = false; //default value
+  }
+
+  private invalidAtLeastOneLists(
+    extract: CbdExtracted,
+  ): ShapeError | undefined {
+    const out = new ShapeError("and");
+
+    for (let list of this.atLeastOneLists) {
+      const sub = new ShapeError("or");
+
+      let atLeastOne = false;
+      for (let item of list) {
+        const error = item.requiredAreNotPresent(extract);
+        if (error) {
+          sub.errors.push(error);
+        } else {
+          atLeastOne = true;
+          break;
+        }
+      }
+      if (!atLeastOne) {
+        out.errors.push(sub);
+      }
+    }
+
+    if (out.errors.length > 0) {
+      return out;
+    }
+    return;
+  }
+
+  private requiredPathsAreNotPresent(
+    extract: CbdExtracted,
+  ): ShapeError | undefined {
+    const errors = this.requiredPaths.filter((path) => !path.found(extract));
+    if (errors.length > 0) {
+      return new ShapeError("and", errors);
+    } else {
+      return;
+    }
+  }
+
+  requiredAreNotPresent(extract: CbdExtracted): ShapeError | undefined {
+    const required = this.requiredPathsAreNotPresent(extract);
+    const atLeastOne = this.invalidAtLeastOneLists(extract);
+    if (required && atLeastOne) {
+      return new ShapeError("and", [...required.errors, ...atLeastOne.errors]);
+    }
+
+    if (required) return required;
+    if (atLeastOne) return atLeastOne;
   }
 }
 
