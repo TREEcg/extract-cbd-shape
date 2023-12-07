@@ -1,0 +1,28 @@
+
+\begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            enlargelimits=0.15,
+            legend style={at={(0.5,-0.15)},
+            anchor=north,legend columns=-1},
+            ylabel={Duration per extraction (ms)},
+            symbolic x coords={CBDAndBlankNode,CBDAndNamedGraphs,CBDAndSimpleShape,CBDAndSimpleShapeAndNamedGraphs,CBDAndShaclExtended,CBDAndShaclExtendedComplex},
+            xtick=data,
+            x tick label style={font=ootnotesize,rotate=45, anchor=east},
+            nodes near coords align={horizontal},
+        ]
+            \addplot+[
+                error bars/.cd,
+                y dir=both,
+                y explicit
+            ] coordinates {
+         (CBDAndBlankNode, 0.014941655643674244) +- (0, 0.0025718418367606916)
+         (CBDAndNamedGraphs, 0.014641501686818482) +- (0, 0.0013242069680785226)
+         (CBDAndSimpleShape, 0.016707300904430115) +- (0, 0.0022418445705702137)
+         (CBDAndSimpleShapeAndNamedGraphs, 0.017467232575303387) +- (0, 0.001090735375684962)
+         (CBDAndShaclExtended, 0.022938660842590563) +- (0, 0.004223934830317749)
+         (CBDAndShaclExtendedComplex, 0.023638940145282034) +- (0, 0.0043898558725774355)
+
+             };
+        \end{axis}
+    \end{tikzpicture}

@@ -1,32 +1,44 @@
 [
   {
-    "name": "Extract1#CBDAndBlankNode",
-    "opsPerSecond": 71285.90455370516,
-    "samples": 132
+    "name": "CBDAndBlankNode",
+    "opsPerSecond": 66926.98746697216,
+    "samples": 131,
+    "mean": 0.000014941655643674245,
+    "deviation": 0.0000025718418367606917
   },
   {
-    "name": "Extract2#CBDAndNamedGraphs",
-    "opsPerSecond": 67959.64763891559,
-    "samples": 128
+    "name": "CBDAndNamedGraphs",
+    "opsPerSecond": 68299.00521066666,
+    "samples": 134,
+    "mean": 0.000014641501686818481,
+    "deviation": 0.0000013242069680785225
   },
   {
-    "name": "Extract3#CBDAndSimpleShape",
-    "opsPerSecond": 56149.18411452214,
-    "samples": 132
+    "name": "CBDAndSimpleShape",
+    "opsPerSecond": 59854.072523159,
+    "samples": 128,
+    "mean": 0.000016707300904430114,
+    "deviation": 0.0000022418445705702137
   },
   {
-    "name": "Extract4#CBDAndSimpleShapeAndNamedGraphs",
-    "opsPerSecond": 58035.439407196805,
-    "samples": 132
+    "name": "CBDAndSimpleShapeAndNamedGraphs",
+    "opsPerSecond": 57250.05353245725,
+    "samples": 134,
+    "mean": 0.000017467232575303387,
+    "deviation": 0.0000010907353756849622
   },
   {
-    "name": "Extract5#CBDAndShaclExtended",
-    "opsPerSecond": 43568.16631196353,
-    "samples": 133
+    "name": "CBDAndShaclExtended",
+    "opsPerSecond": 43594.523972527844,
+    "samples": 132,
+    "mean": 0.000022938660842590563,
+    "deviation": 0.000004223934830317749
   },
   {
-    "name": "Extract6#CBDAndShaclExtendedComplex",
-    "opsPerSecond": 42261.582314288935,
-    "samples": 132
+    "name": "CBDAndShaclExtendedComplex",
+    "opsPerSecond": 42303.081011844115,
+    "samples": 131,
+    "mean": 0.000023638940145282035,
+    "deviation": 0.000004389855872577435
   }
 ]

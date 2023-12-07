@@ -10,12 +10,54 @@ const renderResults = (prefix, results) => {
 
     fs.writeFileSync(
       `./perf/results/${prefix}_${fileSuffix}.json`,
-      JSON.stringify(results, null, 2)
+      JSON.stringify(results, null, 2),
     );
 
     const chartHtml = renderAsHTML(results, systemInfo);
     fs.writeFileSync(`./perf/results/${prefix}_${fileSuffix}.html`, chartHtml);
+
+    const tikz = renderAsTikz(results);
+    fs.writeFileSync(`./perf/results/${prefix}_${fileSuffix}.tex`, tikz);
   });
+};
+
+const renderAsTikz = (results) => {
+  const names = results.map((x) => x.name.replaceAll("#", "\\#")).join(",");
+  const coords = results.map((x) =>
+    `         (${x.name}, ${x.mean * 1000}) +- (0, ${
+      x.deviation * 1000
+    })`
+  ).join("\n");
+
+  const tikz = `
+\\begin{figure}
+\\centering
+\\begin{tikzpicture}
+        \\begin{axis}[
+            ybar,
+            enlargelimits=0.15,
+            legend style={at={(0.5,-0.15)},
+            anchor=north,legend columns=-1},
+            ylabel={Duration per extraction (ms)},
+            symbolic x coords={${names}},
+            xtick=data,
+            x tick label style={font=\\footnotesize,rotate=45, anchor=east},
+            nodes near coords align={horizontal},
+        ]
+            \\addplot+[
+                error bars/.cd,
+                y dir=both,
+                y explicit
+            ] coordinates {
+${coords}
+
+             };
+        \\end{axis}
+    \\end{tikzpicture}
+    \\caption{Graph depicting performance of inband extraction algorithm}
+\\end{figure}
+`;
+  return tikz;
 };
 
 const renderAsHTML = (results, systemInfo) => {
