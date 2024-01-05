@@ -117,7 +117,10 @@ let main = async function () {
       );
       // console.error("Extract6#CBDAndShaclExtendedComplex " + result.length + " quads.");
     })
-
+    //add listeners
+    .on('cycle', function(event) {
+      console.log(String(event.target));
+    })
     // add listeners
     .on("complete", function () {
       const results = this.map((test) => {
@@ -131,6 +134,7 @@ let main = async function () {
       });
 
       renderResults("inband", results);
+
     })
     // run async
     .run({ async: true });

@@ -1,0 +1,38 @@
+name: Extraction algorithm Benchmark.js 
+on:
+  push:
+    branches:
+      - fix-perf
+
+permissions:
+  contents: write
+  deployments: write
+
+jobs:
+  benchmark:
+    name: Run JavaScript benchmark example
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: node ./perf/perftest-inband.js | tee output.txt
+
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          name: Extraction algorithm Benchmark for inband data
+          tool: 'benchmarkjs'
+          output-file-path: output.txt
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          benchmark-data-dir-path: docs/
+          auto-push: true
+          # Show alert with commit comment on detecting possible performance regression
+          alert-threshold: '200%'
+          comment-on-alert: true
+          fail-on-alert: true
+          alert-comment-cc-users: '@ktrz'
