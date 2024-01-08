@@ -172,7 +172,11 @@ let main = async function () {
         }, 25000); // Set the timeout for this specific benchmark
       })
 
-
+    //add listeners
+    .on('cycle', function(event) {
+      console.log(String(event.target));
+    })
+    //add listeners
     .on("complete", function () {
       const results = this.map((test) => {
         return {
