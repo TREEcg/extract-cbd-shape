@@ -1,5 +1,4 @@
-name: Extraction algorithm Benchmark.js
-
+name: Benchmark for extraction algorithm (outband)
 on:
   push:
     branches:

@@ -1,4 +1,4 @@
-name: Extraction algorithm Benchmark.js 
+name: Benchmark for extraction algorithm (inband)
 on:
   push:
     branches:
