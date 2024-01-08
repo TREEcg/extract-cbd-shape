@@ -48,7 +48,7 @@ jobs:
       - name: Store benchmark result
         uses: benchmark-action/github-action-benchmark@v1
         with:
-            name: Extraction algorithm Benchmark for inband data
+            name: Extraction algorithm Benchmark for outband data
             tool: 'benchmarkjs'
             output-file-path: output.txt
             github-token: ${{ secrets.GITHUB_TOKEN }}
