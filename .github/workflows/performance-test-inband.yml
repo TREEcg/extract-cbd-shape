@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   benchmark:
-    name: Run JavaScript benchmark example
+    name: Benchmark for extraction algorithm (inband)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
