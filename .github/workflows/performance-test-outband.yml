@@ -12,6 +12,7 @@ jobs:
   benchmark:
     name: Run JavaScript benchmark example
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js
@@ -21,7 +22,7 @@ jobs:
       - run: npm ci
       - run: npm run build --if-present
       - run: npm run data
-      - run: node ./perf/perftest-inband.js | tee output.txt
+      - run: node ./perf/perftest-outband.js | tee output.txt
 
       # - name: Store benchmark result
       #   uses: benchmark-action/github-action-benchmark@v1
