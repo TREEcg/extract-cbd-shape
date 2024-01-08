@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1704720734896,
+  "lastUpdate": 1704720839049,
   "repoUrl": "https://github.com/TREEcg/extract-cbd-shape",
   "entries": {
     "Extraction algorithm Benchmark for inband data": [
@@ -462,6 +462,53 @@ window.BENCHMARK_DATA = {
             "range": "±3.73%",
             "unit": "ops/sec",
             "extra": "132 samples"
+          }
+        ]
+      }
+    ],
+    "Extraction algorithm Benchmark for outband data": [
+      {
+        "commit": {
+          "author": {
+            "email": "xueying_deng@outlook.com",
+            "name": "XD",
+            "username": "xdxxxdx"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b68f8a9274f34e01652b00e8f52516ce0db5a9e3",
+          "message": "Merge pull request #10 from xdxxxdx/fix-perf\n\nfeat: Add performance result for outband data",
+          "timestamp": "2024-01-08T14:30:35+01:00",
+          "tree_id": "745f9162667292d608c40af8fd9f6514884f1c65",
+          "url": "https://github.com/TREEcg/extract-cbd-shape/commit/b68f8a9274f34e01652b00e8f52516ce0db5a9e3"
+        },
+        "date": 1704720838071,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "Extract1#ExtractionCollectionMembers",
+            "value": 276,
+            "range": "±3.62%",
+            "unit": "ops/sec",
+            "extra": "74 samples"
+          },
+          {
+            "name": "Extract2#ExtractionMembersPartialOutBand",
+            "value": 254,
+            "range": "±8.17%",
+            "unit": "ops/sec",
+            "extra": "63 samples"
+          },
+          {
+            "name": "Extract3#ExtractionMembersOutBand",
+            "value": 216,
+            "range": "±10.45%",
+            "unit": "ops/sec",
+            "extra": "67 samples"
           }
         ]
       }
