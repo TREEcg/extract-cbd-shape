@@ -43,7 +43,7 @@ jobs:
           fi
       - name: Run Benchmark
         run: |
-          run: node ./perf/perftest-outband.js | tee output.txt
+            node ./perf/perftest-outband.js | tee output.txt
 
       - name: Store benchmark result
         uses: benchmark-action/github-action-benchmark@v1
