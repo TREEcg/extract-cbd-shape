@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes" />
     <style>
@@ -15,11 +16,17 @@
         margin: 8px;
         font-size: 1em;
         font-weight: 400;
+        zoom: 80%;
       }
       header {
+        position: relative;
         margin-bottom: 8px;
+        font-size: larger;
+        color:#fff;
         display: flex;
         flex-direction: column;
+        background-color: #00a300;
+        padding: 8px;
       }
       main {
         width: 100%;
@@ -35,14 +42,16 @@
         color: #000;
       }
       button {
+        position: relative;
+        font-size: larger;
         color: #fff;
-        background-color: #3298dc;
+        background-color: green;
         border-color: transparent;
         cursor: pointer;
         text-align: center;
       }
       button:hover {
-        background-color: #2793da;
+        background-color: green;
         flex: none;
       }
       .spacer {
@@ -52,9 +61,14 @@
         font-size: 0.75rem;
       }
       footer {
+        font-size: larger;
         margin-top: 16px;
         display: flex;
+        background-color: #00a300;
         align-items: center;
+        color: #fff;
+        padding: 5px;
+        position: relative;
       }
       .header-label {
         margin-right: 4px;
@@ -82,6 +96,26 @@
       .benchmark-chart {
         max-width: 1000px;
       }
+
+      .navigation {
+      border:2px solid green;
+      position:fixed;
+      top:16%;
+      bottom:10%;
+      font-size: larger;
+      padding: 2px;
+			float: left; 
+			width: 420px;
+			background-color: white;
+      color:black;
+      overflow:scroll;
+		 }		
+      .content {
+        position: relative;
+        margin-left: 440px; 
+        padding: 10px;
+        background-color: #fff;
+      }
     </style>
     <title>TREEcg - Extraction Algorithm Benchmark Chart</title>
   </head>
@@ -89,19 +123,46 @@
   <body>
     <header id="header">
       <div class="header-item">
+        <strong class="header-label">Tree community group:</strong>
+        <a style = "color: white; font-weight:bold">https://tree.linkeddatafragments.org/</a>
+      </div>
+      <div class="header-item">
         <strong class="header-label">Last Update:</strong>
-        <span id="last-update"></span>
+        <span style = "color: white; font-weight:bold" id="last-update"></span>
       </div>
       <div class="header-item">
         <strong class="header-label">Repository:</strong>
-        <a id="repository-link" rel="noopener"></a>
+        <a style = "color: white; font-weight:bold" id="repository-link" rel="noopener"></a>
       </div>
     </header>
+
+  
+    <div class="navigation">
+      <p style="font-weight: bold;">The diagrams present the historical performance tests run <a href="https://github.com/TREEcg/extract-cbd-shape/commits/fix-perf/">GitHub Commits</a>  based on the<a href="https://treecg.github.io/specification/#member-extraction-algorithm"> member extraction algorithm</a>.</p>
+      <p>The results contain two separate parts:</p>
+      <p style="font-weight: bold;">- Executions on the inband dataset for extraction of 13 quads:</p>
+      <ul>     
+      <li>CBDAndBlankNode：Extraction only star-shapes (CBD) + blank nodes to be extracted.</li>
+      <li>CBDAndNamedGraphs：Extraction CBD + named graphs.</li>
+      <li>CBDAndSimpleShape：Extraction CBD + Simple Shape not adding any triples other than what CBD gives.</li>
+      <li>CBDAndSimpleShapeAndNamedGraphs: Extraction CBD + named graphs + Simple shape that does not add any triples other than already present.</li>
+      <li>CBDAndShaclExtended：Extraction Shape selecting specific property paths, but not too complex.</li>
+      <li>CBDAndShaclExtendedComplex：Extraction Complex shape with conditionals.</li>
+    </ul> 
+    <p style="font-weight: bold;">- Executions on the outband dataset for extraction of 40 quads of 10 members published on the web:</p >      
+      <ul>     
+      <li>ExtractionCollectionMembers：Extraction 10 members from a Collection with 10 different nodes.</li>
+      <li>ExtractionMembersPartialOutBand：Extraction 10 members from 1 page, out of band, but each member has already a couple of triples in-band.</li>
+      <li>ExtractionMembersOutBand：Extraction 10 members from 1 page, but each member is out of band.</li>
+      </ul> 
+    </div>
+    <div class="content">
     <main id="main"></main>
+    </div>
     <footer>
-      <button id="dl-button">Download data as JSON</button>
+      <button style="font-weight: bold;" id="dl-button">Download data as JSON</button>
       <div class="spacer"></div>
-      <div class="small">Powered by <a rel="noopener" href="https://github.com/marketplace/actions/continuous-benchmark">github-action-benchmark</a></div>
+      <div class="small"> <strong> Mmeber Extraction Algorithm:</strong> <a style = "color: white; font-weight:bold" rel="noopener" href="https://treecg.github.io/specification/#member-extraction-algorithm">https://treecg.github.io/specification/#member-extraction-algorithm</a></div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.2/dist/Chart.min.js"></script>
@@ -113,7 +174,7 @@
         const toolColors = {
           cargo: '#dea584',
           go: '#00add8',
-          benchmarkjs: '#f1e05a',
+          benchmarkjs: '#00a300',
           benchmarkluau: '#000080',
           pytest: '#3572a5',
           googlecpp: '#f34b7d',
