@@ -56,6 +56,51 @@ export class CBDShapeExtractor {
     });
   }
 
+  public async bulkExtract(
+    store: Store,
+    ids: Array<Term>,
+    shapeId?: Term,
+    graphsToIgnore?: Array<Term>,
+    itemExtracted?: (member: { subject: Term; quads: Quad[] }) => void,
+  ): Promise<Array<{ subject: Term; quads: Quad[] }>> {
+    const out: Array<{ subject: Term; quads: Quad[] }> = [];
+    const idSet = new Set(ids.map((x) => x.value));
+
+    const memberSpecificQuads: { [id: string]: Array<Quad> } = {};
+    const newStore = new Store();
+    for (let quad of store.readQuads(null, null, null, null)) {
+      if (quad.graph.termType == "NamedNode" && idSet.has(quad.graph.value)) {
+        if (!(quad.graph.value in memberSpecificQuads)) {
+          memberSpecificQuads[quad.graph.value] = [];
+        }
+        memberSpecificQuads[quad.graph.value].push(quad);
+      } else {
+        newStore.add(quad);
+      }
+    }
+
+    const promises = [];
+    for (let id of ids) {
+      const promise = this.extract(
+        newStore,
+        id,
+        shapeId,
+        (graphsToIgnore || []).slice(),
+      ).then((quads) => {
+        if (itemExtracted) {
+          itemExtracted({ subject: id, quads });
+        }
+
+        out.push({ subject: id, quads });
+      });
+      promises.push(promise);
+    }
+
+    await Promise.all(promises);
+
+    return out;
+  }
+
   /**
    * Extracts:
    *  * first level quads,
