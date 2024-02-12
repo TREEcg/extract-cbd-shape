@@ -183,6 +183,8 @@ let main = async function () {
           name: test.name,
           opsPerSecond: test.hz,
           samples: test.stats.sample.length,
+          mean: test.stats.mean,
+          deviation: test.stats.deviation,
         };
       });
       renderResults("outband", results);

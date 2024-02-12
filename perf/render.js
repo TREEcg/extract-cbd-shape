@@ -24,8 +24,8 @@ const renderResults = (prefix, results) => {
 const renderAsTikz = (results) => {
   const names = results.map((x) => x.name.replaceAll("#", "\\#")).join(",");
   const coords = results.map((x) =>
-    `         (${x.name}, ${x.mean * 1000}) +- (0, ${
-      x.deviation * 1000
+    `         (${x.name}, ${x.mean * 1000 * 1000}) +- (0, ${
+      x.deviation * 1000 * 1000
     })`
   ).join("\n");
 
@@ -38,7 +38,7 @@ const renderAsTikz = (results) => {
             enlargelimits=0.15,
             legend style={at={(0.5,-0.15)},
             anchor=north,legend columns=-1},
-            ylabel={Duration per extraction (ms)},
+            ylabel={Duration per extraction ($\\mu s$)},
             symbolic x coords={${names}},
             xtick=data,
             x tick label style={font=\\footnotesize,rotate=45, anchor=east},
