@@ -21,8 +21,7 @@
   "dependencies": {
     "@treecg/types": "^0.4.5",
     "jsdom": "^23.0.1",
-    "n3": "^1.17.0",
-    "rdf-dereference": "^2.1.0"
+    "n3": "^1.17.0"
   },
   "devDependencies": {
     "@rdfjs/types": "^1.1.0",
@@ -37,5 +36,8 @@
     "rollup-plugin-polyfill-node": "^0.12.0",
     "systeminformation": "^5.21.20",
     "ts-node": "^10.9.1"
+  },
+  "peerDependencies": {
+    "rdf-dereference": "2.x"
   }
 }
