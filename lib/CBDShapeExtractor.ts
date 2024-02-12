@@ -1,7 +1,7 @@
 import rdfDereference, { RdfDereferencer } from "rdf-dereference";
 import { NodeLink, RDFMap, ShapesGraph, ShapeTemplate } from "./Shape";
 import { Path, PathResult } from "./Path";
-import { BlankNode, Store } from "n3";
+import { BlankNode, DefaultGraph, Store } from "n3";
 import { Quad, Term } from "@rdfjs/types";
 
 class DereferenceNeeded {
@@ -12,6 +12,10 @@ class DereferenceNeeded {
     this.msg = msg;
   }
 }
+
+type CBDShapeExtractorOptions = {
+  cbdDefaultGraph: boolean;
+};
 
 /**
  * Usage:
@@ -24,7 +28,16 @@ export class CBDShapeExtractor {
   dereferencer: RdfDereferencer;
   shapesGraph?: ShapesGraph;
 
-  constructor(shapesGraphStore?: Store, dereferencer?: RdfDereferencer) {
+  options: CBDShapeExtractorOptions;
+
+  constructor(
+    shapesGraphStore?: Store,
+    dereferencer?: RdfDereferencer<Quad>,
+    options: Partial<CBDShapeExtractorOptions> = {},
+  ) {
+    this.options = {
+      cbdDefaultGraph: options.cbdDefaultGraph || false,
+    };
     if (!dereferencer) {
       this.dereferencer = rdfDereference;
     } else {
@@ -306,7 +319,8 @@ export class CBDShapeExtractor {
     graphsToIgnore: Array<string>,
   ) {
     extractedStar.addCBDTerm(id);
-    const quads = store.getQuads(id, null, null, null);
+    const graph = this.options.cbdDefaultGraph ? new DefaultGraph() : null;
+    const quads = store.getQuads(id, null, null, graph);
 
     //Iterate over the quads, add them to the result and check whether we should further get other quads based on blank nodes or the SHACL shape
     for (const q of quads) {
