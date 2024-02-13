@@ -24,7 +24,7 @@
     "n3": "^1.17.0"
   },
   "devDependencies": {
-    "@rdfjs/types": "^1.1.0",
+    "@rdfjs/types": "*",
     "@types/benchmark": "^2.1.5",
     "@types/chai": "^4.3.5",
     "@types/mocha": "^10.0.1",
@@ -38,6 +38,7 @@
     "ts-node": "^10.9.1"
   },
   "peerDependencies": {
-    "rdf-dereference": "2.x"
+    "rdf-dereference": "2.x",
+    "rdf-js": "x"
   }
 }
