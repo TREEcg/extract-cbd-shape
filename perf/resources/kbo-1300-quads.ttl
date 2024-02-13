@@ -1,0 +1,1330 @@
+@prefix geo: <http://www.opengis.net/ont/geosparql#> .
+@prefix kbo: <https://kbopub.economie.fgov.be/kbo#> .
+@prefix legal: <http://www.w3.org/ns/legal#>.
+@prefix locn: <https://www.w3.org/ns/locn#> .
+@prefix org: <http://www.w3.org/ns/org#> .
+@prefix terms: <http://purl.org/dc/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:  <http://example.org/> .
+
+kbo:0877248501.2022.11 a legal:legalEntity,
+        kbo:Enterprise ;
+    terms:isVersionOf kbo:0877248501 ;
+    legal:companyStatus kbo:JuridicalSituation_000 ;
+    legal:companyType kbo:JuridicalForm_014 ;
+    legal:legalName "AEDIFICA" ;
+    legal:registeredAddress kbo:09e327511d79f1a1e594 ;
+    kbo:activity kbo:2003_70201,
+        kbo:2003_70203,
+        kbo:2008_68201,
+        kbo:2008_68203 ;
+    kbo:establishment kbo:2277343234 ;
+    kbo:status kbo:Status_AC .
+
+
+#Named Graph
+kbo:0417199869.2022.11{
+kbo:0417199869.2022.11 a legal:legalEntity,
+        kbo:Enterprise ;
+    terms:isVersionOf kbo:0417199869 ;
+    legal:companyStatus kbo:JuridicalSituation_000 ;
+    legal:companyType kbo:JuridicalForm_014 ;
+    legal:legalName "WAREHOUSES DE PAUW",
+        "WDP" ;
+    legal:registeredAddress kbo:90bf93ec289a49764d95 ;
+    kbo:activity kbo:2003_70203,
+        kbo:2008_68203 ;
+    kbo:establishment kbo:2102213296 ;
+    kbo:status kbo:Status_AC .
+kbo:2003_70203 a kbo:Activity .}
+
+#Extended SHACL
+kbo:Owner0001 ex:own kbo:0877248501.2023.11.
+kbo:0877248501.2023.11 a legal:legalEntity,
+        kbo:Enterprise ;
+    legal:companyStatus kbo:JuridicalSituation_000 ;
+    legal:companyType kbo:JuridicalForm_014 ;
+    legal:legalName "AEDIFICA" ;
+    legal:registeredAddress kbo:09e327511d79f1a1e594 ;
+    kbo:activity kbo:2003_70201,
+        kbo:2003_70203,
+        kbo:2008_68201,
+        kbo:2008_68203 ;
+    kbo:establishment kbo:2277343234 ;
+    kbo:status kbo:Status_AC .
+
+#Fill up quads
+kbo:subject1 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject2 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject3 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject4 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+
+kbo:subject5 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject6 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject7 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject8 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject9 a legal:legalEntity ;
+     terms:isVersionOf kbo:version1 ;
+     legal:companyStatus kbo:JuridicalSituation_001 ;
+     legal:companyType kbo:JuridicalForm_015 ;
+     legal:legalName "Company1" ;
+     legal:registeredAddress kbo:address1 ;
+     kbo:activity kbo:activity1, kbo:activity2 ;
+     kbo:establishment kbo:establishment1 ;
+     kbo:status kbo:Status_BD .
+
+kbo:subject10 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject11 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject12 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject13 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject14 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject15 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject16 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject17 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject18 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject19 a legal:legalEntity ;
+     terms:isVersionOf kbo:version1 ;
+     legal:companyStatus kbo:JuridicalSituation_001 ;
+     legal:companyType kbo:JuridicalForm_015 ;
+     legal:legalName "Company1" ;
+     legal:registeredAddress kbo:address1 ;
+     kbo:activity kbo:activity1, kbo:activity2 ;
+     kbo:establishment kbo:establishment1 ;
+     kbo:status kbo:Status_BD .
+
+kbo:subject20 a legal:legalEntity ;
+     terms:isVersionOf kbo:version1 ;
+     legal:companyStatus kbo:JuridicalSituation_001 ;
+     legal:companyType kbo:JuridicalForm_015 ;
+     legal:legalName "Company1" ;
+     legal:registeredAddress kbo:address1 ;
+     kbo:activity kbo:activity1, kbo:activity2 ;
+     kbo:establishment kbo:establishment1 ;
+     kbo:status kbo:Status_BD .
+
+
+kbo:subject21 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject22 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject23 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject24 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+
+kbo:subject25 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject26 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject27 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject28 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject29 a legal:legalEntity ;
+     terms:isVersionOf kbo:version1 ;
+     legal:companyStatus kbo:JuridicalSituation_001 ;
+     legal:companyType kbo:JuridicalForm_015 ;
+     legal:legalName "Company1" ;
+     legal:registeredAddress kbo:address1 ;
+     kbo:activity kbo:activity1, kbo:activity2 ;
+     kbo:establishment kbo:establishment1 ;
+     kbo:status kbo:Status_BD .
+
+kbo:subject30 a legal:legalEntity ;
+     terms:isVersionOf kbo:version1 ;
+     legal:companyStatus kbo:JuridicalSituation_001 ;
+     legal:companyType kbo:JuridicalForm_015 ;
+     legal:legalName "Company1" ;
+     legal:registeredAddress kbo:address1 ;
+     kbo:activity kbo:activity1, kbo:activity2 ;
+     kbo:establishment kbo:establishment1 ;
+     kbo:status kbo:Status_BD .
+
+kbo:subject31 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject32 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject33 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject34 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+
+kbo:subject35 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject36 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject37 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject38 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject39 a legal:legalEntity ;
+     terms:isVersionOf kbo:version1 ;
+     legal:companyStatus kbo:JuridicalSituation_001 ;
+     legal:companyType kbo:JuridicalForm_015 ;
+     legal:legalName "Company1" ;
+     legal:registeredAddress kbo:address1 ;
+     kbo:activity kbo:activity1, kbo:activity2 ;
+     kbo:establishment kbo:establishment1 ;
+     kbo:status kbo:Status_BD .
+kbo:Owner0001 ex:own kbo:test.
+
+kbo:subject40 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject41 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject42 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject43 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject44 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+
+kbo:subject45 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject46 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject47 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject48 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject49 a legal:legalEntity ;
+     terms:isVersionOf kbo:version1 ;
+     legal:companyStatus kbo:JuridicalSituation_001 ;
+     legal:companyType kbo:JuridicalForm_015 ;
+     legal:legalName "Company1" ;
+     legal:registeredAddress kbo:address1 ;
+     kbo:activity kbo:activity1, kbo:activity2 ;
+     kbo:establishment kbo:establishment1 ;
+     kbo:status kbo:Status_BD .
+
+kbo:subject50 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject51 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject52 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject53 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject54 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject55 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+
+kbo:subject56 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject57 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject58 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject59 a legal:legalEntity ;
+     terms:isVersionOf kbo:version1 ;
+     legal:companyStatus kbo:JuridicalSituation_001 ;
+     legal:companyType kbo:JuridicalForm_015 ;
+     legal:legalName "Company1" ;
+     legal:registeredAddress kbo:address1 ;
+     kbo:activity kbo:activity1, kbo:activity2 ;
+     kbo:establishment kbo:establishment1 ;
+     kbo:status kbo:Status_BD .
+
+kbo:subject60 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject61 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject62 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject63 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject64 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+
+kbo:subject65 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject66 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject67 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject68 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject69 a legal:legalEntity ;
+     terms:isVersionOf kbo:version1 ;
+     legal:companyStatus kbo:JuridicalSituation_001 ;
+     legal:companyType kbo:JuridicalForm_015 ;
+     legal:legalName "Company1" ;
+     legal:registeredAddress kbo:address1 ;
+     kbo:activity kbo:activity1, kbo:activity2 ;
+     kbo:establishment kbo:establishment1 ;
+     kbo:status kbo:Status_BD .
+
+kbo:subject70 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject71 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject72 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject73 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject74 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+
+kbo:subject75 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject76 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject77 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject78 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject79 a legal:legalEntity ;
+     terms:isVersionOf kbo:version1 ;
+     legal:companyStatus kbo:JuridicalSituation_001 ;
+     legal:companyType kbo:JuridicalForm_015 ;
+     legal:legalName "Company1" ;
+     legal:registeredAddress kbo:address1 ;
+     kbo:activity kbo:activity1, kbo:activity2 ;
+     kbo:establishment kbo:establishment1 ;
+     kbo:status kbo:Status_BD .
+kbo:Owner0001 ex:own kbo:test.
+
+kbo:subject80 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject81 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject82 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject83 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject84 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+
+kbo:subject85 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject86 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject87 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject88 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject89 a legal:legalEntity ;
+     terms:isVersionOf kbo:version1 ;
+     legal:companyStatus kbo:JuridicalSituation_001 ;
+     legal:companyType kbo:JuridicalForm_015 ;
+     legal:legalName "Company1" ;
+     legal:registeredAddress kbo:address1 ;
+     kbo:activity kbo:activity1, kbo:activity2 ;
+     kbo:establishment kbo:establishment1 ;
+     kbo:status kbo:Status_BD .
+kbo:Owner0001 ex:own kbo:test.
+
+kbo:subject90 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject91 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject92 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject93 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject94 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject95 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject96 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject97 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject98 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject99 a legal:legalEntity ;
+     terms:isVersionOf kbo:version1 ;
+     legal:companyStatus kbo:JuridicalSituation_001 ;
+     legal:companyType kbo:JuridicalForm_015 ;
+     legal:legalName "Company1" ;
+     legal:registeredAddress kbo:address1 ;
+     kbo:activity kbo:activity1, kbo:activity2 ;
+     kbo:establishment kbo:establishment1 ;
+     kbo:status kbo:Status_BD .
+
+
+kbo:subject100 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject101 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject102 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject103 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject104 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+
+kbo:subject105 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject106 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject107 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject1018 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject109 a legal:legalEntity ;
+     terms:isVersionOf kbo:version1 ;
+     legal:companyStatus kbo:JuridicalSituation_001 ;
+     legal:companyType kbo:JuridicalForm_015 ;
+     legal:legalName "Company1" ;
+     legal:registeredAddress kbo:address1 ;
+     kbo:activity kbo:activity1, kbo:activity2 ;
+     kbo:establishment kbo:establishment1 ;
+     kbo:status kbo:Status_BD .
+
+kbo:subject110 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject111 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject112 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject113 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject114 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject115 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject116 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject117 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject118 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject119 a legal:legalEntity ;
+     terms:isVersionOf kbo:version1 ;
+     legal:companyStatus kbo:JuridicalSituation_001 ;
+     legal:companyType kbo:JuridicalForm_015 ;
+     legal:legalName "Company1" ;
+     legal:registeredAddress kbo:address1 ;
+     kbo:activity kbo:activity1, kbo:activity2 ;
+     kbo:establishment kbo:establishment1 ;
+     kbo:status kbo:Status_BD .
+
+kbo:subject120 a legal:legalEntity ;
+     terms:isVersionOf kbo:version1 ;
+     legal:companyStatus kbo:JuridicalSituation_001 ;
+     legal:companyType kbo:JuridicalForm_015 ;
+     legal:legalName "Company1" ;
+     legal:registeredAddress kbo:address1 ;
+     kbo:activity kbo:activity1, kbo:activity2 ;
+     kbo:establishment kbo:establishment1 ;
+     kbo:status kbo:Status_BD .
+
+
+kbo:subject121 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject122 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject123 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject124 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject125 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .
+
+kbo:subject126 a legal:legalEntity ;
+    terms:isVersionOf kbo:version1 ;
+    legal:companyStatus kbo:JuridicalSituation_001 ;
+    legal:companyType kbo:JuridicalForm_015 ;
+    legal:legalName "Company1" ;
+    legal:registeredAddress kbo:address1 ;
+    kbo:activity kbo:activity1, kbo:activity2 ;
+    kbo:establishment kbo:establishment1 ;
+    kbo:status kbo:Status_BD .

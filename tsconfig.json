@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
       "declaration": true,
+      "sourceMap": true,
       "outDir": "dist",
       "strict": true,
       "downlevelIteration": true,
@@ -9,6 +10,7 @@
     "exclude": [
       "tests",
       "node_modules",
-      "dist"
+      "dist",
+      "perf"
     ]
   }

@@ -1,0 +1,92 @@
+[
+  {
+    "name": "Extract1#CBDAndBlankNode",
+    "opsPerSecond": 78434.66137994193,
+    "samples": 130
+  },
+  {
+    "name": "Extract1.1#CBDAndBlankNodeTenPercent",
+    "opsPerSecond": 77486.52623482526,
+    "samples": 128
+  },
+  {
+    "name": "Extract1.2#CBDAndBlankNodeOnePercent",
+    "opsPerSecond": 80745.98001768083,
+    "samples": 128
+  },
+  {
+    "name": "Extract2#CBDAndNamedGraphs",
+    "opsPerSecond": 82045.87067248237,
+    "samples": 129
+  },
+  {
+    "name": "Extract2.1#CBDAndNamedGraphsTenPercent",
+    "opsPerSecond": 82034.21424596498,
+    "samples": 129
+  },
+  {
+    "name": "Extract2.2#CBDAndNamedGraphsOnePercent",
+    "opsPerSecond": 83029.39193480981,
+    "samples": 132
+  },
+  {
+    "name": "Extract3#CBDAndSimpleShape",
+    "opsPerSecond": 72598.00370785318,
+    "samples": 128
+  },
+  {
+    "name": "Extract3.1#CBDAndSimpleShapeTenPercent",
+    "opsPerSecond": 71215.28555830353,
+    "samples": 129
+  },
+  {
+    "name": "Extract3.2#CBDAndSimpleShapeOnePercent",
+    "opsPerSecond": 72879.34055294246,
+    "samples": 129
+  },
+  {
+    "name": "Extract4#CBDAndSimpleShapeAndNamedGraphs",
+    "opsPerSecond": 75153.11284271147,
+    "samples": 131
+  },
+  {
+    "name": "Extract4.1#CBDAndSimpleShapeAndNamedGraphsTenPercent",
+    "opsPerSecond": 75710.11785349331,
+    "samples": 130
+  },
+  {
+    "name": "Extract4.2#CBDAndSimpleShapeAndNamedGraphsOnePercent",
+    "opsPerSecond": 74895.79118180997,
+    "samples": 130
+  },
+  {
+    "name": "Extract5#CBDAndShaclExtended",
+    "opsPerSecond": 58289.102810025965,
+    "samples": 131
+  },
+  {
+    "name": "Extract5.1#CBDAndShaclExtendedTenPercent",
+    "opsPerSecond": 49278.49374009805,
+    "samples": 131
+  },
+  {
+    "name": "Extract5.2#CBDAndShaclExtendedOnePercent",
+    "opsPerSecond": 55785.495469328365,
+    "samples": 128
+  },
+  {
+    "name": "Extract6#CBDAndShaclExtendedComplex",
+    "opsPerSecond": 19009.208011669874,
+    "samples": 119
+  },
+  {
+    "name": "Extract6.1#CBDAndShaclExtendedComplexTenPercent",
+    "opsPerSecond": 40305.09428971101,
+    "samples": 128
+  },
+  {
+    "name": "Extract6.2#CBDAndShaclExtendedComplexOnePercent",
+    "opsPerSecond": 54546.137520006036,
+    "samples": 130
+  }
+]

@@ -2,6 +2,7 @@ import { assert } from "chai";
 import { DataFactory, NamedNode, Store } from "n3";
 import { ShapesGraph } from "../../lib/Shape";
 import rdfDereference from "rdf-dereference";
+import { CbdExtracted } from "../../lib/CBDShapeExtractor";
 const { namedNode } = DataFactory;
 
 describe("Test whether the Patterns are correctly created", function () {
@@ -52,18 +53,28 @@ describe("Test whether the Patterns are correctly matched", function () {
   });
 
   it("Check whether sequence paths are correctly matched", async () => {
-    let match1 = shapesGraph.shapes
-      .get(namedNode("http://example.org/SequencePathShape"))!
-      .requiredPaths[0].match(store, new NamedNode("http://example.org/A"), [])
-      .next().value;
+    let match1 =
+      shapesGraph.shapes
+        .get(namedNode("http://example.org/SequencePathShape"))!
+        .requiredPaths[0].match(
+          store,
+          new CbdExtracted(),
+          new NamedNode("http://example.org/A"),
+          [],
+        ).length > 0;
     //assert(shapesGraph.shapes.get('http://example.org/SequencePathShape').requiredPaths[0].match(store, new NamedNode("http://example.org/A")));
   });
 
   it("Check whether a double inverse is correctly matched", async () => {
-    let match1 = shapesGraph.shapes
-      .get(namedNode("http://example.org/DoubleInversePathShape"))!
-      .requiredPaths[0].match(store, new NamedNode("http://example.org/A"), [])
-      .next().value;
+    let match1 =
+      shapesGraph.shapes
+        .get(namedNode("http://example.org/DoubleInversePathShape"))!
+        .requiredPaths[0].match(
+          store,
+          new CbdExtracted(),
+          new NamedNode("http://example.org/A"),
+          [],
+        ).length > 0;
     //assert(shapesGraph.shapes.get('http://example.org/SequencePathShape').requiredPaths[0].match(store, new NamedNode("http://example.org/A")));
   });
 });

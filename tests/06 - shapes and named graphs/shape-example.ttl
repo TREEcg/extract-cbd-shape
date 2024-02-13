@@ -1,0 +1,21 @@
+@prefix sh: <http://www.w3.org/ns/shacl#>.
+@prefix ex: <http://example.org/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+ex:shape a sh:NodeShape;
+  sh:property [
+    sh:path ex:point;
+    sh:node ex:PointShape;
+  ].
+ex:PointShape
+  a sh:NodeShape ;
+  sh:property [
+    sh:path ex:x ;
+    sh:datatype xsd:integer ;
+    sh:minCount 1;
+  ] ;
+  sh:property [
+    sh:path ex:y ;
+    sh:datatype xsd:integer ;
+    sh:minCount 1;
+  ].

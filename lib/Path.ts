@@ -1,15 +1,19 @@
 import { Quad, Term } from "@rdfjs/types";
 import { Store } from "n3";
+import { CbdExtracted, Extracted } from "./CBDShapeExtractor";
 
 export interface Path {
   toString(): string;
 
+  found(cbd: CbdExtracted, inverse?: boolean): CbdExtracted | undefined;
+
   match(
     store: Store,
+    extracted: CbdExtracted,
     focusNode: Term,
     graphsToIgnore?: Array<string>,
     inverse?: boolean,
-  ): Generator<PathResult>;
+  ): PathResult[];
 }
 
 export class PredicatePath implements Path {
@@ -23,22 +27,32 @@ export class PredicatePath implements Path {
     return `<${this.predicate.value}>`;
   }
 
-  *match(
+  found(cbd: CbdExtracted, inverse: boolean = false): CbdExtracted | undefined {
+    return cbd.enter(this.predicate, inverse);
+  }
+
+  match(
     store: Store,
+    extracted: CbdExtracted,
     focusNode: Term,
     graphsToIgnore: Array<string>,
     inverse: boolean = false,
-  ): Generator<PathResult, any, unknown> {
-    let quads = inverse
-      ? store.getQuads(null, this.predicate, focusNode, null)
-      : store.getQuads(focusNode, this.predicate, null, null);
+  ): PathResult[] {
+    let quads = (
+      inverse
+        ? store.getQuads(null, this.predicate, focusNode, null)
+        : store.getQuads(focusNode, this.predicate, null, null)
+    ).filter((q) => !graphsToIgnore.includes(q.graph.value));
 
-    for (let quad of quads) {
-      if (!graphsToIgnore.includes(quad.graph.value)) {
-        //If there are no elements left, we are yielding our result
-        let newFocusNode = inverse ? quad.subject : quad.object;
-        yield new PathResult([quad], newFocusNode);
-      }
+    if (quads.length > 0) {
+      let cbd: CbdExtracted = extracted.push(this.predicate, inverse);
+
+      return quads.map((quad) => {
+        const newFocusNode = inverse ? quad.subject : quad.object;
+        return { path: [quad], target: newFocusNode, cbdExtracted: cbd };
+      });
+    } else {
+      return [];
     }
   }
 }
@@ -50,36 +64,51 @@ export class SequencePath implements Path {
     this.sequence = sequence;
   }
 
-  private *matchNext(
-    store: Store,
-    inverse: boolean,
-    index: number,
-    path: Quad[],
-    target: Term,
-    graphsToIgnore: Array<string>
-  ): Generator<PathResult> {
-    if (index === this.sequence.length) {
-      yield new PathResult(path.slice(), target);
-      return;
+  found(cbd: CbdExtracted, inverse?: boolean): CbdExtracted | undefined {
+    let current: CbdExtracted | undefined = cbd;
+    for (const seq of this.sequence) {
+      if (current) {
+        current = seq.found(current, inverse);
+      }
     }
-
-    for (const found of this.sequence[index].match(store, target, graphsToIgnore, inverse)) {
-      const newPath = [...path, ...found.path];
-      yield* this.matchNext(store, inverse, index + 1, newPath, found.target, graphsToIgnore);
-    }
+    return current;
   }
 
   toString(): string {
     return this.sequence.map((x) => x.toString()).join("/");
   }
 
-  *match(
+  match(
     store: Store,
+    extracted: CbdExtracted,
     focusNode: Term,
     graphsToIgnore: Array<string>,
     inverse: boolean = false,
-  ): Generator<PathResult, any, unknown> {
-    yield* this.matchNext(store, inverse, 0, [], focusNode, graphsToIgnore);
+  ): PathResult[] {
+    let results: PathResult[] = [
+      {
+        path: [],
+        target: focusNode,
+        cbdExtracted: extracted,
+      },
+    ];
+    for (const path of this.sequence) {
+      results = results.flatMap((res) => {
+        const nexts = path.match(
+          store,
+          res.cbdExtracted,
+          res.target,
+          graphsToIgnore,
+          inverse,
+        );
+        return nexts.map((n) => ({
+          path: [...res.path, ...n.path],
+          cbdExtracted: n.cbdExtracted,
+          target: n.target,
+        }));
+      });
+    }
+    return results;
   }
 }
 
@@ -90,19 +119,28 @@ export class AlternativePath implements Path {
     this.alternatives = alternatives;
   }
 
+  found(cbd: CbdExtracted, inverse?: boolean): CbdExtracted | undefined {
+    for (const option of this.alternatives) {
+      const maybe = option.found(cbd, inverse);
+      if (maybe) return maybe;
+    }
+    return;
+  }
+
   toString(): string {
     return this.alternatives.map((x) => x.toString()).join("|");
   }
 
-  *match(
+  match(
     store: Store,
+    extracted: CbdExtracted,
     focusNode: Term,
     graphsToIgnore: Array<string>,
     inverse: boolean = false,
-  ): Generator<PathResult, any, unknown> {
-    for (const alt of this.alternatives) {
-      yield* alt.match(store, focusNode, graphsToIgnore, inverse);
-    }
+  ): PathResult[] {
+    return this.alternatives.flatMap((path) =>
+      path.match(store, extracted, focusNode, graphsToIgnore, inverse),
+    );
   }
 }
 
@@ -113,17 +151,28 @@ export class InversePath implements Path {
     this.path = path;
   }
 
+  found(cbd: CbdExtracted, inverse?: boolean): CbdExtracted | undefined {
+    return this.path.found(cbd, !inverse);
+  }
+
   toString(): string {
     return "^" + this.path.toString();
   }
 
-  *match(
+  match(
     store: Store,
+    extracted: CbdExtracted,
     focusNode: Term,
     graphsToIgnore: Array<string>,
     inverse: boolean = false,
-  ): Generator<PathResult, any, unknown> {
-    yield* this.path.match(store, focusNode, graphsToIgnore, !inverse);
+  ): PathResult[] {
+    return this.path.match(
+      store,
+      extracted,
+      focusNode,
+      graphsToIgnore,
+      !inverse,
+    );
   }
 }
 
@@ -138,39 +187,52 @@ export abstract class MultiPath implements Path {
   abstract filter(times: number, res: PathResult): boolean;
   abstract toString(): string;
 
-  private *matchNext(
-    index: number,
-    store: Store,
-    inverse: boolean,
-    path: Quad[],
-    target: Term,
-    graphsToIgnore: Array<string>
-  ): Generator<PathResult> {
-    // Please no off by one error
-    if (!!this.maxCount && index > this.maxCount) return;
+  abstract found(cbd: CbdExtracted): CbdExtracted | undefined;
 
-    for (const res of this.path.match(store, target, graphsToIgnore, inverse)) {
-      if (this.filter(index, res)) {
-        yield new PathResult([...path, ...res.path], res.target);
-      }
-      yield* this.matchNext(
-        index + 1,
-        store,
-        inverse,
-        [...path, ...res.path],
-        res.target,
-        graphsToIgnore
-      );
-    }
-  }
-
-  *match(
+  match(
     store: Store,
+    extracted: CbdExtracted,
     focusNode: Term,
     graphsToIgnore: Array<string>,
     inverse: boolean = false,
-  ): Generator<PathResult> {
-    yield* this.matchNext(0, store, inverse, [], focusNode, graphsToIgnore);
+  ): PathResult[] {
+    const out: PathResult[] = [];
+    let targets: PathResult[] = [
+      {
+        path: [],
+        target: focusNode,
+        cbdExtracted: extracted,
+      },
+    ];
+
+    for (let i = 0; true; i++) {
+      if (this.maxCount && i > this.maxCount) break;
+      if (targets.length === 0) break;
+      const newTargets: PathResult[] = [];
+
+      for (const t of targets) {
+        for (const found of this.path.match(
+          store,
+          t.cbdExtracted,
+          t.target,
+          graphsToIgnore,
+          inverse,
+        )) {
+          if (this.filter(i, found)) {
+            out.push({
+              path: [...t.path, ...found.path],
+              cbdExtracted: t.cbdExtracted,
+              target: found.target,
+            });
+          }
+          newTargets.push(found);
+        }
+      }
+
+      targets = newTargets;
+    }
+
+    return out;
   }
 }
 
@@ -184,6 +246,18 @@ export class OneOrMorePath extends MultiPath {
   toString(): string {
     return this.path.toString() + "+";
   }
+
+  found(cbd: CbdExtracted, inverse?: boolean): CbdExtracted | undefined {
+    let newCbd = this.path.found(cbd, inverse);
+    if (!newCbd) return;
+    let next = this.path.found(newCbd, inverse);
+    while (next) {
+      newCbd = next;
+      next = this.path.found(newCbd, inverse);
+    }
+
+    return newCbd;
+  }
 }
 export class ZeroOrMorePath extends MultiPath {
   constructor(path: Path) {
@@ -194,6 +268,15 @@ export class ZeroOrMorePath extends MultiPath {
   }
   toString(): string {
     return this.path.toString() + "*";
+  }
+
+  found(cbd: CbdExtracted, inverse?: boolean): CbdExtracted | undefined {
+    let next = this.path.found(cbd, inverse);
+    while (next) {
+      cbd = next;
+      next = this.path.found(cbd, inverse);
+    }
+    return cbd;
   }
 }
 
@@ -207,13 +290,14 @@ export class ZeroOrOnePath extends MultiPath {
   toString(): string {
     return this.path.toString() + "?";
   }
+
+  found(cbd: CbdExtracted, inverse?: boolean): CbdExtracted | undefined {
+    return this.path.found(cbd, inverse) || cbd;
+  }
 }
 
-export class PathResult {
+export interface PathResult {
   path: Array<Quad>;
   target: Term;
-  constructor(path: Array<Quad>, target: Term) {
-    this.path = path;
-    this.target = target;
-  }
+  cbdExtracted: CbdExtracted;
 }

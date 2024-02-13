@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Extract1#CBDAndBlankNode",
+    "opsPerSecond": 129174.07402772432,
+    "samples": 187
+  },
+  {
+    "name": "Extract2#CBDAndNamedGraphs",
+    "opsPerSecond": 117522.9467002107,
+    "samples": 189
+  },
+  {
+    "name": "Extract3#CBDAndSimpleShape",
+    "opsPerSecond": 30353.106670192883,
+    "samples": 191
+  },
+  {
+    "name": "Extract4#CBDAndSimpleShapeAndNamedGraphs",
+    "opsPerSecond": 22802.995914106767,
+    "samples": 196
+  },
+  {
+    "name": "Extract5#CBDAndShaclExtended",
+    "opsPerSecond": 21389.91714277137,
+    "samples": 193
+  },
+  {
+    "name": "Extract6#CBDAndShaclExtendedComplex",
+    "opsPerSecond": 19101.079093379998,
+    "samples": 194
+  }
+]

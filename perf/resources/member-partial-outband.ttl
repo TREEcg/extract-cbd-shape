@@ -1,0 +1,54 @@
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix rdfs:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix tree:    <https://w3id.org/tree#> .
+@prefix ex:  <http://example.org/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+
+ex:Community
+    a tree:Collection ;
+    tree:member <http://localhost:8080/member-1.ttl>, <http://localhost:8080/member-2.ttl>, <http://localhost:8080/member-3.ttl>, <http://localhost:8080/member-4.ttl>,
+    <http://localhost:8080/member-5.ttl>, <http://localhost:8080/member-6.ttl>, <http://localhost:8080/member-7.ttl>, <http://localhost:8080/member-8.ttl>, <http://localhost:8080/member-9.ttl>,
+    <http://localhost:8080/member-10.ttl>.
+
+<http://localhost:8080/member-1.ttl>
+    foaf:familyName "member-1"@en;
+    rdfs:label "member"@en.
+
+<http://localhost:8080/member-2.ttl>
+    foaf:familyName "member-2"@en;
+    rdfs:label "member"@en.
+
+<http://localhost:8080/member-3.ttl>
+    foaf:familyName "member-3"@en;
+    rdfs:label "member"@en.
+
+<http://localhost:8080/member-4.ttl>
+    foaf:familyName "member-4"@en;
+    rdfs:label "member"@en.
+
+<http://localhost:8080/member-5.ttl>
+    foaf:familyName "member-5"@en;
+    rdfs:label "member"@en.
+
+<http://localhost:8080/member-6.ttl>
+    foaf:familyName "member-6"@en;
+    rdfs:label "member"@en.
+
+<http://localhost:8080/member-7.ttl>
+    foaf:familyName "member-7"@en;
+    rdfs:label "member"@en.
+
+ <http://localhost:8080/member-8.ttl>
+    foaf:familyName "member-8"@en;
+    rdfs:label "member"@en.
+
+<http://localhost:8080/member-9.ttl>
+    foaf:familyName "member-9"@en;
+    rdfs:label "member"@en.
+
+<http://localhost:8080/member-10.ttl>
+    foaf:familyName "member-10"@en;
+    rdfs:label "member"@en.
+
+
+

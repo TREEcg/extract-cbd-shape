@@ -1,0 +1,32 @@
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            enlargelimits=0.15,
+            legend style={at={(0.5,-0.15)},
+            anchor=north,legend columns=-1},
+            ylabel={Duration per extraction (μs)},
+            symbolic x coords={CBDAndBlankNode,CBDAndNamedGraphs,CBDAndSimpleShape,CBDAndSimpleShapeAndNamedGraphs,CBDAndShaclExtended,CBDAndShaclExtendedComplex},
+            xtick=data,
+            x tick label style={font=\footnotesize,rotate=45, anchor=east},
+            nodes near coords align={horizontal},
+        ]
+            \addplot+[
+                error bars/.cd,
+                y dir=both,
+                y explicit
+            ] coordinates {
+         (CBDAndBlankNode, 13.53339410785156) +- (0, 1.8652727002890261)
+         (CBDAndNamedGraphs, 13.50580458025863) +- (0, 0.960240723056626)
+         (CBDAndSimpleShape, 16.29102846121227) +- (0, 2.4678186743238126)
+         (CBDAndSimpleShapeAndNamedGraphs, 17.02800089525085) +- (0, 1.8128127251347248)
+         (CBDAndShaclExtended, 22.13219663122853) +- (0, 4.149746075910502)
+         (CBDAndShaclExtendedComplex, 22.925594285526273) +- (0, 4.067464891236272)
+
+             };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Graph depicting performance of inband extraction algorithm}
+\end{figure}

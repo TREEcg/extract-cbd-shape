@@ -6,7 +6,9 @@
   "types": "dist/lib/extract-cbd-shape.d.ts",
   "scripts": {
     "test": "mocha",
-    "build": "tsc"
+    "build": "tsc",
+    "data": "npm run build && node ./perf/outband-setup.js",
+    "bench": "npm run build && node ./perf/perftest-inband.js && node ./perf/perftest-inband-percent.js && node ./perf/perftest-outband.js "
   },
   "keywords": [
     "CBD",
@@ -18,17 +20,25 @@
   "license": "MIT",
   "dependencies": {
     "@treecg/types": "^0.4.5",
-    "n3": "^1.17.0",
-    "rdf-dereference": "^2.1.0"
+    "jsdom": "^23.0.1",
+    "n3": "^1.17.0"
   },
   "devDependencies": {
-    "@rdfjs/types": "^1.1.0",
+    "@rdfjs/types": "*",
+    "@types/benchmark": "^2.1.5",
     "@types/chai": "^4.3.5",
     "@types/mocha": "^10.0.1",
     "@types/n3": "^1.16.1",
     "@types/sinon": "^10.0.16",
+    "benchmark": "^2.1.4",
     "chai": "^4.3.7",
     "mocha": "^10.2.0",
+    "rollup-plugin-polyfill-node": "^0.12.0",
+    "systeminformation": "^5.21.20",
     "ts-node": "^10.9.1"
+  },
+  "peerDependencies": {
+    "rdf-dereference": "2.x",
+    "rdf-js": "x"
   }
 }

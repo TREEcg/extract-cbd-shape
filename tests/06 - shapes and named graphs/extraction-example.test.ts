@@ -3,13 +3,13 @@ import { NamedNode, Parser, Store, StreamParser, Term, Writer } from "n3";
 import { CBDShapeExtractor } from "../../lib/CBDShapeExtractor";
 import rdfDereference from "rdf-dereference";
 
-describe("Check whether paths trigger the right extraction process", function () {
+describe("Check weather all selected quads can be extracted", function () {
   let shapeStore = new Store();
   let extractor: CBDShapeExtractor;
   let dataStore = new Store();
   before(async () => {
     let readStream = (
-      await rdfDereference.dereference("./tests/06 - shapes and named graphs/shape.ttl", {
+      await rdfDereference.dereference("./tests/06 - shapes and named graphs/shape-example.ttl", {
         localFiles: true,
       })
     ).data;
@@ -18,7 +18,7 @@ describe("Check whether paths trigger the right extraction process", function ()
     });
     extractor = new CBDShapeExtractor(shapeStore);
     let readStream2 = (
-      await rdfDereference.dereference("./tests/06 - shapes and named graphs/data.ttl", {
+      await rdfDereference.dereference("./tests/06 - shapes and named graphs/data-example.ttl", {
         localFiles: true,
       })
     ).data;
@@ -26,15 +26,14 @@ describe("Check whether paths trigger the right extraction process", function ()
       dataStore.import(readStream2).on("end", resolve).on("error", reject);
     });
   });
-  it("Named Graphs should not conflict with the shape extraction", async () => {
+  it("All quads from example should be extracted", async () => {
     let result = await extractor.extract(
       dataStore,
-      new NamedNode("http://example.org/M1v1"),
-      new NamedNode("http://example.org/Shape"),
-      [new NamedNode("http://example.org/M1v2")] //Other members in the current context
+      new NamedNode("http://example.org/important_point"),
+      new NamedNode("http://example.org/Shape")
     );
-    // It should only have 2 quads: one outside of the named graph, and one in the named graph that is not part of the other named graphs
-    assert.equal(result.length, 2);
+    // It should only have 6 quads
+    assert.equal(result.length, 3);
   });
   
 });
