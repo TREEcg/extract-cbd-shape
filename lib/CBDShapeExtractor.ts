@@ -67,12 +67,12 @@ export class CBDShapeExtractor {
     const idSet = new Set(ids.map((x) => x.value));
 
     const memberSpecificQuads: { [id: string]: Array<Quad> } = {};
+    for (let id of ids) {
+      memberSpecificQuads[id.value] = [];
+    }
     const newStore = new Store();
     for (let quad of store.readQuads(null, null, null, null)) {
       if (quad.graph.termType == "NamedNode" && idSet.has(quad.graph.value)) {
-        if (!(quad.graph.value in memberSpecificQuads)) {
-          memberSpecificQuads[quad.graph.value] = [];
-        }
         memberSpecificQuads[quad.graph.value].push(quad);
       } else {
         newStore.add(quad);
@@ -87,6 +87,7 @@ export class CBDShapeExtractor {
         shapeId,
         (graphsToIgnore || []).slice(),
       ).then((quads) => {
+        quads.push(...memberSpecificQuads[id.value]);
         if (itemExtracted) {
           itemExtracted({ subject: id, quads });
         }
