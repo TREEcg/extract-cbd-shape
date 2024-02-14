@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1707815436464,
+  "lastUpdate": 1707908043257,
   "repoUrl": "https://github.com/TREEcg/extract-cbd-shape",
   "entries": {
     "Extraction algorithm Benchmark for inband data": [
@@ -528,6 +528,72 @@ window.BENCHMARK_DATA = {
             "range": "±3.39%",
             "unit": "ops/sec",
             "extra": "130 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "pieter.colpaert@ugent.be",
+            "name": "Pieter Colpaert",
+            "username": "pietercolpaert"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5bfbfc906690ab6195875cbd7d2d54617621f9e9",
+          "message": "Merge pull request #14 from xdxxxdx/main\n\nUpdate performance-test.yml",
+          "timestamp": "2024-02-14T11:52:21+01:00",
+          "tree_id": "bd3aeeefdacd03e6e082040ad76e37bdcb443f83",
+          "url": "https://github.com/TREEcg/extract-cbd-shape/commit/5bfbfc906690ab6195875cbd7d2d54617621f9e9"
+        },
+        "date": 1707908042678,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "CBDAndBlankNode",
+            "value": 58241,
+            "range": "±3.30%",
+            "unit": "ops/sec",
+            "extra": "130 samples"
+          },
+          {
+            "name": "CBDAndNamedGraphs",
+            "value": 60472,
+            "range": "±2.40%",
+            "unit": "ops/sec",
+            "extra": "130 samples"
+          },
+          {
+            "name": "CBDAndSimpleShape",
+            "value": 56092,
+            "range": "±3.90%",
+            "unit": "ops/sec",
+            "extra": "130 samples"
+          },
+          {
+            "name": "CBDAndSimpleShapeAndNamedGraphs",
+            "value": 57782,
+            "range": "±1.97%",
+            "unit": "ops/sec",
+            "extra": "131 samples"
+          },
+          {
+            "name": "CBDAndShaclExtended",
+            "value": 45325,
+            "range": "±3.38%",
+            "unit": "ops/sec",
+            "extra": "132 samples"
+          },
+          {
+            "name": "CBDAndShaclExtendedComplex",
+            "value": 43265,
+            "range": "±3.36%",
+            "unit": "ops/sec",
+            "extra": "132 samples"
           }
         ]
       }
