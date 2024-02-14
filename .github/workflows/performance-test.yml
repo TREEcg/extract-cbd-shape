@@ -2,8 +2,7 @@ name: Benchmark for extraction algorithm
 on:
   push:
     branches:
-      - fix-perf
-
+      - main
 permissions:
   contents: write
   deployments: write
