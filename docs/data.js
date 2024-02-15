@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1707984061873,
+  "lastUpdate": 1707984078249,
   "repoUrl": "https://github.com/TREEcg/extract-cbd-shape",
   "entries": {
     "Extraction algorithm Benchmark for inband data": [
@@ -863,6 +863,51 @@ window.BENCHMARK_DATA = {
             "range": "±9.23%",
             "unit": "ops/sec",
             "extra": "60 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "pieter.colpaert@ugent.be",
+            "name": "Pieter Colpaert",
+            "username": "pietercolpaert"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "eb09d229ae2a71c0a3a4ff999fe9a70cfd31303b",
+          "message": "Merge pull request #13 from TREEcg/feat/bulk-ingest\n\nFeat/bulk ingest",
+          "timestamp": "2024-02-15T08:58:14+01:00",
+          "tree_id": "b3d793e577317d76645f8f72a112f8c5d2323afe",
+          "url": "https://github.com/TREEcg/extract-cbd-shape/commit/eb09d229ae2a71c0a3a4ff999fe9a70cfd31303b"
+        },
+        "date": 1707984077713,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "Extract1#ExtractionCollectionMembers",
+            "value": 250,
+            "range": "±3.88%",
+            "unit": "ops/sec",
+            "extra": "71 samples"
+          },
+          {
+            "name": "Extract2#ExtractionMembersPartialOutBand",
+            "value": 242,
+            "range": "±6.72%",
+            "unit": "ops/sec",
+            "extra": "66 samples"
+          },
+          {
+            "name": "Extract3#ExtractionMembersOutBand",
+            "value": 248,
+            "range": "±3.26%",
+            "unit": "ops/sec",
+            "extra": "72 samples"
           }
         ]
       }
