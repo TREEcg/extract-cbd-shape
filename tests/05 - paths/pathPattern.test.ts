@@ -4,9 +4,9 @@ import { ShapesGraph } from "../../lib/Shape";
 import rdfDereference from "rdf-dereference";
 import { CbdExtracted } from "../../lib/CBDShapeExtractor";
 const { namedNode } = DataFactory;
-
+import { RdfStore } from "rdf-stores";
 describe("Test whether the Patterns are correctly created", function () {
-  let shapeStore = new Store();
+  let shapeStore = RdfStore.createDefault();
   let shapesGraph: ShapesGraph;
   before(async () => {
     let readStream = (
@@ -27,8 +27,8 @@ describe("Test whether the Patterns are correctly created", function () {
 });
 
 describe("Test whether the Patterns are correctly matched", function () {
-  let shapeStore = new Store();
-  let store = new Store();
+  let shapeStore = RdfStore.createDefault();
+  let store = RdfStore.createDefault();
 
   let shapesGraph: ShapesGraph;
   before(async () => {

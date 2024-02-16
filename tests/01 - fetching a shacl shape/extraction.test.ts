@@ -1,12 +1,13 @@
 import { assert } from "chai";
-import { NamedNode, Parser, Store, StreamParser, Term, Writer } from "n3";
+import { NamedNode, Parser, StreamParser, Term, Writer } from "n3";
+import { RdfStore } from "rdf-stores";
 import { CBDShapeExtractor } from "../../lib/CBDShapeExtractor";
 import rdfDereference from "rdf-dereference";
 
 describe("Check whether we can successfully extract a SHACL shape", async () => {
-  let shapeStore = new Store();
+  let shapeStore = RdfStore.createDefault();
   let extractor: CBDShapeExtractor;
-  let dataStore = new Store();
+  let dataStore = RdfStore.createDefault();
   before(async () => {
     let readStream = (
       await rdfDereference.dereference(

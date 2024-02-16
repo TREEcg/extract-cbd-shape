@@ -1,9 +1,8 @@
-import { Store } from "n3";
 import { ShapesGraph } from "../../lib/Shape";
 import rdfDereference from "rdf-dereference";
-
+import { RdfStore } from "rdf-stores";
 describe("Test shape template of the SHACL SHACL", function () {
-  let shapeStore = new Store();
+  let shapeStore = RdfStore.createDefault();
   let shapesGraph: ShapesGraph;
   before(async () => {
     let readStream = (

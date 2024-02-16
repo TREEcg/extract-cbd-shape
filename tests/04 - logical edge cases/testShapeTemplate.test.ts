@@ -3,17 +3,17 @@ import {
   DataFactory,
   NamedNode,
   Parser,
-  Store,
   StreamParser,
   Term,
   Writer,
 } from "n3";
+import { RdfStore } from "rdf-stores";
 import { ShapesGraph, ShapeTemplate } from "../../lib/Shape";
 import rdfDereference from "rdf-dereference";
 
 const { namedNode } = DataFactory;
 describe("Test shape template of the logical edge cases", function () {
-  let shapeStore = new Store();
+  let shapeStore = RdfStore.createDefault();
   let shapesGraph: ShapesGraph;
   before(async () => {
     let readStream = (

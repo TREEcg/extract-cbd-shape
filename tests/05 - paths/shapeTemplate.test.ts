@@ -1,11 +1,13 @@
 import { assert } from "chai";
-import { DataFactory, Store } from "n3";
+import { DataFactory } from "rdf-data-factory";
+import { RdfStore } from "rdf-stores";
 import { ShapesGraph, ShapeTemplate } from "../../lib/Shape";
 import rdfDereference from "rdf-dereference";
-const { namedNode } = DataFactory;
+
+const df = new DataFactory();
 
 describe("Test whether the SHACL template is well extracted based on paths", function () {
-  let shapeStore = new Store();
+  let shapeStore = RdfStore.createDefault();
   let shapesGraph: ShapesGraph;
   before(async () => {
     let readStream = (
@@ -23,7 +25,7 @@ describe("Test whether the SHACL template is well extracted based on paths", fun
 
   it("Check whether sequence paths are correctly represented", async () => {
     assert(
-      shapesGraph.shapes.get(namedNode("http://example.org/SequencePathShape")),
+      shapesGraph.shapes.get(df.namedNode("http://example.org/SequencePathShape")),
     );
   });
 });

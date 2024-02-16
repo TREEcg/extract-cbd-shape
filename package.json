@@ -21,7 +21,9 @@
   "dependencies": {
     "@treecg/types": "^0.4.5",
     "jsdom": "^23.0.1",
-    "n3": "^1.17.0"
+    "n3": "^1.17.0",
+    "rdf-data-factory": "^1.1.2",
+    "rdf-stores": "^1.0.0"
   },
   "devDependencies": {
     "@rdfjs/types": "*",
