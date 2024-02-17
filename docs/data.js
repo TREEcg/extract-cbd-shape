@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1708154610935,
+  "lastUpdate": 1708154682084,
   "repoUrl": "https://github.com/TREEcg/extract-cbd-shape",
   "entries": {
     "Extraction algorithm Benchmark for inband data": [
@@ -1130,6 +1130,51 @@ window.BENCHMARK_DATA = {
             "range": "±8.77%",
             "unit": "ops/sec",
             "extra": "68 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "pieter.colpaert@ugent.be",
+            "name": "Pieter Colpaert",
+            "username": "pietercolpaert"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "3694c01c95f28decc7e815df3a743fcb8666d006",
+          "message": "Merge pull request #15 from TREEcg/feat-rdfstore\n\nRdfStore instead of N3store, and changed types to RDFJS types",
+          "timestamp": "2024-02-17T08:21:47+01:00",
+          "tree_id": "ba548c7440b7e2ddd0a396db4558ec7a5686c3b2",
+          "url": "https://github.com/TREEcg/extract-cbd-shape/commit/3694c01c95f28decc7e815df3a743fcb8666d006"
+        },
+        "date": 1708154681528,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "Extract1#ExtractionCollectionMembers",
+            "value": 261,
+            "range": "±4.39%",
+            "unit": "ops/sec",
+            "extra": "73 samples"
+          },
+          {
+            "name": "Extract2#ExtractionMembersPartialOutBand",
+            "value": 303,
+            "range": "±4.19%",
+            "unit": "ops/sec",
+            "extra": "69 samples"
+          },
+          {
+            "name": "Extract3#ExtractionMembersOutBand",
+            "value": 330,
+            "range": "±3.99%",
+            "unit": "ops/sec",
+            "extra": "77 samples"
           }
         ]
       }
