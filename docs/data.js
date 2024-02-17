@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1708159840223,
+  "lastUpdate": 1708159910720,
   "repoUrl": "https://github.com/TREEcg/extract-cbd-shape",
   "entries": {
     "Extraction algorithm Benchmark for inband data": [
@@ -1241,6 +1241,51 @@ window.BENCHMARK_DATA = {
             "range": "±3.99%",
             "unit": "ops/sec",
             "extra": "77 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "pieter.colpaert@ugent.be",
+            "name": "Pieter Colpaert",
+            "username": "pietercolpaert"
+          },
+          "committer": {
+            "email": "pieter.colpaert@ugent.be",
+            "name": "Pieter Colpaert",
+            "username": "pietercolpaert"
+          },
+          "distinct": true,
+          "id": "1e0a7e55ab6387263e47f43ac499a7c923645da0",
+          "message": "Update to 0.1.0: RdfStore",
+          "timestamp": "2024-02-17T08:24:34+01:00",
+          "tree_id": "adb5f62bc9f5a1569490b2e6bed9e7b9a4be4285",
+          "url": "https://github.com/TREEcg/extract-cbd-shape/commit/1e0a7e55ab6387263e47f43ac499a7c923645da0"
+        },
+        "date": 1708159910174,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "Extract1#ExtractionCollectionMembers",
+            "value": 224,
+            "range": "±4.77%",
+            "unit": "ops/sec",
+            "extra": "67 samples"
+          },
+          {
+            "name": "Extract2#ExtractionMembersPartialOutBand",
+            "value": 295,
+            "range": "±3.83%",
+            "unit": "ops/sec",
+            "extra": "76 samples"
+          },
+          {
+            "name": "Extract3#ExtractionMembersOutBand",
+            "value": 313,
+            "range": "±3.28%",
+            "unit": "ops/sec",
+            "extra": "76 samples"
           }
         ]
       }
