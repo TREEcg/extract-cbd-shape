@@ -1,5 +1,5 @@
 import { Quad, Term } from "@rdfjs/types";
-import { Store } from "n3";
+import { RdfStore } from "rdf-stores";
 import { CbdExtracted, Extracted } from "./CBDShapeExtractor";
 
 export interface Path {
@@ -8,7 +8,7 @@ export interface Path {
   found(cbd: CbdExtracted, inverse?: boolean): CbdExtracted | undefined;
 
   match(
-    store: Store,
+    store: RdfStore,
     extracted: CbdExtracted,
     focusNode: Term,
     graphsToIgnore?: Array<string>,
@@ -32,7 +32,7 @@ export class PredicatePath implements Path {
   }
 
   match(
-    store: Store,
+    store: RdfStore,
     extracted: CbdExtracted,
     focusNode: Term,
     graphsToIgnore: Array<string>,
@@ -79,7 +79,7 @@ export class SequencePath implements Path {
   }
 
   match(
-    store: Store,
+    store: RdfStore,
     extracted: CbdExtracted,
     focusNode: Term,
     graphsToIgnore: Array<string>,
@@ -132,7 +132,7 @@ export class AlternativePath implements Path {
   }
 
   match(
-    store: Store,
+    store: RdfStore,
     extracted: CbdExtracted,
     focusNode: Term,
     graphsToIgnore: Array<string>,
@@ -160,7 +160,7 @@ export class InversePath implements Path {
   }
 
   match(
-    store: Store,
+    store: RdfStore,
     extracted: CbdExtracted,
     focusNode: Term,
     graphsToIgnore: Array<string>,
@@ -190,7 +190,7 @@ export abstract class MultiPath implements Path {
   abstract found(cbd: CbdExtracted): CbdExtracted | undefined;
 
   match(
-    store: Store,
+    store: RdfStore,
     extracted: CbdExtracted,
     focusNode: Term,
     graphsToIgnore: Array<string>,

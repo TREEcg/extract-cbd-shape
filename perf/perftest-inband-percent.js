@@ -1,5 +1,6 @@
 const Benchmark = require("benchmark");
 const Store = require("n3").Store;
+const {RdfStore} = require('rdf-stores');
 const rdfDereference = require("rdf-dereference").default;
 const NamedNode = require("n3").NamedNode;
 
@@ -12,10 +13,10 @@ Benchmark.options.maxTime = 2;
 
 let main = async function () {
   let suite = new Benchmark.Suite(undefined, {maxTime: 2});
-  let kboData = new Store();
-  let kboData130Quads = new Store();
-  let kboData1300Quads = new Store();
-  let shaclKBO = new Store();
+  let kboData = RdfStore.createDefault();
+  let kboData130Quads = RdfStore.createDefault();
+  let kboData1300Quads = RdfStore.createDefault();
+  let shaclKBO = RdfStore.createDefault();
   //Load the quads from the file
   let kboDataStream = (
       await rdfDereference.dereference("./perf/resources/kbo.ttl", {

@@ -1,5 +1,8 @@
-import { BlankNode, Store } from "n3";
+import { BlankNode } from "n3";
+import { RdfStore } from "rdf-stores";
 import { Term } from "@rdfjs/types";
+import { DataFactory } from 'rdf-data-factory';
+const df = new DataFactory();
 import { createTermNamespace, RDF } from "@treecg/types";
 import {
   AlternativePath,
@@ -31,6 +34,19 @@ const SHACL = createTermNamespace(
   "or",
   "NodeShape",
 );
+
+
+const getSubjects = function (store: RdfStore, predicate: Term|null, object: Term|null, graph?:Term|null) {
+  return store.getQuads(null, predicate, object, graph).map((quad) => {
+    return quad.subject;
+  });
+}
+
+const getObjects = function (store: RdfStore, subject:Term|null, predicate: Term|null, graph?:Term|null) {
+  return store.getQuads(subject, predicate, null, graph).map((quad) => {
+    return quad.object;
+  });
+}
 
 //TODO: split this file up between Shape functionality and SHACL to our Shape class conversion steps. Also introduce a ShEx to Shape Template
 export class NodeLink {
@@ -157,33 +173,33 @@ export class RDFMap<T> {
 export class ShapesGraph {
   shapes: RDFMap<ShapeTemplate>;
 
-  constructor(shapeStore: Store) {
+  constructor(shapeStore: RdfStore) {
     this.shapes = this.initializeFromStore(shapeStore);
   }
 
-  protected constructPathPattern(shapeStore: Store, listItem: Term): Path {
+  protected constructPathPattern(shapeStore: RdfStore, listItem: Term): Path {
     if (listItem instanceof BlankNode) {
       //Look for special types
-      let zeroOrMorePathObjects = shapeStore.getObjects(
+      let zeroOrMorePathObjects = getObjects(shapeStore,
         listItem,
         SHACL.zeroOrMorePath,
         null,
       );
-      let oneOrMorePathObjects = shapeStore.getObjects(
+      let oneOrMorePathObjects = getObjects(shapeStore,
         listItem,
         SHACL.oneOrMorePath,
         null,
       );
-      let zeroOrOnePathObjects = shapeStore.getObjects(
+      let zeroOrOnePathObjects = getObjects(shapeStore,
         listItem,
         SHACL.zeroOrOnePath,
         null,
       );
-      let inversePathObjects = shapeStore.getObjects(
+      let inversePathObjects = getObjects(shapeStore,
         listItem,
         SHACL.inversePath, null,
       );
-      let alternativePathObjects = shapeStore.getObjects(
+      let alternativePathObjects = getObjects(shapeStore,
         listItem,
         SHACL.alternativePath,
         null,
@@ -230,13 +246,13 @@ export class ShapesGraph {
    * @returns false if it wasn’t a property shape
    */
   protected preprocessPropertyShape(
-    shapeStore: Store,
+    shapeStore: RdfStore,
     propertyShapeId: Term,
     shape: ShapeTemplate,
     required?: boolean,
   ): boolean {
     //Skip if shape has been deactivated
-    let deactivated = shapeStore.getObjects(
+    let deactivated = getObjects(shapeStore,
       propertyShapeId,
       SHACL.deactivated,
       null,
@@ -245,7 +261,7 @@ export class ShapesGraph {
       return true; //Success: doesn’t matter what kind of thing it was, it’s deactivated so let’s just proceed
     }
 
-    let path = shapeStore.getObjects(propertyShapeId, SHACL.path, null)[0];
+    let path = getObjects(shapeStore,propertyShapeId, SHACL.path, null)[0];
     //Process the path now and make sure there’s a match function
     if (!path) {
       return false; //this isn’t a property shape...
@@ -253,7 +269,7 @@ export class ShapesGraph {
 
     let pathPattern = this.constructPathPattern(shapeStore, path);
 
-    let minCount = shapeStore.getObjects(propertyShapeId, SHACL.minCount, null);
+    let minCount = getObjects(shapeStore,propertyShapeId, SHACL.minCount, null);
 
     if ((minCount[0] && minCount[0].value !== "0") || required) {
       shape.requiredPaths.push(pathPattern);
@@ -265,7 +281,7 @@ export class ShapesGraph {
     // Maybe to potentially point to another node, xone a datatype?
 
     // Does it link to a literal or to a new node?
-    let nodeLink = shapeStore.getObjects(propertyShapeId, SHACL.node, null);
+    let nodeLink = getObjects(shapeStore,propertyShapeId, SHACL.node, null);
     if (nodeLink[0]) {
       shape.nodeLinks.push(new NodeLink(pathPattern, nodeLink[0]));
     }
@@ -280,7 +296,7 @@ export class ShapesGraph {
    * @param shape
    * @returns
    */
-  preprocessShape(shapeStore: Store, shapeId: Term, shape: ShapeTemplate) {
+  preprocessShape(shapeStore: RdfStore, shapeId: Term, shape: ShapeTemplate) {
     return this.preprocessPropertyShape(shapeStore, shapeId, shape)
       ? true
       : this.preprocessNodeShape(shapeStore, shapeId, shape);
@@ -293,12 +309,12 @@ export class ShapesGraph {
    * @param shape
    */
   protected preprocessNodeShape(
-    shapeStore: Store,
+    shapeStore: RdfStore,
     nodeShapeId: Term,
     shape: ShapeTemplate,
   ) {
     //Check if it’s closed or open
-    let closedIndicator: Term = shapeStore.getObjects(
+    let closedIndicator: Term = getObjects(shapeStore,
       nodeShapeId,
       SHACL.closed,
       null,
@@ -308,14 +324,14 @@ export class ShapesGraph {
     }
 
     //Process properties if it has any
-    let properties = shapeStore.getObjects(nodeShapeId, SHACL.property, null);
+    let properties = getObjects(shapeStore,nodeShapeId, SHACL.property, null);
     for (let prop of properties) {
       this.preprocessPropertyShape(shapeStore, prop, shape);
     }
 
     // process sh:and: just add all IDs to this array
     // Process everything you can find nested in AND clauses
-    for (let andList of shapeStore.getObjects(nodeShapeId, SHACL.and, null)) {
+    for (let andList of getObjects(shapeStore,nodeShapeId, SHACL.and, null)) {
       // Try to process it as a property shape
       //for every andList found, iterate through it and try to preprocess the property shape
       for (let and of this.rdfListToArray(shapeStore, andList)) {
@@ -323,9 +339,8 @@ export class ShapesGraph {
       }
     }
     //Process zero or more sh:xone and sh:or lists in the same way -- explanation in README why they can be handled in the same way
-    for (let xoneOrOrList of shapeStore
-      .getObjects(nodeShapeId, SHACL.xone, null)
-      .concat(shapeStore.getObjects(nodeShapeId, SHACL.or, null))) {
+    for (let xoneOrOrList of getObjects(shapeStore, nodeShapeId, SHACL.xone, null)
+        .concat(getObjects(shapeStore,nodeShapeId, SHACL.or, null))) {
       let atLeastOneList: Array<ShapeTemplate> = this.rdfListToArray(
         shapeStore,
         xoneOrOrList,
@@ -344,13 +359,13 @@ export class ShapesGraph {
   /**
    * @param nodeShape is an N3.Store with the quads of the SHACL shape
    */
-  initializeFromStore(shapeStore: Store): RDFMap<ShapeTemplate> {
+  initializeFromStore(shapeStore: RdfStore): RDFMap<ShapeTemplate> {
     //get all named nodes of entities that are sh:ShapeNodes which we’ll recognize through their use of sh:property (we’ll find other relevant shape nodes later on)
     //TODO: This is a limitation though: we only support NodeShapes with at least one sh:property set? Other NodeShapes in this context are otherwise just meaningless?
     const shapeNodes: Term[] = (<Term[]>[])
-      .concat(shapeStore.getSubjects(SHACL.property, null, null))
-      .concat(shapeStore.getSubjects(RDF.terms.type, SHACL.NodeShape, null))
-      .concat(shapeStore.getObjects(null, SHACL.node, null))
+      .concat(getSubjects(shapeStore, SHACL.property, null, null))
+      .concat(getSubjects(shapeStore, RDF.terms.type, SHACL.NodeShape, null))
+      .concat(getObjects(shapeStore,null, SHACL.node, null))
       //DISTINCT
       .filter((value: Term, index: number, array: Array<Term>) => {
         return array.findIndex((x) => x.equals(value)) === index;
@@ -360,7 +375,7 @@ export class ShapesGraph {
     for (let shapeId of shapeNodes) {
       let shape = new ShapeTemplate();
       //Don’t process if shape is deactivated
-      let deactivated = shapeStore.getObjects(shapeId, SHACL.deactivated, null);
+      let deactivated = getObjects(shapeStore,shapeId, SHACL.deactivated, null);
       if (!(deactivated.length > 0 && deactivated[0].value === "true")) {
         this.preprocessNodeShape(shapeStore, shapeId, shape);
         shapes.set(shapeId, shape);
@@ -376,38 +391,38 @@ export class ShapesGraph {
    * @returns
    */
   protected *rdfListToGenerator(
-    shapeStore: Store,
+    shapeStore: RdfStore,
     item: Term,
   ): Generator<Term> {
     if (
-      shapeStore.getObjects(
+      getObjects(shapeStore,
         item,
-        "http://www.w3.org/1999/02/22-rdf-syntax-ns#first",
+        df.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#first"),
         null,
       )[0]
     ) {
-      yield shapeStore.getObjects(
+      yield getObjects(shapeStore,
         item,
-        "http://www.w3.org/1999/02/22-rdf-syntax-ns#first",
+        df.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#first"),
         null,
       )[0];
-      let rest = shapeStore.getObjects(
+      let rest = getObjects(shapeStore,
         item,
-        "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest",
+        df.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"),
         null,
       )[0];
       while (
         rest &&
         rest.value !== "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"
       ) {
-        yield shapeStore.getObjects(
+        yield getObjects(shapeStore,
           rest,
-          "http://www.w3.org/1999/02/22-rdf-syntax-ns#first",
+          df.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#first"),
           null,
         )[0];
-        rest = shapeStore.getObjects(
+        rest = getObjects(shapeStore,
           rest,
-          "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest",
+          df.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"),
           null,
         )[0];
       }
@@ -418,7 +433,7 @@ export class ShapesGraph {
     return;
   }
 
-  protected rdfListToArray(shapeStore: Store, item: Term): Array<Term> {
+  protected rdfListToArray(shapeStore: RdfStore, item: Term): Array<Term> {
     return Array.from(this.rdfListToGenerator(shapeStore, item));
   }
 }

@@ -1,13 +1,15 @@
 import { assert } from "chai";
-import { NamedNode, Store, Writer } from "n3";
+import { Writer } from "n3";
+import { DataFactory } from "rdf-data-factory";
+import { RdfStore } from "rdf-stores";
 import { CBDShapeExtractor } from "../../lib/extract-cbd-shape";
 import rdfDereference from "rdf-dereference";
 import { TREE } from "@treecg/types";
-
+const df = new DataFactory();
 describe("Check whether a member from the MRG source can be fully extracted", function () {
   this.timeout(25000);
   it("Extract a shape from MRG and check whether it successfully did a call to a geometry it needs", async () => {
-    let shapeStore = new Store();
+    let shapeStore =RdfStore.createDefault();
     let readStream = (
       await rdfDereference.dereference(
         "./tests/02 - marine regions LDES/shacl.ttl",
@@ -18,7 +20,7 @@ describe("Check whether a member from the MRG source can be fully extracted", fu
       shapeStore.import(readStream).on("end", resolve).on("error", reject);
     });
     let extractor = new CBDShapeExtractor(shapeStore);
-    let dataStore = new Store();
+    let dataStore =RdfStore.createDefault();
     let readStream2 = (
       await rdfDereference.dereference(
         "./tests/02 - marine regions LDES/data.ttl",
@@ -30,8 +32,8 @@ describe("Check whether a member from the MRG source can be fully extracted", fu
     });
     let result = await extractor.extract(
       dataStore,
-      new NamedNode("http://marineregions.org/mrgid/24983?t=1690208097"),
-      new NamedNode("http://example.org/shape"),
+      df.namedNode("http://marineregions.org/mrgid/24983?t=1690208097"),
+      df.namedNode("http://example.org/shape"),
     );
 
     assert.equal(
@@ -46,7 +48,7 @@ describe("Check whether a member from the MRG source can be fully extracted", fu
   });
 
   it("Extract a shape from MRG, based on the blank node and check whether it successfully did a call to a geometry it needs", async () => {
-    let dataStore = new Store();
+    let dataStore = RdfStore.createDefault();
     let readStream2 = (
       await rdfDereference.dereference(
         "./tests/02 - marine regions LDES/data.ttl",
@@ -58,9 +60,9 @@ describe("Check whether a member from the MRG source can be fully extracted", fu
     });
     let extractor = new CBDShapeExtractor(dataStore);
 
-    const shapeId = dataStore.getObjects(null, TREE.terms.shape, null)[0];
+    const shapeId = dataStore.getQuads(null, TREE.terms.shape, null)[0].object;
 
-    const id = new NamedNode(
+    const id = df.namedNode(
       "http://marineregions.org/mrgid/24983?t=1690208097",
     );
     let result = await extractor.extract(dataStore, id, shapeId);

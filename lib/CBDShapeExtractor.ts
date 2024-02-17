@@ -1,7 +1,8 @@
 import rdfDereference, { RdfDereferencer } from "rdf-dereference";
 import { NodeLink, RDFMap, ShapesGraph, ShapeTemplate } from "./Shape";
 import { Path, PathResult } from "./Path";
-import { BlankNode, DefaultGraph, Store } from "n3";
+import { BlankNode, DefaultGraph } from "n3";
+import { RdfStore } from "rdf-stores";
 import { Quad, Term } from "@rdfjs/types";
 
 class DereferenceNeeded {
@@ -31,7 +32,7 @@ export class CBDShapeExtractor {
   options: CBDShapeExtractorOptions;
 
   constructor(
-    shapesGraphStore?: Store,
+    shapesGraphStore?: RdfStore,
     dereferencer?: RdfDereferencer<Quad>,
     options: Partial<CBDShapeExtractorOptions> = {},
   ) {
@@ -50,14 +51,14 @@ export class CBDShapeExtractor {
     }
   }
 
-  loadQuadStreamInStore(store: Store, quadStream: any) {
+  loadQuadStreamInStore(store: RdfStore, quadStream: any) {
     return new Promise((resolve, reject) => {
       store.import(quadStream).on("end", resolve).on("error", reject);
     });
   }
 
   public async bulkExtract(
-    store: Store,
+    store: RdfStore,
     ids: Array<Term>,
     shapeId?: Term,
     graphsToIgnore?: Array<Term>,
@@ -70,12 +71,12 @@ export class CBDShapeExtractor {
     for (let id of ids) {
       memberSpecificQuads[id.value] = [];
     }
-    const newStore = new Store();
+    const newStore = RdfStore.createDefault();
     for (let quad of store.readQuads(null, null, null, null)) {
       if (quad.graph.termType == "NamedNode" && idSet.has(quad.graph.value)) {
         memberSpecificQuads[quad.graph.value].push(quad);
       } else {
-        newStore.add(quad);
+        newStore.addQuad(quad);
       }
     }
 
@@ -109,14 +110,14 @@ export class CBDShapeExtractor {
    *  * all quads in the namedgraph of this entity,
    *  * all quads of required paths found in the shape
    *  * the same algorithm on top of all found node links
-   * @param store The N3 Store loaded with a set of initial quads
+   * @param store The RdfStore loaded with a set of initial quads
    * @param id The entity to be described/extracted
    * @param shapeId The optional SHACL NodeShape identifier
    * @param graphsToIgnore The optional parameter of graph to ignore when other entities are mentioned in the current context
    * @returns Promise of a quad array of the described entity
    */
   public async extract(
-    store: Store,
+    store: RdfStore,
     id: Term,
     shapeId?: Term,
     graphsToIgnore?: Array<Term>,
@@ -210,7 +211,7 @@ export class CBDShapeExtractor {
   }
 
   private async extractRecursively(
-    store: Store,
+    store: RdfStore,
     id: Term,
     extracted: CbdExtracted,
     graphsToIgnore: Array<string>,
@@ -360,7 +361,7 @@ export class CBDShapeExtractor {
   public async CBD(
     result: Quad[],
     extractedStar: CbdExtracted,
-    store: Store,
+    store: RdfStore,
     id: Term,
     graphsToIgnore: Array<string>,
   ) {

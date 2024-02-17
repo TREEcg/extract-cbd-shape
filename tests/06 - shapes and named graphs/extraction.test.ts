@@ -1,12 +1,13 @@
 import { assert } from "chai";
-import { NamedNode, Parser, Store, StreamParser, Term, Writer } from "n3";
+import { NamedNode, Parser, StreamParser, Term, Writer } from "n3";
 import { CBDShapeExtractor } from "../../lib/CBDShapeExtractor";
 import rdfDereference from "rdf-dereference";
+import { RdfStore } from "rdf-stores";
 
 describe("Check whether paths trigger the right extraction process", function () {
-  let shapeStore = new Store();
+  let shapeStore = RdfStore.createDefault();
   let extractor: CBDShapeExtractor;
-  let dataStore = new Store();
+  let dataStore = RdfStore.createDefault();
   before(async () => {
     let readStream = (
       await rdfDereference.dereference("./tests/06 - shapes and named graphs/shape.ttl", {

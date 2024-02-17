@@ -1,6 +1,7 @@
 import * as process from 'process';
 import { CBDShapeExtractor } from '../lib/CBDShapeExtractor';
-import {Store, Writer, NamedNode} from 'n3';
+import {Writer, NamedNode} from 'n3';
+import { RdfStore } from 'rdf-stores';
 import rdfDereference from 'rdf-dereference';
 
 // Check if at least one command line argument is provided
@@ -11,7 +12,7 @@ if (process.argv.length <= 2) {
 async function main () {
     // Get the command line parameter at index 2 (index 0 is the node executable and index 1 is the script file)
     const entity = process.argv[2];
-    let shapeStore:Store = new Store();
+    let shapeStore:RdfStore = RdfStore.createDefault();
     let shapeId = "";
     if (process.argv[3]) {
         //A shape type has been set!
@@ -36,7 +37,7 @@ async function main () {
     let extractor = new CBDShapeExtractor(shapeStore);
     console.error('Processing shape ' + shapeId + ' from this shape: ', extractor.shapesGraph);
     let writer = new Writer();
-    let quads = await extractor.extract(new Store(), new NamedNode(entity), new NamedNode(shapeId));
+    let quads = await extractor.extract(RdfStore.createDefault(), new NamedNode(entity), new NamedNode(shapeId));
     writer.addQuads(quads);
     writer.end((err, res) => {console.log(res);});
 }

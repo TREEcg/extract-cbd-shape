@@ -1,12 +1,13 @@
 import { assert } from "chai";
 import { NamedNode, Parser, Store, StreamParser, Term, Writer } from "n3";
 import { CBDShapeExtractor } from "../../lib/extract-cbd-shape";
+import { RdfStore } from "rdf-stores";
 import rdfDereference from "rdf-dereference";
 
 describe("Tests whether plain CBD works using the data from 01 and 02", function () {
   it("Example 01 should return 11 triples with CBD", async () => {
     let extractor = new CBDShapeExtractor();
-    let dataStore = new Store();
+    let dataStore = RdfStore.createDefault();
     let readStream = (
       await rdfDereference.dereference(
         "./tests/01 - fetching a shacl shape/shacl-catalog.ttl",
@@ -27,7 +28,7 @@ describe("Tests whether plain CBD works using the data from 01 and 02", function
   });
   it("Example 02 should return 2 triples with CBD", async () => {
     let extractor = new CBDShapeExtractor();
-    let dataStore = new Store();
+    let dataStore = RdfStore.createDefault();
     let readStream = (
       await rdfDereference.dereference(
         "./tests/02 - marine regions LDES/data.ttl",
@@ -51,7 +52,7 @@ describe("Tests whether plain CBD works using the data from 01 and 02", function
 describe("Test CBD with nested blank nodes", async () => {
   it("Should be able to process nested blank nodes", async () => {
     let extractor = new CBDShapeExtractor();
-    let dataStore = new Store();
+    let dataStore = RdfStore.createDefault();
     let readStream = (
       await rdfDereference.dereference(
         "./tests/03 - CBD tests without a shape/data.ttl",
@@ -75,7 +76,7 @@ describe("Test CBD with nested blank nodes", async () => {
 describe("Test CBD with named graph", () => {
   it("Should retrieve all triples within a graph", async () => {
     let extractor = new CBDShapeExtractor();
-    let dataStore = new Store();
+    let dataStore = RdfStore.createDefault();
     let readStream = (
       await rdfDereference.dereference(
         "./tests/03 - CBD tests without a shape/data.ttl",
@@ -96,7 +97,7 @@ describe("Test CBD with named graph", () => {
   });
   it("Should retrieve all triples within a graph and combine it with the triples found from CBD", async () => {
     let extractor = new CBDShapeExtractor();
-    let dataStore = new Store();
+    let dataStore = RdfStore.createDefault();
     let readStream = (
       await rdfDereference.dereference(
         "./tests/03 - CBD tests without a shape/data.ttl",
@@ -117,7 +118,7 @@ describe("Test CBD with named graph", () => {
   });
   it("Should retrieve only the quads from that particular update in an LDES", async () => {
     let extractor = new CBDShapeExtractor();
-    let dataStore = new Store();
+    let dataStore = RdfStore.createDefault();
     let readStream = (
       await rdfDereference.dereference(
         "./tests/03 - CBD tests without a shape/data.ttl",

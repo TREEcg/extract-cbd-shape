@@ -1,13 +1,14 @@
 import { assert } from "chai";
-import { NamedNode, Parser, Store, StreamParser, Term, Writer } from "n3";
 import { CBDShapeExtractor } from "../../lib/CBDShapeExtractor";
 import rdfDereference from "rdf-dereference";
 import { Quad, Term as RTerm } from "@rdfjs/types";
-
+import { RdfStore } from "rdf-stores";
+import { DataFactory } from "rdf-data-factory";
+const df = new DataFactory();
 describe("Check weather all selected quads can be extracted", function () {
-  let shapeStore = new Store();
+  let shapeStore = RdfStore.createDefault();
   let extractor: CBDShapeExtractor;
-  let dataStore = new Store();
+  let dataStore = RdfStore.createDefault();
   before(async () => {
     let readStream = (
       await rdfDereference.dereference(
@@ -36,8 +37,8 @@ describe("Check weather all selected quads can be extracted", function () {
   it("All quads from example should be extracted", async () => {
     let result = await extractor.extract(
       dataStore,
-      new NamedNode("http://example.org/line"),
-      new NamedNode("http://example.org/shape"),
+      df.namedNode("http://example.org/line"),
+      df.namedNode("http://example.org/shape"),
     );
     // It should only have 6 quads
     assert.equal(result.length, 6);
@@ -62,10 +63,10 @@ describe("Check weather all selected quads can be extracted", function () {
     let result = await extractor.bulkExtract(
       dataStore,
       [
-        new NamedNode("http://example.org/line"),
-        new NamedNode("http://example.org/important_point"),
+        df.namedNode("http://example.org/line"),
+        df.namedNode("http://example.org/important_point"),
       ],
-      new NamedNode("http://example.org/shape"),
+      df.namedNode("http://example.org/shape"),
       undefined,
       cb,
     );
