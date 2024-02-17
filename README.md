@@ -1,6 +1,6 @@
 # Extract CBD Shape
 
-Given (i) an N3 Store of triples, (ii) an N3 Store with a SHACL shape’s triples, and (iii) a target entity URI,
+Given (i) an RdfStore (see [`rdf-stores`](https://github.com/rubensworks/rdf-stores.js?tab=readme-ov-file#index-combinations)) of triples, (ii) an RdfStore with a SHACL shape’s triples, and (iii) a target entity URI,
 this library will extract all triples that belong to the entity.
 If more triples of the entity are needed, extra triples are retrieved by dereferencing the relevant entity.
 
@@ -21,8 +21,8 @@ let extractor = new CBDShapeExtractor(shapesGraph);
 let entityquads = await extractor.extract(store, entityId, shapeId, graphsToIgnore);
 ```
 
- * The shapesGraph is an N3.Store that contains the quads of a shape
- * The store is an N3.Store containing the quads in the current context (e.g., the quads parsed from an HTTP response, or a message received over a channel)
+ * The shapesGraph is an RdfStore that contains the quads of a shape
+ * The store is an RdfStore containing the quads in the current context (e.g., the quads parsed from an HTTP response, or a message received over a channel)
  * The entityId is the IRI of the entity to extract from the current context
  * The Shape ID is the IRI of the NodeShape in the shapesGraph to start from
  * The graphToIgnore are the namedgraphs in the current context (the store) to disregard when extracting the member
