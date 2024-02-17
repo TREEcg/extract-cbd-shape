@@ -1,5 +1,5 @@
 const Benchmark = require("benchmark");
-const Store = require("n3").Store;
+const {RdfStore} = require('rdf-stores');
 const rdfDereference = require("rdf-dereference").default;
 const NamedNode = require("n3").NamedNode;
 const { performance } = require("perf_hooks");
@@ -47,10 +47,10 @@ const runBenchmarkInCleanContext = async (benchmarkName, benchmarkFn, timeout) =
 
 let main = async function () {
   let suite = new Benchmark.Suite();
-  let memberData = new Store();
-  let memberOutBandData = new Store();
-  let memberOutBandDataPartial = new Store();
-  let shaclmember = new Store();
+  let memberData = RdfStore.createDefault();
+  let memberOutBandData = RdfStore.createDefault();
+  let memberOutBandDataPartial = RdfStore.createDefault();
+  let shaclmember = RdfStore.createDefault();
 
   //Load the quads from the file
   let memberDataStream = (
