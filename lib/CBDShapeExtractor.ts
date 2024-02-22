@@ -16,6 +16,7 @@ class DereferenceNeeded {
 
 type CBDShapeExtractorOptions = {
   cbdDefaultGraph: boolean;
+  fetch?: typeof fetch;
 };
 
 /**
@@ -140,7 +141,7 @@ export class CBDShapeExtractor {
         dereferenced.push(target);
         await this.loadQuadStreamInStore(
           store,
-          (await this.dereferencer.dereference(target)).data,
+          (await this.dereferencer.dereference(target, {fetch: this.options.fetch})).data,
         );
 
         return await tryExtract();
