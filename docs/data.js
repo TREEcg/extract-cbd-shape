@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1708687003078,
+  "lastUpdate": 1708687072630,
   "repoUrl": "https://github.com/TREEcg/extract-cbd-shape",
   "entries": {
     "Extraction algorithm Benchmark for inband data": [
@@ -1463,6 +1463,51 @@ window.BENCHMARK_DATA = {
             "range": "±2.93%",
             "unit": "ops/sec",
             "extra": "78 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "pieter.colpaert@ugent.be",
+            "name": "Pieter Colpaert",
+            "username": "pietercolpaert"
+          },
+          "committer": {
+            "email": "pieter.colpaert@ugent.be",
+            "name": "Pieter Colpaert",
+            "username": "pietercolpaert"
+          },
+          "distinct": true,
+          "id": "b11046ee8295cfd2fddf54e13bdf84d26cea2c8c",
+          "message": "Merge branch 'main' of github.com:pietercolpaert/extract-cbd-shape",
+          "timestamp": "2024-02-23T12:14:52+01:00",
+          "tree_id": "08c8b3371bfc50d359dee5917117a6777248d23e",
+          "url": "https://github.com/TREEcg/extract-cbd-shape/commit/b11046ee8295cfd2fddf54e13bdf84d26cea2c8c"
+        },
+        "date": 1708687072290,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "Extract1#ExtractionCollectionMembers",
+            "value": 256,
+            "range": "±4.29%",
+            "unit": "ops/sec",
+            "extra": "76 samples"
+          },
+          {
+            "name": "Extract2#ExtractionMembersPartialOutBand",
+            "value": 295,
+            "range": "±5.18%",
+            "unit": "ops/sec",
+            "extra": "70 samples"
+          },
+          {
+            "name": "Extract3#ExtractionMembersOutBand",
+            "value": 318,
+            "range": "±3.87%",
+            "unit": "ops/sec",
+            "extra": "72 samples"
           }
         ]
       }
