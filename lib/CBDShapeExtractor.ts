@@ -39,7 +39,7 @@ export class CBDShapeExtractor {
   ) {
     this.options = {
       cbdDefaultGraph: options.cbdDefaultGraph || false,
-      fetch: option.fetch,
+      fetch: options.fetch,
     };
     if (!dereferencer) {
       this.dereferencer = rdfDereference;
