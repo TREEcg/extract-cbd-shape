@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1711117705589,
+  "lastUpdate": 1711117830400,
   "repoUrl": "https://github.com/TREEcg/extract-cbd-shape",
   "entries": {
     "Extraction algorithm Benchmark for inband data": [
@@ -1572,6 +1572,58 @@ window.BENCHMARK_DATA = {
             "name": "Extract3#ExtractionMembersOutBand",
             "value": 318,
             "range": "±3.87%",
+            "unit": "ops/sec",
+            "extra": "72 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "pieter.colpaert@ugent.be",
+            "name": "Pieter Colpaert",
+            "username": "pietercolpaert"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "86728607fc265c026fa8d2ee9d275a3701c7ba20",
+          "message": "Merge pull request #21 from xdxxxdx/main\n\nfeat: add 1000 members extraction benchmark.",
+          "timestamp": "2024-03-22T15:26:36+01:00",
+          "tree_id": "195e5debd2bb96dc39d3fa500437a652b051d0ed",
+          "url": "https://github.com/TREEcg/extract-cbd-shape/commit/86728607fc265c026fa8d2ee9d275a3701c7ba20"
+        },
+        "date": 1711117829853,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "Extract1#ExtractionCollectionMembers",
+            "value": 275,
+            "range": "±4.03%",
+            "unit": "ops/sec",
+            "extra": "75 samples"
+          },
+          {
+            "name": "Extract2#ExtractionMembersPartialOutBand",
+            "value": 264,
+            "range": "±9.50%",
+            "unit": "ops/sec",
+            "extra": "71 samples"
+          },
+          {
+            "name": "Extract3#ExtractionMembersOutBand",
+            "value": 250,
+            "range": "±9.48%",
+            "unit": "ops/sec",
+            "extra": "72 samples"
+          },
+          {
+            "name": "Extract4#ExtractionCollection1000Members",
+            "value": 278,
+            "range": "±4.77%",
             "unit": "ops/sec",
             "extra": "72 samples"
           }
