@@ -1,5 +1,5 @@
 const Benchmark = require("benchmark");
-const {RdfStore} = require('rdf-stores');
+const { RdfStore } = require("rdf-stores");
 const rdfDereference = require("rdf-dereference").default;
 const NamedNode = require("n3").NamedNode;
 const { performance } = require("perf_hooks");
@@ -9,7 +9,11 @@ const CBDShapeExtractor =
   require("../dist/lib/CBDShapeExtractor").CBDShapeExtractor;
 
 const { renderResults } = require("./render");
-const runBenchmarkInCleanContext = async (benchmarkName, benchmarkFn, timeout) => {
+const runBenchmarkInCleanContext = async (
+  benchmarkName,
+  benchmarkFn,
+  timeout
+) => {
   const dom = new JSDOM();
   const cleanContext = dom.window.document;
 
@@ -42,12 +46,10 @@ const runBenchmarkInCleanContext = async (benchmarkName, benchmarkFn, timeout) =
   }
 };
 
-
-
-
 let main = async function () {
   let suite = new Benchmark.Suite();
   let memberData = RdfStore.createDefault();
+  let memberData1000Members = RdfStore.createDefault();
   let memberOutBandData = RdfStore.createDefault();
   let memberOutBandDataPartial = RdfStore.createDefault();
   let shaclmember = RdfStore.createDefault();
@@ -60,25 +62,34 @@ let main = async function () {
   ).data;
 
   //Load the quads from the file
+  let memberDataStream1000members = (
+    await rdfDereference.dereference("./perf/resources/member-1000.ttl", {
+      localFiles: true,
+    })
+  ).data;
+
+  //Load the quads from the file
   let memberDataStreamOutBand = (
-      await rdfDereference.dereference("./perf/resources/member-outband.ttl", {
-        localFiles: true,
-      })
+    await rdfDereference.dereference("./perf/resources/member-outband.ttl", {
+      localFiles: true,
+    })
   ).data;
 
   //Load the quads from the file
   let memberDataStreamOutBandPartial = (
-      await rdfDereference.dereference("./perf/resources/member-partial-outband.ttl", {
+    await rdfDereference.dereference(
+      "./perf/resources/member-partial-outband.ttl",
+      {
         localFiles: true,
-      })
+      }
+    )
   ).data;
 
   //load the shacl shape from the file
   let memberShaclStream = (
-    await rdfDereference.dereference(
-      "./perf/resources/shacl-member.ttl",
-      { localFiles: true }
-    )
+    await rdfDereference.dereference("./perf/resources/shacl-member.ttl", {
+      localFiles: true,
+    })
   ).data;
 
   await new Promise((resolve, reject) => {
@@ -86,13 +97,25 @@ let main = async function () {
   });
 
   await new Promise((resolve, reject) => {
-    memberOutBandData.import(memberDataStreamOutBand).on("end", resolve).on("error", reject);
+    memberData1000Members
+      .import(memberDataStream1000members)
+      .on("end", resolve)
+      .on("error", reject);
   });
 
   await new Promise((resolve, reject) => {
-    memberOutBandDataPartial.import(memberDataStreamOutBandPartial).on("end", resolve).on("error", reject);
+    memberOutBandData
+      .import(memberDataStreamOutBand)
+      .on("end", resolve)
+      .on("error", reject);
   });
 
+  await new Promise((resolve, reject) => {
+    memberOutBandDataPartial
+      .import(memberDataStreamOutBandPartial)
+      .on("end", resolve)
+      .on("error", reject);
+  });
 
   await new Promise((resolve, reject) => {
     shaclmember
@@ -106,74 +129,129 @@ let main = async function () {
   let extractorWithShape = new CBDShapeExtractor(shaclmember);
   //console.log(shaclmember.getQuads(null, null, null, null))
 
-  /* * Test extracting 10 members from a Collection with 10 different nodes
-    * Test extracting 10 members from 1 page, out of band, but each member has already a couple of triples in-band
-    * Test extracting 10 members from 1 page, but each member is out of band*/
+  /*
+   * Test extracting 10 members from a Collection with 10 different nodes
+   * Test extracting 10 members from 1 page, out of band, but each member has already a couple of triples in-band
+   * Test extracting 10 members from 1 page, but each member is out of band
+   * Test extracting 10 members from a Collection with 1000 different nodes
+   **/
 
   //out-band tests
-  //Extraction 10 members from a Collection with 10 different nodes
+
   suite
-      .add("Extract1#ExtractionCollectionMembers", async () => {
-    await runBenchmarkInCleanContext("Extract1#ExtractionCollectionMembers", async (cleanContext, deferred) => {
-      const members = memberData.getQuads(null, "https://w3id.org/tree#member", null);
-      const result = new Store();
-      for (const member of members) {
-        result.addQuads(await extractor.extract(memberData, member.object));
-      }
-      // console.error("Extract1#ExtractionMembersAllInBand " + result.size + " quads.");
-    }, 25000);
-  })
-
-
-
-      // Extraction 10 members from 1 page, out of band, but each member has already a couple of triples in-band
-      // 20 quads in band
-      // 20 quads out of band
-      .add("Extract2#ExtractionMembersPartialOutBand", async (deferred) => {
-        await runBenchmarkInCleanContext("Extract2#ExtractionMembersPartialOutBand", async (cleanContext) => {
-          const members = memberOutBandDataPartial.getQuads(
-              null,
-              "https://w3id.org/tree#member",
-              null
+    //Extraction 10 members from a Collection with 10 different nodes
+    .add("Extract1#ExtractionCollectionMembers", async () => {
+      await runBenchmarkInCleanContext(
+        "Extract1#ExtractionCollectionMembers",
+        async (cleanContext, deferred) => {
+          const members = memberData.getQuads(
+            null,
+            new NamedNode("https://w3id.org/tree#member"),
+            null,
+            null
           );
-          const result = new Store();
+          const result = RdfStore.createDefault();
+          for (const member of members) {
+            for (const quad of await extractor.extract(
+              memberData,
+              member.object
+            )) {
+              result.addQuad(quad);
+            }
+          }
+          // console.log("Extract1#ExtractionCollection10Members: " + result.size + " quads.");
+        },
+        25000
+      );
+    })
+
+    // Extraction 10 members from 1 page, out of band, but each member has already a couple of triples in-band
+    // 20 quads in band
+    // 20 quads out of band
+    .add("Extract2#ExtractionMembersPartialOutBand", async (deferred) => {
+      await runBenchmarkInCleanContext(
+        "Extract2#ExtractionMembersPartialOutBand",
+        async (cleanContext) => {
+          const members = memberData.getQuads(
+            null,
+            new NamedNode("https://w3id.org/tree#member"),
+            null,
+            null
+          );
+          const result = RdfStore.createDefault();
           for (const member of members) {
             let extract = await extractorWithShape.extract(
-                memberOutBandDataPartial,
-                member.object,
-                new NamedNode("http://example.org/memberShape")
+              memberOutBandDataPartial,
+              member.object,
+              new NamedNode("http://example.org/memberShape")
             );
             // console.log(extract);
-            result.addQuads(extract);
+            for (const quad of extract) {
+              result.addQuad(quad);
+            }
           }
-          // console.error("Extract2#ExtractionMembersPartialOutBand " + result.size + " quads.");
-        }, 25000); // Set the timeout for this specific benchmark
-      })
+          // console.log("Extract3#ExtractionMembersPartialOutBand: " + result.size + " quads.");
+        },
+        25000
+      ); // Set the timeout for this specific benchmark
+    })
 
-      // * Test extracting 10 members from 1 page, but each member is out of band*/
-      .add("Extract3#ExtractionMembersOutBand", async (deferred) => {
-        await runBenchmarkInCleanContext("Extract3#ExtractionMembersOutBand", async (cleanContext) => {
-          const members = memberOutBandData.getQuads(
-              null,
-              "https://w3id.org/tree#member",
-              null
+    // * Test extracting 10 members from 1 page, but each member is out of band*/
+    .add("Extract3#ExtractionMembersOutBand", async (deferred) => {
+      await runBenchmarkInCleanContext(
+        "Extract3#ExtractionMembersOutBand",
+        async (cleanContext) => {
+          const members = memberData.getQuads(
+            null,
+            new NamedNode("https://w3id.org/tree#member"),
+            null,
+            null
           );
-          const result = new Store();
+          const result = RdfStore.createDefault();
           for (const member of members) {
             let extract = await extractorWithShape.extract(
-                memberOutBandData,
-                member.object,
-                new NamedNode("http://example.org/memberShape")
+              memberOutBandData,
+              member.object,
+              new NamedNode("http://example.org/memberShape")
             );
             // console.log(extract);
-            result.addQuads(extract);
+            for (const quad of extract) {
+              result.addQuad(quad);
+            }
           }
-          // console.error("Extract3#ExtractionMembersOutBand " + result.size + " quads.");
-        }, 25000); // Set the timeout for this specific benchmark
-      })
+          // console.log("Extract4#ExtractionMembersOutBand: " + result.size + " quads.");
+        },
+        25000
+      ); // Set the timeout for this specific benchmark
+    })
 
+    //Extraction 1000 members from a Collection with 1000 different nodes
+    .add("Extract4#ExtractionCollection1000Members", async () => {
+      await runBenchmarkInCleanContext(
+        "Extract#ExtractionCollection1000Members",
+        async (cleanContext, deferred) => {
+          const members = memberData1000Members.getQuads(
+            null,
+            new NamedNode("https://w3id.org/tree#member"),
+            null,
+            null
+          );
+          const result = RdfStore.createDefault();
+          for (const member of members) {
+            for (const quad of await extractor.extract(
+              memberData1000Members,
+              member.object
+            )) {
+              result.addQuad(quad);
+            }
+          }
+          // console.log("Extract2#ExtractionCollection1000Members: " + result.size + " quads.");
+        },
+        25000
+      );
+    })
     //add listeners
-    .on('cycle', function(event) {
+    .on("cycle", function (event) {
       console.log(String(event.target));
     })
     //add listeners
