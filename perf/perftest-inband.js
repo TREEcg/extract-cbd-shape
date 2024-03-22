@@ -70,9 +70,9 @@ let main = async function () {
         kboData,
         new NamedNode("https://kbopub.economie.fgov.be/kbo#0417199869.2022.11")
       );
-      console.log(
-        "Extract2#CBDAndNamedGraphs returned " + result.length + " quads."
-      );
+      // console.log(
+      //   "Extract2#CBDAndNamedGraphs returned " + result.length + " quads."
+      // );
     })
 
     //Extraction CBD + Simple Shape not adding any triples other than what CBD gives
