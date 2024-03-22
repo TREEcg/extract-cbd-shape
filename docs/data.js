@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1711118143294,
+  "lastUpdate": 1711118257612,
   "repoUrl": "https://github.com/TREEcg/extract-cbd-shape",
   "entries": {
     "Extraction algorithm Benchmark for inband data": [
@@ -1692,6 +1692,58 @@ window.BENCHMARK_DATA = {
             "range": "±4.77%",
             "unit": "ops/sec",
             "extra": "72 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "xueying_deng@outlook.com",
+            "name": "XD",
+            "username": "xdxxxdx"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "196702a638cbdfd49e5ff178dfab4c2da7495521",
+          "message": "Update perftest-inband.js",
+          "timestamp": "2024-03-22T15:34:01+01:00",
+          "tree_id": "e50bf76ff80060c7ea60b4cff24ed6d7069aa701",
+          "url": "https://github.com/TREEcg/extract-cbd-shape/commit/196702a638cbdfd49e5ff178dfab4c2da7495521"
+        },
+        "date": 1711118256590,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "Extract1#ExtractionCollectionMembers",
+            "value": 268,
+            "range": "±3.21%",
+            "unit": "ops/sec",
+            "extra": "76 samples"
+          },
+          {
+            "name": "Extract2#ExtractionMembersPartialOutBand",
+            "value": 254,
+            "range": "±7.66%",
+            "unit": "ops/sec",
+            "extra": "64 samples"
+          },
+          {
+            "name": "Extract3#ExtractionMembersOutBand",
+            "value": 214,
+            "range": "±10.58%",
+            "unit": "ops/sec",
+            "extra": "62 samples"
+          },
+          {
+            "name": "Extract4#ExtractionCollection1000Members",
+            "value": 271,
+            "range": "±4.21%",
+            "unit": "ops/sec",
+            "extra": "75 samples"
           }
         ]
       }
