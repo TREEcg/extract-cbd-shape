@@ -1,4 +1,3 @@
-import { BlankNode } from "n3";
 import { RdfStore } from "rdf-stores";
 import { Term } from "@rdfjs/types";
 import { DataFactory } from 'rdf-data-factory';
@@ -178,7 +177,7 @@ export class ShapesGraph {
   }
 
   protected constructPathPattern(shapeStore: RdfStore, listItem: Term): Path {
-    if (listItem instanceof BlankNode) {
+    if (listItem.termType === 'BlankNode') {
       //Look for special types
       let zeroOrMorePathObjects = getObjects(shapeStore,
         listItem,

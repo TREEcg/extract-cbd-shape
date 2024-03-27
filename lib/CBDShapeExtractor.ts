@@ -1,12 +1,14 @@
 import rdfDereference, { RdfDereferencer } from "rdf-dereference";
 import { NodeLink, RDFMap, ShapesGraph, ShapeTemplate } from "./Shape";
 import { Path, PathResult } from "./Path";
-import { BlankNode, DefaultGraph } from "n3";
+import { DataFactory } from "rdf-data-factory";
 import { RdfStore } from "rdf-stores";
 import { Quad, Term } from "@rdfjs/types";
 import debug from "debug";
 
 const log = debug("cbdExtracted");
+
+const df = new DataFactory();
 
 class DereferenceNeeded {
   target: string;
@@ -380,7 +382,7 @@ export class CBDShapeExtractor {
     graphsToIgnore: Array<string>,
   ) {
     extractedStar.addCBDTerm(id);
-    const graph = this.options.cbdDefaultGraph ? new DefaultGraph() : null;
+    const graph = this.options.cbdDefaultGraph ? df.defaultGraph(): null;
     const quads = store.getQuads(id, null, null, graph);
 
     // Iterate over the quads, add them to the result and check whether we should further get other quads based on blank nodes or the SHACL shape
@@ -395,7 +397,7 @@ export class CBDShapeExtractor {
 
       // Conditionally get more quads: if it’s a not yet extracted blank node
       if (
-        q.object instanceof BlankNode &&
+        q.object.termType === 'BlankNode' &&
         !extractedStar.cbdExtracted(q.object)
       ) {
         // Only perform CBD again recursively on the blank node
