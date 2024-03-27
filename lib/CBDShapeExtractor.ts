@@ -4,6 +4,9 @@ import { Path, PathResult } from "./Path";
 import { BlankNode, DefaultGraph } from "n3";
 import { RdfStore } from "rdf-stores";
 import { Quad, Term } from "@rdfjs/types";
+import debug from "debug";
+
+const log = debug("cbdExtracted");
 
 class DereferenceNeeded {
   target: string;
@@ -37,10 +40,9 @@ export class CBDShapeExtractor {
     dereferencer?: RdfDereferencer<Quad>,
     options: Partial<CBDShapeExtractorOptions> = {},
   ) {
-    this.options = {
-      cbdDefaultGraph: options.cbdDefaultGraph || false,
-      fetch: options.fetch,
-    };
+    // Assign with default options
+    this.options = Object.assign({ cbdDefaultGraph: false }, options);
+
     if (!dereferencer) {
       this.dereferencer = rdfDereference;
     } else {
@@ -124,7 +126,9 @@ export class CBDShapeExtractor {
     shapeId?: Term,
     graphsToIgnore?: Array<Term>,
   ): Promise<Array<Quad>> {
-    //First extract everything except for something within the graphs to ignore, or within the graph of the current entity, as that’s going to be added anyway later on
+    const logger = log.extend("extract");
+
+    // First extract everything except for something within the graphs to ignore, or within the graph of the current entity, as that’s going to be added anyway later on
     let dontExtractFromGraph: Array<string> = (
       graphsToIgnore ? graphsToIgnore : []
     ).map((item) => {
@@ -136,13 +140,16 @@ export class CBDShapeExtractor {
       target: string,
       msg?: string,
     ) => Promise<Quad[]> = async (target: string, msg?: string) => {
-      const ms = msg ? ` (${msg})` : "";
-      console.error("Maybe dereferencing " + target + ms);
       if (dereferenced.indexOf(target) == -1) {
+        logger(`Dereferencing ${target} ${msg ?? ""}`);
         dereferenced.push(target);
         await this.loadQuadStreamInStore(
           store,
-          (await this.dereferencer.dereference(target, {fetch: this.options.fetch})).data,
+          (
+            await this.dereferencer.dereference(target, {
+              fetch: this.options.fetch,
+            })
+          ).data,
         );
 
         return await tryExtract();
@@ -182,7 +189,7 @@ export class CBDShapeExtractor {
 
     const result = await tryExtract();
 
-    //When returning the quad array, remove duplicate triples as CBD, required properties, etc. could have added multiple times the same triple
+    // When returning the quad array, remove duplicate triples as CBD, required properties, etc. could have added multiple times the same triple
     return result.filter((value: Quad, index: number, array: Quad[]) => {
       return index === array.findIndex((x) => x.equals(value));
     });
@@ -221,7 +228,7 @@ export class CBDShapeExtractor {
     offline: boolean,
     shapeId?: Term | ShapeTemplate,
   ): Promise<void> {
-    //If it has already been extracted, don’t extract it again: prevents cycles
+    // If it has already been extracted, don’t extract it again: prevents cycles
     if (extracted.cbdExtracted(id)) {
       return;
     }
@@ -234,7 +241,7 @@ export class CBDShapeExtractor {
       shape = this.shapesGraph.shapes.get(shapeId);
     }
 
-    //Perform CBD and we’re done, except on the condition there’s a shape defined and it’s closed
+    // Perform CBD and we’re done, except on the condition there’s a shape defined and it’s closed
     if (!(shape && shape.closed)) {
       this.CBD(result, extracted, store, id, graphsToIgnore);
     }
@@ -252,7 +259,7 @@ export class CBDShapeExtractor {
       let extraPaths: Path[] = [];
       let extraNodeLinks: NodeLink[] = [];
 
-      //Process atLeastOneLists in extraPaths and extra NodeLinks
+      // Process atLeastOneLists in extraPaths and extra NodeLinks
       this.recursivelyProcessAtLeastOneLists(
         extracted,
         shape,
@@ -268,7 +275,9 @@ export class CBDShapeExtractor {
           let pathQuads = path
             .match(store, extracted, id, graphsToIgnore)
             .map((pathResult: PathResult) => {
-              //if the shape is open and thus CBD is going to take place, remove the first element from the quads list of the matches, if the subject of that first item is the focusnode (otherwise the first element was a reverse path)
+              // if the shape is open and thus CBD is going to take place,
+              //   and the subject of that first item is the focusnode (otherwise the first element was a reverse path)
+              //   remove the first element from the quads list of the matches,
               if (
                 !shape!.closed &&
                 pathResult.path[0].subject.value === id.value
@@ -279,7 +288,7 @@ export class CBDShapeExtractor {
             })
             .flat()
             .filter((quad) => {
-              //Make sure we don’t add quads multiple times
+              // Make sure we don’t add quads multiple times
               if (!visited.find((x) => x.equals(quad))) {
                 visited.push(quad);
                 return true;
@@ -288,7 +297,7 @@ export class CBDShapeExtractor {
               return false;
             });
 
-          result.push(...pathQuads); //concat all quad paths in the results
+          result.push(...pathQuads); // concat all quad paths in the results
         }
       }
 
@@ -317,7 +326,9 @@ export class CBDShapeExtractor {
           nodeLink.pathPattern.match(store, extracted, id, graphsToIgnore),
         )
           .map((pathResult: PathResult) => {
-            //if the shape is open and thus CBD is going to take place, remove the first element from the quads list of the matches, if the subject of that first item is the focusnode (otherwise the first element was a reverse path)
+            // if the shape is open and thus CBD is going to take place
+            // and if the subject of that first item is the focusnode (otherwise the first element was a reverse path)
+            //   remove the first element from the quads list of the matches,
             if (
               !shape?.closed &&
               pathResult.path[0].subject.value === id.value
@@ -328,8 +339,8 @@ export class CBDShapeExtractor {
           })
           .flat()
           .filter((quad) => {
-            //Make sure we don’t add quads multiple times
-            //There must be a more efficient solution to making sure there’s only one of each triple...
+            // Make sure we don’t add quads multiple times
+            // There must be a more efficient solution to making sure there’s only one of each triple...
             if (!visited.find((x) => x.equals(quad))) {
               visited.push(quad);
               return true;
@@ -342,7 +353,7 @@ export class CBDShapeExtractor {
     }
 
     if (!offline && id.termType === "NamedNode" && shape) {
-      //Check required paths and lazy evaluate the atLeastOneLists
+      // Check required paths and lazy evaluate the atLeastOneLists
       const problems = shape.requiredAreNotPresent(extracted);
       if (problems) {
         throw new DereferenceNeeded(
@@ -355,10 +366,11 @@ export class CBDShapeExtractor {
 
   /**
    * Performs Concise Bounded Description: extract star-shape and recurses over the blank nodes
-   * @param result
-   * @param store
-   * @param id
-   * @param extracted
+   * @param result list of quads
+   * @param extractedStar topology object to keep track of already found properties 
+   * @param store store to use for cbd
+   * @param id starting subject
+   * @param graphsToIgnore 
    */
   public async CBD(
     result: Quad[],
@@ -371,9 +383,9 @@ export class CBDShapeExtractor {
     const graph = this.options.cbdDefaultGraph ? new DefaultGraph() : null;
     const quads = store.getQuads(id, null, null, graph);
 
-    //Iterate over the quads, add them to the result and check whether we should further get other quads based on blank nodes or the SHACL shape
+    // Iterate over the quads, add them to the result and check whether we should further get other quads based on blank nodes or the SHACL shape
     for (const q of quads) {
-      //ignore quads in the graphs to ignore
+      // Ignore quads in the graphs to ignore
       if (graphsToIgnore?.includes(q.graph.value)) {
         continue;
       }
@@ -386,12 +398,12 @@ export class CBDShapeExtractor {
         q.object instanceof BlankNode &&
         !extractedStar.cbdExtracted(q.object)
       ) {
-        //only perform CBD again recursively on the blank node
+        // Only perform CBD again recursively on the blank node
         await this.CBD(result, next, store, q.object, graphsToIgnore);
       }
     }
 
-    //Should we also take into account RDF* and/or RDF reification systems here?
+    // Should we also take into account RDF* and/or RDF reification systems here?
   }
 }
 
