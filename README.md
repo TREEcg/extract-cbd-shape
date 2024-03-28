@@ -109,3 +109,12 @@ It won’t:
 ### Creating the Shape Template from ShEx
 
 _TODO_
+
+
+### Logging
+
+Logging can be enabled using the `DEBUG` environment variable, `DEBUG=extract-cbd-shape:*`.
+
+
+
+

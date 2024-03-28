@@ -6,7 +6,7 @@ import { RdfStore } from "rdf-stores";
 import { Quad, Term } from "@rdfjs/types";
 import debug from "debug";
 
-const log = debug("cbdExtracted");
+const log = debug("extract-cbd-shape");
 
 const df = new DataFactory();
 
