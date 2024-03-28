@@ -20,7 +20,7 @@ async function loadShape(shapeURL: string, shapeStore: RdfStore) {
         shapeStore.import(readStream).on("end",resolve)
         .on("error", reject);
     });
-    //Now check whether there are one or more owl:imports on the shapesgraph
+    //Now check whether there are one or more owl:imports on the shapesgraph -- But we don’t know how to know the IRI of the shapesgraph as it is not included in the SHACL spec... So we’ll leave it open for now.
     let importsURLs = shapeStore.getQuads(null, df.namedNode('http://www.w3.org/2002/07/owl#imports'),null,null).map((quad) => {
         return quad.object.value ;
     });
@@ -33,7 +33,7 @@ async function loadShape(shapeURL: string, shapeStore: RdfStore) {
                 shapeStore.import(newReadStream).on("end",resolve)
                 .on("error", reject);
             });
-            //check for new URLs
+            //check for new imports URLs
             importsURLs = shapeStore.getQuads(null, df.namedNode('http://www.w3.org/2002/07/owl#imports'),null,null).map((quad) => {
                 return quad.object.value ;
             });
