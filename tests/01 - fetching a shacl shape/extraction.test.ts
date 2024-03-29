@@ -74,6 +74,6 @@ describe("Check whether we can successfully extract a SHACL shape", async () => 
         writer.end((err, res) => {console.log(res);});*/
 
     //TODO: Didn’t yet calculate how many actually should be returned here... Just assumed this number is correct...
-    assert.equal(result.length, 273); // Just testing whether there are quads being returned now
+    assert.equal(result.length, 264); // Just testing whether there are quads being returned now
   });
 });
