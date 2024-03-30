@@ -22,7 +22,7 @@
 :NodeShapeShape
 	a sh:NodeShape ;
     ### We expect a sh:property to always refer to a property shape. In case it doesn’t it’s because it will have conditionals.
-    sh:or ( 
+    sh:xone ( 
         [
 		    sh:path sh:property;
 		    sh:node :PropertyShapeShape ;
@@ -87,7 +87,7 @@ shsh:ListNodeShape
 	a sh:NodeShape ;
 	rdfs:label "List node shape"@en ;
 	rdfs:comment "Defines constraints on what it means for a node to be a node within a well-formed RDF list. Note that this does not check whether the rdf:rest items are also well-formed lists as this would lead to unsupported recursion."@en ;
-	sh:or ( [
+	sh:xone ( [
 				sh:hasValue rdf:nil ;
         		sh:property [
 					sh:path rdf:first ;
