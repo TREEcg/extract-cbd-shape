@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1711793139299,
+  "lastUpdate": 1711793169951,
   "repoUrl": "https://github.com/TREEcg/extract-cbd-shape",
   "entries": {
     "Extraction algorithm Benchmark for inband data": [
@@ -2348,6 +2348,58 @@ window.BENCHMARK_DATA = {
             "range": "±2.08%",
             "unit": "ops/sec",
             "extra": "75 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "pieter.colpaert@ugent.be",
+            "name": "Pieter Colpaert",
+            "username": "pietercolpaert"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5c6cd3a189e490888ff33528d8e320b1d87253e9",
+          "message": "Merge pull request #26 from TREEcg/rewrite/extract\n\nrewrite into extract instance",
+          "timestamp": "2024-03-30T11:02:35+01:00",
+          "tree_id": "fe334e7d163ded4e625c02ca7eecef825f67495d",
+          "url": "https://github.com/TREEcg/extract-cbd-shape/commit/5c6cd3a189e490888ff33528d8e320b1d87253e9"
+        },
+        "date": 1711793169376,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "Extract1#ExtractionCollectionMembers",
+            "value": 296,
+            "range": "±3.94%",
+            "unit": "ops/sec",
+            "extra": "78 samples"
+          },
+          {
+            "name": "Extract2#ExtractionMembersPartialOutBand",
+            "value": 300,
+            "range": "±8.26%",
+            "unit": "ops/sec",
+            "extra": "67 samples"
+          },
+          {
+            "name": "Extract3#ExtractionMembersOutBand",
+            "value": 300,
+            "range": "±6.22%",
+            "unit": "ops/sec",
+            "extra": "78 samples"
+          },
+          {
+            "name": "Extract4#ExtractionCollection1000Members",
+            "value": 326,
+            "range": "±1.80%",
+            "unit": "ops/sec",
+            "extra": "79 samples"
           }
         ]
       }
