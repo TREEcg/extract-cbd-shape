@@ -98,3 +98,61 @@ describe("Extracting logical edge cases", function () {
     assert.equal(result.length, 7);
   });
 });
+
+describe("Check whether paths are correctly chained", async () => {
+  const shape = `
+@prefix sh:  <http://www.w3.org/ns/shacl#> .
+@prefix ex:  <http://example.org/> .
+
+ex:innerShape 
+	a sh:NodeShape ;
+	sh:property [
+		sh:path (ex:first ex:second);
+	] .
+
+ex:outerShape 
+	a sh:NodeShape ;
+	sh:property [
+		sh:path ex:inner;
+    sh:node ex:innerShape;
+	] .
+`;
+
+  const data = `
+@prefix ex:  <http://example.org/> .
+
+ex:false ex:second "Don't find me".
+
+ex:true ex:first ex:trueInner.
+ex:trueInner ex:second "Find me".
+
+ex:subject ex:first ex:false;
+  ex:inner ex:true.
+`;
+
+  let shapeStore = RdfStore.createDefault();
+  let extractor: CBDShapeExtractor;
+  let dataStore = RdfStore.createDefault();
+
+  const shapeQuads = new Parser().parse(shape);
+  const dataQuads = new Parser().parse(data);
+
+  shapeQuads.forEach((quad) => shapeStore.addQuad(quad));
+  dataQuads.forEach((quad) => dataStore.addQuad(quad));
+  extractor = new CBDShapeExtractor(shapeStore);
+
+  const entity = await extractor.extract(
+    dataStore,
+    new NamedNode("http://example.org/subject"),
+    new NamedNode("http://example.org/outerShape"),
+  );
+  it("Follows complex path inside inner node", async () => {
+    const findMe = entity.find((q) => q.object.value === "Find me");
+    assert.isTrue(!!findMe, "Find me is found");
+  });
+
+  it("Doesn't follow path if it is not part of the shape", async () => {
+    const findMe = entity.find((q) => q.object.value === "Don't find me");
+    assert.isTrue(!findMe, "Don't find me is not found");
+  });
+});
