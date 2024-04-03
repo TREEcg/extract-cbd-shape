@@ -123,16 +123,14 @@ export class CBDShapeExtractor {
     graphsToIgnore?: Array<Term>,
   ): Promise<Array<Quad>> {
     // First extract everything except for something within the graphs to ignore, or within the graph of the current entity, as that’s going to be added anyway later on
-    let dontExtractFromGraph: Array<string> = (
-      graphsToIgnore ? graphsToIgnore : []
-    ).map((item) => {
-      return item.value;
-    });
+    if (!graphsToIgnore) {
+      graphsToIgnore = [];
+    }
 
     const extractInstance = new ExtractInstance(
       store,
       this.dereferencer,
-      dontExtractFromGraph,
+      graphsToIgnore,
       this.options,
       this.shapesGraph,
     );
@@ -239,21 +237,32 @@ class ExtractInstance {
 
   dereferencer: RdfDereferencer;
   options: CBDShapeExtractorOptions;
-  graphsToIgnore: string[];
+  graphs: Term [];
 
   shapesGraph?: ShapesGraph;
 
   constructor(
     store: RdfStore,
     dereferencer: RdfDereferencer,
-    graphsToIgnore: string[],
+    graphsToIgnore: Term[],
     options: CBDShapeExtractorOptions,
     shapesGraph?: ShapesGraph,
   ) {
     this.store = store;
     this.dereferencer = dereferencer;
     this.shapesGraph = shapesGraph;
-    this.graphsToIgnore = graphsToIgnore;
+    //Turn graphs To Ignore into graphs
+    this.graphs = store.getQuads()
+            //only interested in the graph
+            .map((quad) => { return quad.graph })
+            // distinct graphs
+            .filter((graph, index, array) => {
+              return array.indexOf(graph) === index;
+            })
+            // Now filter on graphs that are not in the graphsToIgnore list
+            .filter((graph) => {
+              return graphsToIgnore.find((graphToIgnore) => { return graphToIgnore.equals(graph) }) === undefined;
+            });
     this.options = options;
   }
 
@@ -339,7 +348,7 @@ class ExtractInstance {
     }
 
     if (!shape?.closed) {
-      this.CBD(id, result, extracted, this.graphsToIgnore);
+      this.CBD(id, result, extracted, this.graphs);
     }
 
     // Next, on our newly fetched data,
@@ -358,7 +367,7 @@ class ExtractInstance {
       )) {
         if (!path.found(extracted) || shape.closed) {
           let pathQuads = path
-            .match(this.store, extracted, id, this.graphsToIgnore)
+            .match(this.store, extracted, id, this.graphs)
             .flatMap((pathResult) => {
               return pathResult.path;
             });
@@ -372,7 +381,7 @@ class ExtractInstance {
           this.store,
           extracted,
           id,
-          this.graphsToIgnore,
+          this.graphs,
         );
 
         // I don't know how to do this correctly, but this is not the way
@@ -422,17 +431,20 @@ class ExtractInstance {
     id: Term,
     result: Quad[],
     extractedStar: CbdExtracted,
-    graphsToIgnore: Array<string>,
+    graphs: Array<Term>,
   ) {
     extractedStar.addCBDTerm(id);
-    const graph = this.options.cbdDefaultGraph ? df.defaultGraph() : null;
-    const quads = this.store.getQuads(id, null, null, graph);
+    let quads : Quad[] = [];
+    if (graphs) {
+      for (const graph of graphs) { 
+        quads = quads.concat(this.store.getQuads(id, null, null, graph));
+      }
+    } else {
+      //search all graphs if graphs is not set
+      quads = this.store.getQuads(id, null, null, null)
+    }
 
     for (const q of quads) {
-      // Ignore quads in the graphs to ignore
-      if (graphsToIgnore?.includes(q.graph.value)) {
-        continue;
-      }
       result.push(q);
 
       const next = extractedStar.push(q.predicate, false);
@@ -442,7 +454,7 @@ class ExtractInstance {
         q.object.termType === "BlankNode" &&
         !extractedStar.cbdExtracted(q.object)
       ) {
-        await this.CBD(q.object, result, next, graphsToIgnore);
+        await this.CBD(q.object, result, next, graphs);
       }
     }
   }
