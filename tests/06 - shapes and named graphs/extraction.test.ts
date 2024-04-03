@@ -33,10 +33,21 @@ describe("Check whether paths trigger the right extraction process", function ()
       dataStore,
       df.namedNode("http://example.org/M1v1"),
       df.namedNode("http://example.org/Shape"),
-      [df.namedNode("http://example.org/M1v2")] //Other members in the current context
+      [df.namedNode("http://example.org/M1v2"),df.namedNode("http://example.org/M2v1")] //Other members in the current context
     );
     // It should only have 2 quads: one outside of the named graph, and one in the named graph that is not part of the other named graphs
     assert.equal(result.length, 2);
   });
   
+  it("Named Graphs should be able to be used without member named graph semantics", async () => {
+    let result = await extractor.extract(
+      dataStore,
+      df.namedNode("http://example.org/M2v1"),
+      undefined,
+      [df.namedNode("http://example.org/M1v2"),df.namedNode("http://example.org/M1v1")] //Other members in the current context
+    );
+    // It should only have 2 quads: one outside of the named graph, and one in the named graph that is not part of the other named graphs
+    assert.equal(result.length, 2);
+  });
+
 });
