@@ -20,7 +20,6 @@ class DereferenceNeeded {
 }
 
 type CBDShapeExtractorOptions = {
-  cbdDefaultGraph: boolean;
   fetch?: typeof fetch;
 };
 
@@ -43,7 +42,7 @@ export class CBDShapeExtractor {
     options: Partial<CBDShapeExtractorOptions> = {},
   ) {
     // Assign with default options
-    this.options = Object.assign({ cbdDefaultGraph: false }, options);
+    this.options = Object.assign({}, options);
 
     if (!dereferencer) {
       this.dereferencer = rdfDereference;
