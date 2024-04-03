@@ -236,7 +236,7 @@ class ExtractInstance {
 
   dereferencer: RdfDereferencer;
   options: CBDShapeExtractorOptions;
-  graphs: Term [];
+  graphs: Term [] | undefined;
 
   shapesGraph?: ShapesGraph;
 
@@ -251,17 +251,21 @@ class ExtractInstance {
     this.dereferencer = dereferencer;
     this.shapesGraph = shapesGraph;
     //Turn graphs To Ignore into graphs
-    this.graphs = store.getQuads()
+    this.graphs = [df.defaultGraph()];
+    //Add extra graphs that are not in the ignore list
+    this.graphs.push(...store.getQuads()
             //only interested in the graph
             .map((quad) => { return quad.graph })
-            // distinct graphs
+            // distinct graphs without default graph
             .filter((graph, index, array) => {
-              return array.indexOf(graph) === index;
+              return !graph.equals(df.defaultGraph()) && array.indexOf(graph) === index;
             })
             // Now filter on graphs that are not in the graphsToIgnore list
             .filter((graph) => {
-              return graphsToIgnore.find((graphToIgnore) => { return graphToIgnore.equals(graph) }) === undefined;
-            });
+              return graphsToIgnore.find((graphToIgnore) => { return graphToIgnore.value === graph.value }) === undefined;
+            })
+    );
+    //console.log('I’m looking into these graphs:',this.graphs);
     this.options = options;
   }
 
@@ -430,13 +434,13 @@ class ExtractInstance {
     id: Term,
     result: Quad[],
     extractedStar: CbdExtracted,
-    graphs: Array<Term>,
+    graphs?: Array<Term>,
   ) {
     extractedStar.addCBDTerm(id);
     let quads : Quad[] = [];
     if (graphs) {
       for (const graph of graphs) { 
-        quads = quads.concat(this.store.getQuads(id, null, null, graph));
+        quads.push(...this.store.getQuads(id, null, null, graph));
       }
     } else {
       //search all graphs if graphs is not set

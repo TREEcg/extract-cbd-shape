@@ -41,7 +41,7 @@ export class PredicatePath implements Path {
     let quads: Quad[] = [];
     if (graphs) {
       for (let graph of graphs) {
-        quads = quads.concat( 
+        quads.push(... 
           inverse? 
             store.getQuads(null, this.predicate, focusNode, graph) :
             store.getQuads(focusNode, this.predicate, null, graph)
