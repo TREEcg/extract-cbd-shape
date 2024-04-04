@@ -251,21 +251,16 @@ class ExtractInstance {
     this.dereferencer = dereferencer;
     this.shapesGraph = shapesGraph;
     //Turn graphs To Ignore into graphs
-    this.graphs = [df.defaultGraph()];
+    this.graphs = [];
+    //let graphSet = new Set(store.getGraphs().map((graph) => graph.value));
+    let graphsToIgnoreSet = new Set(graphsToIgnore.map((graph) => graph.value));
     //Add extra graphs that are not in the ignore list
-    this.graphs.push(...store.getQuads()
-            //only interested in the graph
-            .map((quad) => { return quad.graph })
-            // distinct graphs without default graph
-            .filter((graph, index, array) => {
-              return !graph.equals(df.defaultGraph()) && array.indexOf(graph) === index;
-            })
+    this.graphs.push(... store.getGraphs()
             // Now filter on graphs that are not in the graphsToIgnore list
             .filter((graph) => {
-              return graphsToIgnore.find((graphToIgnore) => { return graphToIgnore.value === graph.value }) === undefined;
+              return !graphsToIgnoreSet.has(graph.value);
             })
     );
-    //console.log('I’m looking into these graphs:',this.graphs);
     this.options = options;
   }
 
@@ -351,7 +346,11 @@ class ExtractInstance {
     }
 
     if (!shape?.closed) {
-      this.CBD(id, result, extracted, this.graphs);
+      // Remove the current id from the member graph: these quads are going to be extracted through the named graph.
+      let CBDGraphs = this.graphs?.filter((graph) => {
+        return !graph.equals(id);
+      });
+      this.CBD(id, result, extracted, CBDGraphs);
     }
 
     // Next, on our newly fetched data,

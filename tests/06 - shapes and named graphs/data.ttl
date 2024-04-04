@@ -29,3 +29,6 @@ ex:M1v2 {
     ex:M2v1 a ex:TestThing2 .
 }
      
+ex:M2v1 {
+    ex:M2v1 a ex:TestThing3 .
+}
