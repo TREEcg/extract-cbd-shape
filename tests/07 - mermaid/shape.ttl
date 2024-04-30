@@ -1,0 +1,72 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+@prefix ex:  <http://example.org/> .
+
+# Sequence path
+ex:SequencePathShape a sh:NodeShape ;
+    sh:property [
+        sh:path (ex:p1 ex:p2 ) ;
+        sh:minCount 1
+    ] .
+
+# Path
+ex:InversePathShape a sh:NodeShape ;
+    sh:property [
+        sh:path [sh:inversePath ex:p2 ] ;
+        sh:minCount 1
+    ] .
+
+# Sequence and inverse path
+ex:SequenceAndInversePathShape a sh:NodeShape ;
+    sh:property [
+        sh:path ([sh:inversePath ex:p2 ] ex:p1 ) ;
+        sh:minCount 1
+    ] .
+
+ # Double inverse path
+ex:DoubleInversePathShape a sh:NodeShape ;
+    sh:closed true;
+    sh:property [
+        sh:path ([sh:inversePath [sh:inversePath ex:p1 ] ]) ;
+        sh:minCount 1
+    ] .
+
+# Zero or More path
+ex:ZeroOrMorePathShape a sh:NodeShape ;
+    sh:closed true;
+    sh:property [
+        sh:path ([sh:zeroOrMorePath ex:p1 ]) ;
+        sh:minCount 1
+    ] .
+
+ex:OneOrMorePathShape a sh:NodeShape ;
+    sh:closed true;
+    sh:property [
+        sh:path ([sh:oneOrMorePath ex:p1 ]) ;
+        sh:minCount 1
+    ] .
+
+ex:ZeroOrOnePathShape a sh:NodeShape ;
+    sh:closed true;
+    sh:property [
+        sh:path (ex:p1 [sh:zeroOrOnePath ex:p2 ]) ;
+        sh:minCount 1
+    ] .
+
+ex:AlternativePathShape a sh:NodeShape ;
+    sh:closed true;
+    sh:property [
+        sh:path ([sh:alternativePath (ex:p1 ex:p2)]) ;
+        sh:minCount 1
+    ] .
+
+
+ex:AllTogetherPathShape a sh:NodeShape ;
+    sh:closed true;
+    sh:property [
+        sh:path ([sh:alternativePath ([ sh:inversePath ex:p1 ] ex:p2)]) ;
+        sh:minCount 1
+    ] .

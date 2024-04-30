@@ -1,10 +1,11 @@
 import rdfDereference, { RdfDereferencer } from "rdf-dereference";
-import { NodeLink, RDFMap, ShapesGraph, ShapeTemplate } from "./Shape";
+import { NodeLink, RDFMap, ShapeTemplate } from "./Shape";
 import { Path, PathResult } from "./Path";
 import { DataFactory } from "rdf-data-factory";
 import { RdfStore } from "rdf-stores";
 import { Quad, Term } from "@rdfjs/types";
 import debug from "debug";
+import {ShapesGraph} from "./ShapesGraph";
 
 const log = debug("extract-cbd-shape");
 

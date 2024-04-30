@@ -1,0 +1,50 @@
+import { assert } from "chai";
+import { DataFactory } from "rdf-data-factory";
+import { RdfStore } from "rdf-stores";
+import rdfDereference from "rdf-dereference";
+import {ShapesGraph} from "../../lib/ShapesGraph";
+import fs from "fs/promises";
+
+const df = new DataFactory();
+
+describe("Test whether the correct Mermaid text is generated for a ShapesGraph", function () {
+  let shapeStore = RdfStore.createDefault();
+  let shapesGraph: ShapesGraph;
+  before(async () => {
+    let readStream = (
+      await rdfDereference.dereference("./tests/07 - mermaid/shape.ttl", {
+        localFiles: true,
+      })
+    ).data;
+
+    await new Promise((resolve, reject) => {
+      shapeStore.import(readStream).on("end", resolve).on("error", reject);
+    });
+
+    shapesGraph = new ShapesGraph(shapeStore);
+  });
+
+  it("Sequence path", async () => {
+    const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/SequencePathShape"));
+    const expectedMermaid = await fs.readFile('./tests/07 - mermaid/sequence-path.txt', 'utf-8');
+    assert.equal(actualMermaid, expectedMermaid);
+  });
+
+  it("Inverse path", async () => {
+    const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/InversePathShape"));
+    const expectedMermaid = await fs.readFile('./tests/07 - mermaid/inverse-path.txt', 'utf-8');
+    assert.equal(actualMermaid, expectedMermaid);
+  });
+
+  it("Sequence and inverse path ", async () => {
+    const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/SequenceAndInversePathShape"));
+    const expectedMermaid = await fs.readFile('./tests/07 - mermaid/sequence-and-inverse-path.txt', 'utf-8');
+    assert.equal(actualMermaid, expectedMermaid);
+  });
+
+  it.skip("Double inverse path ", async () => {
+    const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/DoubleInversePathShape"));
+    const expectedMermaid = await fs.readFile('./tests/07 - mermaid/double-inverse-path.txt', 'utf-8');
+    assert.equal(actualMermaid, expectedMermaid);
+  });
+});
