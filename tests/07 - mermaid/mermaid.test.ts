@@ -30,6 +30,12 @@ describe("Test whether the correct Mermaid text is generated for a ShapesGraph",
     assert.equal(actualMermaid, expectedMermaid);
   });
 
+  it("Optional sequence path", async () => {
+    const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/OptionalSequencePathShape"));
+    const expectedMermaid = await fs.readFile('./tests/07 - mermaid/optional-sequence-path.txt', 'utf-8');
+    assert.equal(actualMermaid, expectedMermaid);
+  });
+
   it("Inverse path", async () => {
     const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/InversePathShape"));
     const expectedMermaid = await fs.readFile('./tests/07 - mermaid/inverse-path.txt', 'utf-8');
@@ -81,6 +87,24 @@ describe("Test whether the correct Mermaid text is generated for a ShapesGraph",
   it("Nested shape", async () => {
     const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/NestedShape"));
     const expectedMermaid = await fs.readFile('./tests/07 - mermaid/nested-shape.txt', 'utf-8');
+    assert.equal(actualMermaid, expectedMermaid);
+  });
+
+  it("Nested with optional path shape", async () => {
+    const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/NestedWithOptionalShape"));
+    const expectedMermaid = await fs.readFile('./tests/07 - mermaid/nested-with-optional-shape.txt', 'utf-8');
+    assert.equal(actualMermaid, expectedMermaid);
+  });
+
+  it("Xone with node shape", async () => {
+    const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/XoneWithNodeShape"));
+    const expectedMermaid = await fs.readFile('./tests/07 - mermaid/xone-with-node-shape.txt', 'utf-8');
+    assert.equal(actualMermaid, expectedMermaid);
+  });
+
+  it("Xone with node shape 2", async () => {
+    const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/XoneWithNodeShape2"));
+    const expectedMermaid = await fs.readFile('./tests/07 - mermaid/xone-with-node-shape-2.txt', 'utf-8');
     assert.equal(actualMermaid, expectedMermaid);
   });
 });

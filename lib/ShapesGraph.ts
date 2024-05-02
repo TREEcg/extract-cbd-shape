@@ -37,13 +37,16 @@ const SHACL = createTermNamespace(
 
 export class ShapesGraph {
   shapes: RDFMap<ShapeTemplate>;
+  private counter: number;
 
   constructor(shapeStore: RdfStore) {
     this.shapes = this.initializeFromStore(shapeStore);
+    this.counter = 0;
   }
 
   public toMermaid(term: Term): string {
     const startShape = this.shapes.get(term);
+    this.counter = 0;
 
     if (!startShape) {
       return ''; // TODO: throw an error.
@@ -55,27 +58,102 @@ export class ShapesGraph {
   }
 
   private toMermaidSingleShape(shape: ShapeTemplate, id: string, name: string): string {
-    let counter = 0;
     let mermaid = `  S${id}((${name}))\n`;
-    // S1-->|gsp:geo|S3[ ]-->|"asWKT | asGML"|S4[ ]
-    shape.requiredPaths.forEach(requiredPath => {
-      let p = requiredPath.toString();
-      p = p.replace(/</g, '');
-      p = p.replace(/>/g, '');
+    let alreadyProcessedPaths: string[] = [];
 
-      if (p.startsWith('^')) {
-        p = p.substring(1);
-        mermaid += `  S${id}_${counter}[ ]-->|"${p}"|S${id}\n`;
-      } else {
-        mermaid += `  S${id}-->|"${p}"|S${id}_${counter}[ ]\n`;
+    shape.nodeLinks.forEach(nodeLink => {
+      let p = nodeLink.pathPattern.toString();
+      const isPathRequired = this.isPathRequired(p, shape.requiredPaths);
+      alreadyProcessedPaths.push(p);
+      p = this.cleanPath(p);
+      const linkedShape = this.shapes.get(nodeLink.link);
+
+      if (!linkedShape) {
+        return ''; // TODO: throw an error.
       }
 
-      counter ++;
+      const linkedShapeId = `${id}_${this.counter}`;
+
+      let link = '-->';
+
+      if (!isPathRequired) {
+        link = '-.->';
+      }
+      if (p.startsWith('^')) {
+        p = p.substring(1);
+        mermaid += `  S${linkedShapeId}[ ]${link}|"${p}"|S${id}\n`;
+      } else {
+        mermaid += `  S${id}${link}|"${p}"|S${linkedShapeId}[ ]\n`;
+      }
+
+      this.counter++;
+
+      const linkedShapeMermaid = this.toMermaidSingleShape(linkedShape, linkedShapeId, 'Shape');
+      mermaid += linkedShapeMermaid;
     });
+
+    shape.atLeastOneLists.forEach(list => {
+      if (list.length > 0) {
+        const xId = `${id}_${this.counter}`;
+        mermaid += `  S${id}---X${xId}{OR}\n`;
+
+        list.forEach(shape => {
+          const shapeId = `${id}_${this.counter}`;
+          this.counter ++;
+
+          mermaid += `  X${xId}---S${shapeId}\n`;
+          const linkedShapeMermaid = this.toMermaidSingleShape(shape, shapeId, 'Shape');
+          mermaid += linkedShapeMermaid;
+        });
+      }
+    });
+
+    mermaid += this.simplePathToMermaid(shape.requiredPaths, alreadyProcessedPaths, id, '-->');
+    mermaid += this.simplePathToMermaid(shape.optionalPaths, alreadyProcessedPaths, id, '-.->');
 
     return mermaid;
   }
 
+  private cleanPath(path: string) {
+    path = path.replace(/</g, '');
+    return path.replace(/>/g, '');
+  }
+
+  private isPathRequired(path:string, requiredPaths: Path[]) {
+    for (const requiredPath of requiredPaths) {
+      if (path === requiredPath.toString()) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private simplePathToMermaid(paths: Path[], alreadyProcessedPaths: string[], shapedId: string, link: string) {
+    let mermaid = '';
+
+    paths.forEach(path => {
+      let p = path.toString();
+
+      if (alreadyProcessedPaths.includes(p)) {
+        return;
+      }
+
+      alreadyProcessedPaths.push(p);
+      p = this.cleanPath(p);
+
+      if (p.startsWith('^')) {
+        p = p.substring(1);
+        mermaid += `  S${shapedId}_${this.counter}[ ]${link}|"${p}"|S${shapedId}\n`;
+      } else {
+        mermaid += `  S${shapedId}${link}|"${p}"|S${shapedId}_${this.counter}[ ]\n`;
+      }
+
+      this.counter++;
+    });
+
+    return mermaid;
+  }
 
   protected constructPathPattern(shapeStore: RdfStore, listItem: Term): Path {
     if (listItem.termType === "BlankNode") {

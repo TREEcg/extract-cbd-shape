@@ -12,6 +12,13 @@ ex:SequencePathShape a sh:NodeShape ;
         sh:minCount 1
     ] .
 
+# Optional sequence path
+ex:OptionalSequencePathShape a sh:NodeShape ;
+    sh:property [
+        sh:path (ex:p1 ex:p2 ) ;
+        sh:minCount 0
+    ] .
+
 # Path
 ex:InversePathShape a sh:NodeShape ;
     sh:property [
@@ -76,6 +83,53 @@ ex:NestedShape a sh:NodeShape ;
     sh:property [
         sh:path ex:subject ;
         sh:minCount 1 ;
+        sh:node [
+            sh:property [
+                sh:path rdfs:label ;
+                sh:minCount 1
+            ]
+        ]
+    ] .
+
+ex:XoneWithNodeShape a sh:NodeShape ;
+	sh:xone ( [
+		sh:path foaf:name;
+		sh:minCount 1
+	] [
+		sh:property [
+			sh:path ex:qualifiedName ;
+			sh:node ex:QualifiedNameShape;
+			sh:minCount 1
+		]
+	]) .
+
+
+ex:XoneWithNodeShape2 a sh:NodeShape ;
+	sh:xone ( [
+		sh:path foaf:name;
+		sh:minCount 1
+	] [
+		sh:property [
+			sh:path ex:qualifiedName ;
+			sh:node ex:QualifiedNameShape2;
+			sh:minCount 1
+		]
+	]) .
+
+ex:QualifiedNameShape2 a sh:NodeShape ;
+	sh:property [
+		sh:minCount 1 ;
+		sh:path ex:name ;
+	], [
+		sh:path ex:validUntil ;
+		# ...
+	] .
+
+# Nested shape with optional path
+ex:NestedWithOptionalShape a sh:NodeShape ;
+    sh:property [
+        sh:path ex:subject ;
+        sh:minCount 0 ;
         sh:node [
             sh:property [
                 sh:path rdfs:label ;

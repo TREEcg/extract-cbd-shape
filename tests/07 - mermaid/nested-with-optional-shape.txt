@@ -1,0 +1,5 @@
+flowchart TD
+  S1((Shape))
+  S1-.->|"http://example.org/subject"|S1_0[ ]
+  S1_0((Shape))
+  S1_0-->|"http://www.w3.org/2000/01/rdf-schema#label"|S1_0_1[ ]
