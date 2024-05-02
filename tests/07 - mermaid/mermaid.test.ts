@@ -42,6 +42,12 @@ describe("Test whether the correct Mermaid text is generated for a ShapesGraph",
     assert.equal(actualMermaid, expectedMermaid);
   });
 
+  it("Optional inverse path", async () => {
+    const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/OptionalInversePathShape"));
+    const expectedMermaid = await fs.readFile('./tests/07 - mermaid/optional-inverse-path.txt', 'utf-8');
+    assert.equal(actualMermaid, expectedMermaid);
+  });
+
   it("Sequence and inverse path", async () => {
     const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/SequenceAndInversePathShape"));
     const expectedMermaid = await fs.readFile('./tests/07 - mermaid/sequence-and-inverse-path.txt', 'utf-8');

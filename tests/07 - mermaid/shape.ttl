@@ -19,11 +19,18 @@ ex:OptionalSequencePathShape a sh:NodeShape ;
         sh:minCount 0
     ] .
 
-# Path
+# Inverse path
 ex:InversePathShape a sh:NodeShape ;
     sh:property [
         sh:path [sh:inversePath ex:p2 ] ;
         sh:minCount 1
+    ] .
+
+# Optional inverse path
+ex:OptionalInversePathShape a sh:NodeShape ;
+    sh:property [
+        sh:path [sh:inversePath ex:p2 ] ;
+        sh:minCount 0
     ] .
 
 # Sequence and inverse path
