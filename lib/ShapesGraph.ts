@@ -44,12 +44,16 @@ export class ShapesGraph {
     this.counter = 0;
   }
 
+  /**
+   * This function returns a Mermaid representation of a shape identified by a given term.
+   * @param term {Term} - The term of the Shape that is the start of the representation.
+   */
   public toMermaid(term: Term): string {
     const startShape = this.shapes.get(term);
     this.counter = 0;
 
     if (!startShape) {
-      return ''; // TODO: throw an error.
+      throw new Error(`No shape found for term "${term.value}"`);
     }
 
     let mermaid = 'flowchart TD\n';
@@ -57,6 +61,13 @@ export class ShapesGraph {
     return mermaid;
   }
 
+  /**
+   * This function returns a Mermaid representation of a given shape.
+   * @param shape - The shape for which to generate a representation.
+   * @param id - The ID to identify the shape in the representation.
+   * @param name - The name used for the shape in the representation.
+   * @private
+   */
   private toMermaidSingleShape(shape: ShapeTemplate, id: string, name: string): string {
     let mermaid = `  S${id}((${name}))\n`;
     let alreadyProcessedPaths: string[] = [];
@@ -69,7 +80,7 @@ export class ShapesGraph {
       const linkedShape = this.shapes.get(nodeLink.link);
 
       if (!linkedShape) {
-        return ''; // TODO: throw an error.
+        throw new Error(`The linked shape "${nodeLink.link}" is not found`);
       }
 
       const linkedShapeId = `${id}_${this.counter}`;
@@ -114,12 +125,23 @@ export class ShapesGraph {
     return mermaid;
   }
 
-  private cleanPath(path: string) {
+  /**
+   * This function removes < and > from a path.
+   * @param path - The path from which to remove the < and >.
+   * @private
+   */
+  private cleanPath(path: string): string {
     path = path.replace(/</g, '');
     return path.replace(/>/g, '');
   }
 
-  private isPathRequired(path:string, requiredPaths: Path[]) {
+  /**
+   * This function returns true if the given path is required.
+   * @param path - The path that needs to be checked.
+   * @param requiredPaths - An array of all required paths.
+   * @private
+   */
+  private isPathRequired(path:string, requiredPaths: Path[]) : boolean {
     for (const requiredPath of requiredPaths) {
       if (path === requiredPath.toString()) {
         return true;
@@ -129,6 +151,15 @@ export class ShapesGraph {
     return false;
   }
 
+  /**
+   * This function returns a Mermaid presentation for an array of simple paths.
+   * This function is intended to be used with shape.requiredPaths and shape.optionalPaths.
+   * @param paths - An array of paths.
+   * @param alreadyProcessedPaths - An array of stringified paths that already have been processed.
+   * @param shapedId - The id of the shape to which these paths belong.
+   * @param link - The Mermaid link that needs to be used.
+   * @private
+   */
   private simplePathToMermaid(paths: Path[], alreadyProcessedPaths: string[], shapedId: string, link: string) {
     let mermaid = '';
 
@@ -156,7 +187,13 @@ export class ShapesGraph {
     return mermaid;
   }
 
-  private isRealInversePath(path: string) {
+  /**
+   * This function returns true if a given path is real inverse path.
+   * This means that the path is not a double, quadruple, ... inverse path.
+   * @param path - The path that needs to be checked.
+   * @private
+   */
+  private isRealInversePath(path: string): boolean {
     const found = path.match(/^(\^+)[^\^]+/);
 
     if (!found) {
@@ -166,11 +203,16 @@ export class ShapesGraph {
     return found[1].length % 2 !== 0;
   }
 
-  private getRealPath(path: string) {
+  /**
+   * This function removes all the ^ from the path.
+   * @param path - The path from which to remove the ^.
+   * @private
+   */
+  private getRealPath(path: string) : string {
     const found = path.match(/^\^*([^\^]+)/);
 
     if (!found) {
-      return ''; //TODO: throw error.
+      throw new Error(`No real path found in "${path}"`);
     }
 
     return found[1];

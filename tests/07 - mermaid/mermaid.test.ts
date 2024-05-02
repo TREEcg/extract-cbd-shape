@@ -125,4 +125,20 @@ describe("Test whether the correct Mermaid text is generated for a ShapesGraph",
     const expectedMermaid = await fs.readFile('./tests/07 - mermaid/xone-with-node-shape-2.txt', 'utf-8');
     assert.equal(actualMermaid, expectedMermaid);
   });
+
+  it("Throw error when shape not found", async () => {
+    let error: Error;
+    const term = "http://example.org/abc";
+
+    try {
+      shapesGraph.toMermaid(df.namedNode(term));
+    } catch (e) {
+      error = e as Error;
+    }
+
+    // @ts-ignore
+    assert.isDefined(error);
+    // @ts-ignore
+    assert.equal(error.message, `No shape found for term "${term}"`);
+  });
 });
