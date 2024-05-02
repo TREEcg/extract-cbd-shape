@@ -1,0 +1,240 @@
+[
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=default/500/2000",
+    "opsPerSecond": 2.205312786633144,
+    "samples": 13,
+    "mean": 0.45345041576923073,
+    "deviation": 0.02128647499724073
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=default/500/2000",
+    "opsPerSecond": 49.3865908703736,
+    "samples": 34,
+    "mean": 0.020248411205882354,
+    "deviation": 0.0011565576053858275
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GSPO&GSOP&GPSO&GPOS&GOSP&GOPS/500/2000",
+    "opsPerSecond": 2.0396220666539433,
+    "samples": 13,
+    "mean": 0.4902869096923077,
+    "deviation": 0.05903004004772553
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GSPO&GSOP&GPSO&GPOS&GOSP&GOPS/500/2000",
+    "opsPerSecond": 44.235271809431595,
+    "samples": 29,
+    "mean": 0.02260639437931035,
+    "deviation": 0.0023124767232870136
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=SGPO&SGOP&SPGO&SPOG&SOGP&SOPG/500/2000",
+    "opsPerSecond": 3.7098487586141626,
+    "samples": 17,
+    "mean": 0.2695527675294117,
+    "deviation": 0.03054478698915041
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=SGPO&SGOP&SPGO&SPOG&SOGP&SOPG/500/2000",
+    "opsPerSecond": 4.005330851273471,
+    "samples": 17,
+    "mean": 0.24966726523529412,
+    "deviation": 0.013860138507339371
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=PGSO&PGOS&PSGO&PSOG&POGS&POSG/500/2000",
+    "opsPerSecond": 17.16455212789149,
+    "samples": 28,
+    "mean": 0.05825960342857143,
+    "deviation": 0.0034629034858991064
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=PGSO&PGOS&PSGO&PSOG&POGS&POSG/500/2000",
+    "opsPerSecond": 31.46309197219017,
+    "samples": 28,
+    "mean": 0.03178327167857143,
+    "deviation": 0.004937988132878703
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=OGSP&OGPS&OSGP&OSPG&OPGS&OPSG/500/2000",
+    "opsPerSecond": 0.22072058464747454,
+    "samples": 6,
+    "mean": 4.530615038,
+    "deviation": 1.0084069620366096
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=OGSP&OGPS&OSGP&OSPG&OPGS&OPSG/500/2000",
+    "opsPerSecond": 0.2914566844759787,
+    "samples": 6,
+    "mean": 3.431041569,
+    "deviation": 0.18321302822232405
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=SGPO&SGOP&PGSO&PGOS&OGSP&OGPS/500/2000",
+    "opsPerSecond": 4.127736624856044,
+    "samples": 17,
+    "mean": 0.24226351894117648,
+    "deviation": 0.0315151175886814
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=SGPO&SGOP&PGSO&PGOS&OGSP&OGPS/500/2000",
+    "opsPerSecond": 4.450430053091528,
+    "samples": 18,
+    "mean": 0.22469738611111112,
+    "deviation": 0.03746172001676707
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GSPO&GSOP&PSGO&PSOG&OSGP&OSPG/500/2000",
+    "opsPerSecond": 2.4054110979382908,
+    "samples": 13,
+    "mean": 0.4157293532307692,
+    "deviation": 0.022531482769171635
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GSPO&GSOP&PSGO&PSOG&OSGP&OSPG/500/2000",
+    "opsPerSecond": 27.74262157783366,
+    "samples": 26,
+    "mean": 0.03604562017307692,
+    "deviation": 0.0011589085008841635
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GPSO&GPOS&SPGO&SPOG&OPGS&OPSG/500/2000",
+    "opsPerSecond": 20.473951840519767,
+    "samples": 23,
+    "mean": 0.04884254919565217,
+    "deviation": 0.0076635601551085335
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GPSO&GPOS&SPGO&SPOG&OPGS&OPSG/500/2000",
+    "opsPerSecond": 32.12354942688282,
+    "samples": 24,
+    "mean": 0.031129810305555557,
+    "deviation": 0.0034427420524727028
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GOSP&GOPS&SOGP&SOPG&POGS&POSG/500/2000",
+    "opsPerSecond": 21.228019622213345,
+    "samples": 25,
+    "mean": 0.047107550199999994,
+    "deviation": 0.004647245182769308
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GOSP&GOPS&SOGP&SOPG&POGS&POSG/500/2000",
+    "opsPerSecond": 27.907599725462607,
+    "samples": 27,
+    "mean": 0.035832533425925926,
+    "deviation": 0.006000973064030824
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=SPGO&SOGP&PSGO&POGS&OSGP&OPGS/500/2000",
+    "opsPerSecond": 0.1771386163152232,
+    "samples": 5,
+    "mean": 5.6452964396,
+    "deviation": 0.1637681325078903
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=SPGO&SOGP&PSGO&POGS&OSGP&OPGS/500/2000",
+    "opsPerSecond": 0.219533967274648,
+    "samples": 6,
+    "mean": 4.555103761,
+    "deviation": 0.8277279181795483
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GPSO&GOSP&PGSO&POSG&OGSP&OPSG/500/2000",
+    "opsPerSecond": 0.0839327992112276,
+    "samples": 5,
+    "mean": 11.9142934514,
+    "deviation": 0.2521083409551842
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GPSO&GOSP&PGSO&POSG&OGSP&OPSG/500/2000",
+    "opsPerSecond": 35.37771423777243,
+    "samples": 27,
+    "mean": 0.028266382425925923,
+    "deviation": 0.0020734799135186483
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GSPO&GOPS&SGPO&SOPG&OGPS&OSPG/500/2000",
+    "opsPerSecond": 26.251612423256805,
+    "samples": 28,
+    "mean": 0.03809289821428572,
+    "deviation": 0.0017830355645810229
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GSPO&GOPS&SGPO&SOPG&OGPS&OSPG/500/2000",
+    "opsPerSecond": 38.35856421093984,
+    "samples": 28,
+    "mean": 0.02606979746428571,
+    "deviation": 0.003310487385408014
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GSOP&GPOS&SGOP&SPOG&PGOS&PSOG/500/2000",
+    "opsPerSecond": 24.843677188185396,
+    "samples": 27,
+    "mean": 0.04025169029629631,
+    "deviation": 0.00146638796504652
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GSOP&GPOS&SGOP&SPOG&PGOS&PSOG/500/2000",
+    "opsPerSecond": 34.45854167249997,
+    "samples": 25,
+    "mean": 0.02902038076666667,
+    "deviation": 0.0026840858110640142
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=SPOG&SOPG&PSOG&POSG&OSPG&OPSG/500/2000",
+    "opsPerSecond": 0.15254220135876803,
+    "samples": 5,
+    "mean": 6.555562926799999,
+    "deviation": 0.1318507070891201
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=SPOG&SOPG&PSOG&POSG&OSPG&OPSG/500/2000",
+    "opsPerSecond": 0.15256632531811365,
+    "samples": 5,
+    "mean": 6.5545263538,
+    "deviation": 0.03232103073789014
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GPOS&GOPS&PGOS&POGS&OGPS&OPGS/500/2000",
+    "opsPerSecond": 0.03608833505690871,
+    "samples": 5,
+    "mean": 27.709784849400002,
+    "deviation": 0.16668992036050603
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GPOS&GOPS&PGOS&POGS&OGPS&OPGS/500/2000",
+    "opsPerSecond": 0.6537472210879837,
+    "samples": 8,
+    "mean": 1.5296432133750002,
+    "deviation": 0.02381026518142462
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GSOP&GOSP&SGOP&SOGP&OGSP&OSGP/500/2000",
+    "opsPerSecond": 23.678628847977894,
+    "samples": 26,
+    "mean": 0.0422321751153846,
+    "deviation": 0.0025340360093814864
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GSOP&GOSP&SGOP&SOGP&OGSP&OSGP/500/2000",
+    "opsPerSecond": 27.44400787623511,
+    "samples": 27,
+    "mean": 0.036437826592592586,
+    "deviation": 0.0014589732088245383
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GSPO&GPSO&SGPO&SPGO&PGSO&PSGO/500/2000",
+    "opsPerSecond": 24.55009933497564,
+    "samples": 27,
+    "mean": 0.04073303274074073,
+    "deviation": 0.0036594506201802967
+  },
+  {
+    "name": "shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GSPO&GPSO&SGPO&SPGO&PGSO&PSGO/500/2000",
+    "opsPerSecond": 33.48780390024261,
+    "samples": 26,
+    "mean": 0.029861617769230762,
+    "deviation": 0.0035260379876183748
+  }
+]

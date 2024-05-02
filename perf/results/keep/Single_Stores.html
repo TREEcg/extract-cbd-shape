@@ -1,0 +1,73 @@
+<!doctype html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Benchmark Results</title>
+          <script src="https://cdn.tailwindcss.com"></script>
+          <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        </head>
+        <body>
+        <h1 class="text-2xl font-bold">Benchmark Results</h1>
+        <div class="rounded-md bg-blue-50 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg
+            class="h-5 w-5 text-blue-400"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
+        <div class="ml-3 flex-1 md:flex md:justify-between">
+          <dl class="text-blue-700 grid grid-cols-2">
+            <dt class="font-bold">Platform</dt>
+            <dd>linux</dd>
+            <dt class="font-bold">Distro</dt>
+            <dd>EndeavourOS</dd>
+            <dt class="font-bold">Arch</dt>
+            <dd>x64</dd>
+            <dt class="font-bold">Release</dt>
+            <dd>rolling</dd>
+            <dt class="font-bold">CPU</dt>
+            <dd>Intel Gen Intel® Core™ i7-1185G7</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+          <canvas id="chart"></canvas>
+          <script>
+            const labels = ["shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=default/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=default/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GSPO/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GSPO/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GSOP/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GSOP/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GPSO/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GPSO/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GPOS/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GPOS/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GOSP/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GOSP/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GOPS/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GOPS/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=SGPO/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=SGPO/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=SGOP/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=SGOP/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=SPGO/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=SPGO/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=SPOG/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=SPOG/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=SOGP/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=SOGP/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=SOPG/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=SOPG/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=PGSO/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=PGSO/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=PGOS/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=PGOS/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=PSGO/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=PSGO/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=PSOG/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=PSOG/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=POGS/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=POGS/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=POSG/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=POSG/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=OGSP/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=OGSP/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=OGPS/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=OGPS/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=OSGP/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=OSGP/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=OSPG/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=OSPG/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=OPGS/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=OPGS/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=OPSG/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=OPSG/500/2000"];
+            const data = [2.1556137810752243,47.65269833377085,2.3237046973237665,56.65957547159919,1.5716549791053744,48.705313388111676,0.1799080685457715,50.21622763545676,0.1126575715090826,0.9430154570375017,0.10033403197295711,0.46978280314756654,0.0821567333298496,0.44808991525665526,4.173438744637498,3.7697794737146255,3.536630034233779,3.7186183757775155,0.7933485236132156,0.8231271607666089,0.46039182637146553,0.46776091930642255,0.837171466526639,0.8368936694838037,0.5511829581561647,0.5599776998960615,0.16721420346143512,46.51703000230546,0.0754883910747723,0.9581683972818048,0.854465555791983,0.9128067005551137,0.38525456609663916,0.39316851115006196,0.11185551214445166,0.49269808060748266,0.3420941516997814,0.36627770278924177,0.05545301479008996,0.37062980551463487,0.04248549913459805,0.3564150460353639,0.2686760302986108,0.27671933411392885,0.20836571320599728,0.21235473766311644,0.09474828383321758,0.3385208491683654,0.21988887363043752,0.2349203523832944];
+            const chart = new Chart('chart', {
+              type: 'bar',
+              data: {
+                labels: labels,
+                datasets: [
+                  {
+                    label: 'Ops/Second',
+                    data: data,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                  },
+                ],
+              },
+              options: {
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                  },
+                },
+              },
+            });
+          </script>
+        </body>
+      </html>
+    
