@@ -142,10 +142,11 @@ export class ShapesGraph {
       alreadyProcessedPaths.push(p);
       p = this.cleanPath(p);
 
-      if (p.startsWith('^')) {
-        p = p.substring(1);
+      if (this.isRealInversePath(p)) {
+        p = this.getRealPath(p);
         mermaid += `  S${shapedId}_${this.counter}[ ]${link}|"${p}"|S${shapedId}\n`;
       } else {
+        p = this.getRealPath(p);
         mermaid += `  S${shapedId}${link}|"${p}"|S${shapedId}_${this.counter}[ ]\n`;
       }
 
@@ -153,6 +154,26 @@ export class ShapesGraph {
     });
 
     return mermaid;
+  }
+
+  private isRealInversePath(path: string) {
+    const found = path.match(/^(\^+)[^\^]+/);
+
+    if (!found) {
+      return false;
+    }
+
+    return found[1].length % 2 !== 0;
+  }
+
+  private getRealPath(path: string) {
+    const found = path.match(/^\^*([^\^]+)/);
+
+    if (!found) {
+      return ''; //TODO: throw error.
+    }
+
+    return found[1];
   }
 
   protected constructPathPattern(shapeStore: RdfStore, listItem: Term): Path {

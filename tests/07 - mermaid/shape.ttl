@@ -40,11 +40,27 @@ ex:SequenceAndInversePathShape a sh:NodeShape ;
         sh:minCount 1
     ] .
 
- # Double inverse path
+# Double inverse path
 ex:DoubleInversePathShape a sh:NodeShape ;
     sh:closed true;
     sh:property [
         sh:path ([sh:inversePath [sh:inversePath ex:p1 ] ]) ;
+        sh:minCount 1
+    ] .
+
+# Triple inverse path
+ex:TripleInversePathShape a sh:NodeShape ;
+    sh:closed true;
+    sh:property [
+        sh:path ([sh:inversePath [sh:inversePath [sh:inversePath ex:p1 ] ] ]) ;
+        sh:minCount 1
+    ] .
+
+# Quadruple inverse path
+ex:QuadrupleInversePathShape a sh:NodeShape ;
+    sh:closed true;
+    sh:property [
+        sh:path ([sh:inversePath [sh:inversePath [sh:inversePath [sh:inversePath ex:p1 ] ] ] ]) ;
         sh:minCount 1
     ] .
 

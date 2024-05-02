@@ -54,9 +54,21 @@ describe("Test whether the correct Mermaid text is generated for a ShapesGraph",
     assert.equal(actualMermaid, expectedMermaid);
   });
 
-  it.skip("Double inverse path", async () => {
+  it("Double inverse path", async () => {
     const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/DoubleInversePathShape"));
     const expectedMermaid = await fs.readFile('./tests/07 - mermaid/double-inverse-path.txt', 'utf-8');
+    assert.equal(actualMermaid, expectedMermaid);
+  });
+
+  it("Triple inverse path", async () => {
+    const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/TripleInversePathShape"));
+    const expectedMermaid = await fs.readFile('./tests/07 - mermaid/triple-inverse-path.txt', 'utf-8');
+    assert.equal(actualMermaid, expectedMermaid);
+  });
+
+  it("Quadruple inverse path", async () => {
+    const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/DoubleInversePathShape"));
+    const expectedMermaid = await fs.readFile('./tests/07 - mermaid/quadruple-inverse-path.txt', 'utf-8');
     assert.equal(actualMermaid, expectedMermaid);
   });
 
