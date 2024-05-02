@@ -1,5 +1,5 @@
-import {RdfStore} from "rdf-stores";
-import {Term} from "@rdfjs/types";
+import { RdfStore } from "rdf-stores";
+import { Term } from "@rdfjs/types";
 import {
   AlternativePath,
   InversePath,
@@ -10,9 +10,9 @@ import {
   ZeroOrMorePath,
   ZeroOrOnePath
 } from "./Path";
-import {createTermNamespace, RDF} from "@treecg/types";
-import {NodeLink, RDFMap, ShapeTemplate} from "./Shape";
-import {DataFactory} from "rdf-data-factory";
+import { createTermNamespace, RDF, RDFS } from "@treecg/types";
+import { NodeLink, RDFMap, ShapeTemplate } from "./Shape";
+import { DataFactory } from "rdf-data-factory";
 
 const df = new DataFactory();
 
@@ -57,7 +57,7 @@ export class ShapesGraph {
     }
 
     let mermaid = 'flowchart TD\n';
-    mermaid += this.toMermaidSingleShape(startShape, '1', 'Shape');
+    mermaid += this.toMermaidSingleShape(startShape, '1', startShape.label || 'Shape');
     return mermaid;
   }
 
@@ -99,7 +99,7 @@ export class ShapesGraph {
 
       this.counter++;
 
-      const linkedShapeMermaid = this.toMermaidSingleShape(linkedShape, linkedShapeId, 'Shape');
+      const linkedShapeMermaid = this.toMermaidSingleShape(linkedShape, linkedShapeId, linkedShape.label || 'Shape');
       mermaid += linkedShapeMermaid;
     });
 
@@ -110,10 +110,10 @@ export class ShapesGraph {
 
         list.forEach(shape => {
           const shapeId = `${id}_${this.counter}`;
-          this.counter ++;
+          this.counter++;
 
           mermaid += `  X${xId}---S${shapeId}\n`;
-          const linkedShapeMermaid = this.toMermaidSingleShape(shape, shapeId, 'Shape');
+          const linkedShapeMermaid = this.toMermaidSingleShape(shape, shapeId, shape.label || 'Shape');
           mermaid += linkedShapeMermaid;
         });
       }
@@ -141,7 +141,7 @@ export class ShapesGraph {
    * @param requiredPaths - An array of all required paths.
    * @private
    */
-  private isPathRequired(path:string, requiredPaths: Path[]) : boolean {
+  private isPathRequired(path: string, requiredPaths: Path[]): boolean {
     for (const requiredPath of requiredPaths) {
       if (path === requiredPath.toString()) {
         return true;
@@ -208,7 +208,7 @@ export class ShapesGraph {
    * @param path - The path from which to remove the ^.
    * @private
    */
-  private getRealPath(path: string) : string {
+  private getRealPath(path: string): string {
     const found = path.match(/^\^*([^\^]+)/);
 
     if (!found) {
@@ -367,6 +367,16 @@ export class ShapesGraph {
     nodeShapeId: Term,
     shape: ShapeTemplate,
   ) {
+    // Extract label
+    const rdfsLabel = getObjects(shapeStore, nodeShapeId, RDFS.terms.label)[0];
+    if (rdfsLabel) {
+      shape.label = rdfsLabel.value;
+    } else {
+      shape.label = nodeShapeId.termType === "BlankNode" ?
+        nodeShapeId.value :
+        nodeShapeId.value.split("/")[nodeShapeId.value.split("/").length - 1];
+    }
+
     //Check if it's closed or open
     let closedIndicator: Term = getObjects(
       shapeStore,
@@ -419,7 +429,7 @@ export class ShapesGraph {
    * @param shapeStore
    */
   initializeFromStore(shapeStore: RdfStore): RDFMap<ShapeTemplate> {
-    //get all named nodes of entities that are sh:ShapeNodes which we'll recognize through their use of sh:property (we'll find other relevant shape nodes later on)
+    //get all named nodes of entities that are sh:NodeShapes which we'll recognize through their use of sh:property (we'll find other relevant shape nodes later on)
     //TODO: This is a limitation though: we only support NodeShapes with at least one sh:property set? Other NodeShapes in this context are otherwise just meaningless?
     const shapeNodes: Term[] = (<Term[]>[])
       .concat(getSubjects(shapeStore, SHACL.property, null, null))
@@ -481,7 +491,7 @@ export class ShapesGraph {
       while (
         rest &&
         rest.value !== "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"
-        ) {
+      ) {
         yield getObjects(
           shapeStore,
           rest,

@@ -36,11 +36,12 @@ export class ShapeTemplate {
   requiredPaths: Array<Path>;
   optionalPaths: Array<Path>;
   atLeastOneLists: Array<Array<ShapeTemplate>>;
+  label?: string;
 
   constructor() {
     //All properties will be added, but if a required property is not available, then we need to further look it up
     this.requiredPaths = [];
-    //If there’s a nodelink through one of the properties, I want to know what other shape to look up in the shapesgraph from there
+    //If there’s a nodelink through one of the properties, I want to know what other shape to look up in the shapes graph from there
     this.nodeLinks = [];
     this.atLeastOneLists = [];
     this.optionalPaths = [];

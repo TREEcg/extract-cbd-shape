@@ -107,6 +107,7 @@ ex:NestedShape a sh:NodeShape ;
         sh:path ex:subject ;
         sh:minCount 1 ;
         sh:node [
+            rdfs:label "SecondNestedShape" ;
             sh:property [
                 sh:path rdfs:label ;
                 sh:minCount 1
@@ -119,6 +120,7 @@ ex:XoneWithNodeShape a sh:NodeShape ;
 		sh:path foaf:name;
 		sh:minCount 1
 	] [
+        rdfs:label "SecondXoneWithNodeShape" ;
 		sh:property [
 			sh:path ex:qualifiedName ;
 			sh:node ex:QualifiedNameShape;
@@ -132,6 +134,7 @@ ex:XoneWithNodeShape2 a sh:NodeShape ;
 		sh:path foaf:name;
 		sh:minCount 1
 	] [
+         rdfs:label "SecondXoneWithNodeShape2" ;
 		sh:property [
 			sh:path ex:qualifiedName ;
 			sh:node ex:QualifiedNameShape2;
@@ -154,6 +157,7 @@ ex:NestedWithOptionalShape a sh:NodeShape ;
         sh:path ex:subject ;
         sh:minCount 0 ;
         sh:node [
+            rdfs:label "OptionalNestedNodeShape" ;
             sh:property [
                 sh:path rdfs:label ;
                 sh:minCount 1
