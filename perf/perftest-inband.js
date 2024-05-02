@@ -26,7 +26,7 @@ let main = async function () {
     await rdfDereference.dereference(
       "./perf/resources/shacl-kbo.ttl",
       // "./tests/06 - shapes and named graphs/shape.ttl",
-      { localFiles: true }
+      { localFiles: true },
     )
   ).data;
 
@@ -57,66 +57,99 @@ let main = async function () {
   //In-band tests - 13 quads
   //Extraction only star-shapes (CBD) + blank nodes to be extracted
   suite
-    .add("CBDAndBlankNode", async function () {
-      let result = await extractor.extract(
-        kboData,
-        new NamedNode("https://kbopub.economie.fgov.be/kbo#0877248501.2022.11")
-      );
-      //  console.log("Extract1#CBD returned " + result.length + " quads.");
+    .add("CBDAndBlankNode", {
+      defer: true,
+      fn: async function (res) {
+        let result = await extractor.extract(
+          kboData,
+          new NamedNode(
+            "https://kbopub.economie.fgov.be/kbo#0877248501.2022.11",
+          ),
+        );
+        res.resolve();
+        //  console.log("Extract1#CBD returned " + result.length + " quads.");
+      },
     })
     //Extraction CBD + named graphs
-    .add("CBDAndNamedGraphs", async function () {
-      let result = await extractor.extract(
-        kboData,
-        new NamedNode("https://kbopub.economie.fgov.be/kbo#0417199869.2022.11")
-      );
-      // console.log(
-      //   "Extract2#CBDAndNamedGraphs returned " + result.length + " quads."
-      // );
+    .add("CBDAndNamedGraphs", {
+      defer: true,
+      fn: async function (res) {
+        let result = await extractor.extract(
+          kboData,
+          new NamedNode(
+            "https://kbopub.economie.fgov.be/kbo#0417199869.2022.11",
+          ),
+        );
+        res.resolve();
+        // console.log(
+        //   "Extract2#CBDAndNamedGraphs returned " + result.length + " quads."
+        // );
+      },
     })
-
     //Extraction CBD + Simple Shape not adding any triples other than what CBD gives
-    .add("CBDAndSimpleShape", async function () {
-      let result = await extractorWithShape.extract(
-        kboData,
-        new NamedNode("https://kbopub.economie.fgov.be/kbo#0877248501.2022.11"),
-        new NamedNode("https://kbopub.economie.fgov.be/kbo#LegalEntityShape")
-      );
-      // console.log("Extract3#CBDAndSimpleShape " + result.length + " quads.");
+    .add("CBDAndSimpleShape", {
+      defer: true,
+      fn: async function (res) {
+        let result = await extractorWithShape.extract(
+          kboData,
+          new NamedNode(
+            "https://kbopub.economie.fgov.be/kbo#0877248501.2022.11",
+          ),
+          new NamedNode("https://kbopub.economie.fgov.be/kbo#LegalEntityShape"),
+        );
+        res.resolve();
+        // console.log("Extract3#CBDAndSimpleShape " + result.length + " quads.");
+      },
     })
-
     // Extraction CBD + named graphs + Simple shape that does not add any triples other than already present
-    .add("CBDAndSimpleShapeAndNamedGraphs", async function () {
-      let result = await extractorWithShape.extract(
-        kboData,
-        new NamedNode("https://kbopub.economie.fgov.be/kbo#0417199869.2022.11"),
-        new NamedNode("https://kbopub.economie.fgov.be/kbo#LegalEntityShape")
-      );
-      //  console.log("Extract4#CBDAndSimpleShapeAndNamedGraphs " + result.length + " quads.");
-    })
+    .add("CBDAndSimpleShapeAndNamedGraphs", {
+      defer: true,
 
+      fn: async function (res) {
+        let result = await extractorWithShape.extract(
+          kboData,
+          new NamedNode(
+            "https://kbopub.economie.fgov.be/kbo#0417199869.2022.11",
+          ),
+          new NamedNode("https://kbopub.economie.fgov.be/kbo#LegalEntityShape"),
+        );
+        res.resolve();
+        //  console.log("Extract4#CBDAndSimpleShapeAndNamedGraphs " + result.length + " quads.");
+      },
+    })
     // Extraction Shape selecting specific property paths, but not too complex
-    .add("CBDAndShaclExtended", async function () {
-      let result = await extractorWithShape.extract(
-        kboData,
-        new NamedNode("https://kbopub.economie.fgov.be/kbo#0877248501.2023.11"),
-        new NamedNode(
-          "https://kbopub.economie.fgov.be/kbo#LegalEntityShapeExtended"
-        )
-      );
-      //  console.log("Extract5#CBDAndShaclExtended " + result.length + " quads.");
+    .add("CBDAndShaclExtended", {
+      defer: true,
+      fn: async function (res) {
+        let result = await extractorWithShape.extract(
+          kboData,
+          new NamedNode(
+            "https://kbopub.economie.fgov.be/kbo#0877248501.2023.11",
+          ),
+          new NamedNode(
+            "https://kbopub.economie.fgov.be/kbo#LegalEntityShapeExtended",
+          ),
+        );
+        res.resolve();
+        //  console.log("Extract5#CBDAndShaclExtended " + result.length + " quads.");
+      },
     })
-
     // Extraction Complex shape with conditionals
-    .add("CBDAndShaclExtendedComplex", async function () {
-      let result = await extractorWithShape.extract(
-        kboData,
-        new NamedNode("https://kbopub.economie.fgov.be/kbo#0877248501.2023.11"),
-        new NamedNode(
-          "https://kbopub.economie.fgov.be/kbo#LegalEntityShapeConditions"
-        )
-      );
-      // console.log("Extract6#CBDAndShaclExtendedComplex " + result.length + " quads.");
+    .add("CBDAndShaclExtendedComplex", {
+      defer: true,
+      fn: async function (res) {
+        let result = await extractorWithShape.extract(
+          kboData,
+          new NamedNode(
+            "https://kbopub.economie.fgov.be/kbo#0877248501.2023.11",
+          ),
+          new NamedNode(
+            "https://kbopub.economie.fgov.be/kbo#LegalEntityShapeConditions",
+          ),
+        );
+        // console.log("Extract6#CBDAndShaclExtendedComplex " + result.length + " quads.");
+        res.resolve();
+      },
     })
     //add listeners
     .on("cycle", function (event) {
