@@ -70,3 +70,16 @@ ex:AllTogetherPathShape a sh:NodeShape ;
         sh:path ([sh:alternativePath ([ sh:inversePath ex:p1 ] ex:p2)]) ;
         sh:minCount 1
     ] .
+
+# Nested shape
+ex:NestedShape a sh:NodeShape ;
+    sh:property [
+        sh:path ex:subject ;
+        sh:minCount 1 ;
+        sh:node [
+            sh:property [
+                sh:path rdfs:label ;
+                sh:minCount 1
+            ]
+        ]
+    ] .

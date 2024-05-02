@@ -36,15 +36,51 @@ describe("Test whether the correct Mermaid text is generated for a ShapesGraph",
     assert.equal(actualMermaid, expectedMermaid);
   });
 
-  it("Sequence and inverse path ", async () => {
+  it("Sequence and inverse path", async () => {
     const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/SequenceAndInversePathShape"));
     const expectedMermaid = await fs.readFile('./tests/07 - mermaid/sequence-and-inverse-path.txt', 'utf-8');
     assert.equal(actualMermaid, expectedMermaid);
   });
 
-  it.skip("Double inverse path ", async () => {
+  it.skip("Double inverse path", async () => {
     const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/DoubleInversePathShape"));
     const expectedMermaid = await fs.readFile('./tests/07 - mermaid/double-inverse-path.txt', 'utf-8');
+    assert.equal(actualMermaid, expectedMermaid);
+  });
+
+  it("Zero or more path", async () => {
+    const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/ZeroOrMorePathShape"));
+    const expectedMermaid = await fs.readFile('./tests/07 - mermaid/zero-or-more-path.txt', 'utf-8');
+    assert.equal(actualMermaid, expectedMermaid);
+  });
+
+  it("One or more path", async () => {
+    const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/OneOrMorePathShape"));
+    const expectedMermaid = await fs.readFile('./tests/07 - mermaid/one-or-more-path.txt', 'utf-8');
+    assert.equal(actualMermaid, expectedMermaid);
+  });
+
+  it("Zero or one path", async () => {
+    const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/ZeroOrOnePathShape"));
+    const expectedMermaid = await fs.readFile('./tests/07 - mermaid/zero-or-one-path.txt', 'utf-8');
+    assert.equal(actualMermaid, expectedMermaid);
+  });
+
+  it("Alternative path", async () => {
+    const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/AlternativePathShape"));
+    const expectedMermaid = await fs.readFile('./tests/07 - mermaid/alternative-path.txt', 'utf-8');
+    assert.equal(actualMermaid, expectedMermaid);
+  });
+
+  it("All together path", async () => {
+    const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/AllTogetherPathShape"));
+    const expectedMermaid = await fs.readFile('./tests/07 - mermaid/all-together-path.txt', 'utf-8');
+    assert.equal(actualMermaid, expectedMermaid);
+  });
+
+  it("Nested shape", async () => {
+    const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/NestedShape"));
+    const expectedMermaid = await fs.readFile('./tests/07 - mermaid/nested-shape.txt', 'utf-8');
     assert.equal(actualMermaid, expectedMermaid);
   });
 });

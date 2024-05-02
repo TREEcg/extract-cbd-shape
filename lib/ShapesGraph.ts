@@ -65,9 +65,9 @@ export class ShapesGraph {
 
       if (p.startsWith('^')) {
         p = p.substring(1);
-        mermaid += `  S${id}_${counter}[ ]-->|${p}|S${id}\n`;
+        mermaid += `  S${id}_${counter}[ ]-->|"${p}"|S${id}\n`;
       } else {
-        mermaid += `  S${id}-->|${p}|S${id}_${counter}[ ]\n`;
+        mermaid += `  S${id}-->|"${p}"|S${id}_${counter}[ ]\n`;
       }
 
       counter ++;
