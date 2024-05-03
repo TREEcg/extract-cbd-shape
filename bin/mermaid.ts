@@ -6,7 +6,11 @@ import rdfDereference from "rdf-dereference";
 import fs from "fs/promises";
 import * as process from 'process';
 import { Term } from "rdf-js";
+import { deflate} from "pako";
+import { fromUint8Array } from 'js-base64';
+
 const df = new DataFactory();
+
 
 // Check if at least one command line argument is provided
 if (process.argv.length <= 2) {
@@ -54,6 +58,28 @@ async function main () {
 
     shapesGraph = new ShapesGraph(shapeStore);
     const actualMermaid = shapesGraph.toMermaid(shapeTerm);
+    console.log('```mermaid');
     console.log(actualMermaid);
+    console.log('```');
+
+
+    const formatJSON = (data: unknown): string => JSON.stringify(data, undefined, 2);
+    const serialize = (state: string): string => {
+      const data = new TextEncoder().encode(state);
+      const compressed = deflate(data, { level: 9 }); // zlib level 9
+      return fromUint8Array(compressed, true); // url safe base64 encoding
+    }
+    const defaultState = {
+      code: actualMermaid,
+      mermaid: formatJSON({
+        theme: 'default'
+      }),
+      autoSync: true,
+      updateDiagram: true
+    };
+    const json = JSON.stringify(defaultState);
+    const serialized = serialize(json);
+    console.log();
+    console.log('Mermaid Live: https://mermaid.live/edit#pako:'+ serialized);
 }
 main();
