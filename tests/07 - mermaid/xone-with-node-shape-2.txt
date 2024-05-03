@@ -1,4 +1,4 @@
-flowchart TD
+flowchart LR
   S1((XoneWithNodeShape2))
   S1---X1_0{OR}
   X1_0---S1_0

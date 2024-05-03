@@ -1,4 +1,4 @@
-flowchart TD
+flowchart LR
   S1((NestedShape))
   S1-->|"http://example.org/subject"|S1_0[ ]
   S1_0((SecondNestedShape))
