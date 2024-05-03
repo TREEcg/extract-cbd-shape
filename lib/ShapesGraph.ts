@@ -56,7 +56,7 @@ export class ShapesGraph {
       throw new Error(`No shape found for term "${term.value}"`);
     }
 
-    let mermaid = 'flowchart TD\n';
+    let mermaid = 'flowchart LR\n';
     mermaid += this.toMermaidSingleShape(startShape, '1', startShape.label || 'Shape');
     return mermaid;
   }
