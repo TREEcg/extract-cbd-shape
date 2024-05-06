@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1711793253633,
+  "lastUpdate": 1714985338305,
   "repoUrl": "https://github.com/TREEcg/extract-cbd-shape",
   "entries": {
     "Extraction algorithm Benchmark for inband data": [
@@ -1582,6 +1582,72 @@ window.BENCHMARK_DATA = {
             "name": "CBDAndShaclExtendedComplex",
             "value": 56324,
             "range": "±3.06%",
+            "unit": "ops/sec",
+            "extra": "133 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "pheyvaer.heyvaert@ugent.be",
+            "name": "Pieter Heyvaert",
+            "username": "pheyvaer"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "66e397820bef10d21173d824f3b34a5ec5695b87",
+          "message": "Shape to mermaid (#30)\n\n* Add a shapeGraph to mermaid functionality\r\n  * optional paths, nodeLinks and atLeastOneLists\r\n  * inverse path\r\n\r\n* Add error test + docs\r\n\r\n* Extract label for Node Shapes from rdfs:label or IRI\r\n\r\n* Added a simple binary for mermaid\r\n\r\n* bump version\r\n\r\n---------\r\n\r\nCo-authored-by: Julian Rojas <julian.rojas87@gmail.com>\r\nCo-authored-by: Pieter Colpaert <pieter.colpaert@ugent.be>\r\nCo-authored-by: ajuvercr <arthur.vercruysse@outlook.com>",
+          "timestamp": "2024-05-06T10:47:16+02:00",
+          "tree_id": "ee8c6ebc9d44fb88d6b5412e5c60dcef15f72587",
+          "url": "https://github.com/TREEcg/extract-cbd-shape/commit/66e397820bef10d21173d824f3b34a5ec5695b87"
+        },
+        "date": 1714985337720,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "CBDAndBlankNode",
+            "value": 78848,
+            "range": "±4.48%",
+            "unit": "ops/sec",
+            "extra": "132 samples"
+          },
+          {
+            "name": "CBDAndNamedGraphs",
+            "value": 86399,
+            "range": "±1.17%",
+            "unit": "ops/sec",
+            "extra": "134 samples"
+          },
+          {
+            "name": "CBDAndSimpleShape",
+            "value": 73115,
+            "range": "±3.36%",
+            "unit": "ops/sec",
+            "extra": "132 samples"
+          },
+          {
+            "name": "CBDAndSimpleShapeAndNamedGraphs",
+            "value": 80360,
+            "range": "±1.22%",
+            "unit": "ops/sec",
+            "extra": "135 samples"
+          },
+          {
+            "name": "CBDAndShaclExtended",
+            "value": 62184,
+            "range": "±3.19%",
+            "unit": "ops/sec",
+            "extra": "134 samples"
+          },
+          {
+            "name": "CBDAndShaclExtendedComplex",
+            "value": 56416,
+            "range": "±3.73%",
             "unit": "ops/sec",
             "extra": "133 samples"
           }
