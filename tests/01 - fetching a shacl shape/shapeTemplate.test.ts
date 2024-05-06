@@ -1,6 +1,6 @@
-import { ShapesGraph } from "../../lib/Shape";
 import rdfDereference from "rdf-dereference";
 import { RdfStore } from "rdf-stores";
+import {ShapesGraph} from "../../lib/ShapesGraph";
 describe("Test shape template of the SHACL SHACL", function () {
   let shapeStore = RdfStore.createDefault();
   let shapesGraph: ShapesGraph;

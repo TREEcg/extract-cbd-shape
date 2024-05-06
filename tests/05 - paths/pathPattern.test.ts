@@ -1,10 +1,10 @@
 import { assert } from "chai";
 import { DataFactory, NamedNode, Store } from "n3";
-import { ShapesGraph } from "../../lib/Shape";
 import rdfDereference from "rdf-dereference";
 import { CbdExtracted } from "../../lib/CBDShapeExtractor";
 const { namedNode } = DataFactory;
 import { RdfStore } from "rdf-stores";
+import {ShapesGraph} from "../../lib/ShapesGraph";
 describe("Test whether the Patterns are correctly created", function () {
   let shapeStore = RdfStore.createDefault();
   let shapesGraph: ShapesGraph;

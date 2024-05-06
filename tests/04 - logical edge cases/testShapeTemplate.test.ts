@@ -8,8 +8,9 @@ import {
   Writer,
 } from "n3";
 import { RdfStore } from "rdf-stores";
-import { ShapesGraph, ShapeTemplate } from "../../lib/Shape";
+import { ShapeTemplate } from "../../lib/Shape";
 import rdfDereference from "rdf-dereference";
+import {ShapesGraph} from "../../lib/ShapesGraph";
 
 const { namedNode } = DataFactory;
 describe("Test shape template of the logical edge cases", function () {

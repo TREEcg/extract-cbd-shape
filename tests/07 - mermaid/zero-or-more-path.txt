@@ -1,0 +1,3 @@
+flowchart LR
+  S1((ZeroOrMorePathShape))
+  S1-->|"http://example.org/p1*"|S1_0[ ]

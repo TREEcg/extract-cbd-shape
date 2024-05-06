@@ -1,8 +1,9 @@
 import { assert } from "chai";
 import { DataFactory } from "rdf-data-factory";
 import { RdfStore } from "rdf-stores";
-import { ShapesGraph, ShapeTemplate } from "../../lib/Shape";
+import { ShapeTemplate } from "../../lib/Shape";
 import rdfDereference from "rdf-dereference";
+import {ShapesGraph} from "../../lib/ShapesGraph";
 
 const df = new DataFactory();
 
