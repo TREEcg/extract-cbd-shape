@@ -1,13 +1,16 @@
-import { Parser, Quad_Graph, Store as N3Store } from "n3";
+import { Parser } from "n3";
 import { Quad, QuadTermName, Stream, Term } from "@rdfjs/types";
 import { DataFactory } from "rdf-data-factory";
 import { CBDShapeExtractor } from "../dist/lib/CBDShapeExtractor";
 import {
   RdfStore,
   RdfStoreIndexNestedMap,
+  RdfStoreIndexNestedMapQuoted,
   TermDictionaryNumberRecordFullTerms,
+  TermDictionaryQuotedIndexed,
 } from "rdf-stores";
-import Benchmark from "benchmark";
+import * as Benchmark from "benchmark";
+import type { Options } from "benchmark";
 import { renderResults } from "./render";
 import { Store } from "../dist/lib/Util";
 import { EventEmitter } from "stream";
@@ -16,6 +19,8 @@ type DataType = "CBD" | "NamedNodes";
 
 const GenerateData = (prefix: string, ty: DataType, graph?: Term): Quad[] => {
   let str: string;
+  let graphStart = graph ? `<${graph.value}> {` : "";
+  let graphEnd = graph ? `}` : "";
   if (ty === "CBD") {
     str = `
 @prefix ns: <${prefix}>.
@@ -24,6 +29,7 @@ const GenerateData = (prefix: string, ty: DataType, graph?: Term): Quad[] => {
 @prefix legal: <http://www.w3.org/ns/legal#>.
 @prefix locn: <https://www.w3.org/ns/locn#> .
 
+${graphStart}
 ns:object a ns:Type, kbo:Enterprise ;
     terms:isVersionOf kbo:0877248501 ;
     legal:companyStatus [
@@ -31,8 +37,10 @@ ns:object a ns:Type, kbo:Enterprise ;
       legal:status kbo:Active;
     ];
     legal:companyType kbo:JuridicalForm_014 ;
-    legal:legalName "AEDIFICA" ;
-    legal:registeredAddress [
+    legal:legalName "AEDIFICA".
+
+
+ns:object legal:registeredAddress [
       locn:postName "Ghent";
       locn:postCode 9000;
       locn:fullAddress "Appelstraat 2, 9000 Gent";
@@ -43,6 +51,7 @@ ns:object a ns:Type, kbo:Enterprise ;
         kbo:2008_68203;
     kbo:establishment kbo:2277343234 ;
     kbo:status kbo:Status_AC .
+${graphEnd}
 `;
   } else {
     str = `
@@ -52,11 +61,18 @@ ns:object a ns:Type, kbo:Enterprise ;
 @prefix legal: <http://www.w3.org/ns/legal#>.
 @prefix locn: <https://www.w3.org/ns/locn#> .
 
+${graphStart}
 ns:object a ns:Type, kbo:Enterprise ;
     terms:isVersionOf kbo:0877248501 ;
     legal:companyStatus ns:object_status;
     legal:companyType kbo:JuridicalForm_014 ;
-    legal:legalName "AEDIFICA" ;
+    legal:legalName "AEDIFICA" .
+
+ns:object_status 
+      legal:lastSeen "SomeDate";
+      legal:status kbo:Active.
+
+ns:object
     legal:registeredAddress ns:object_address;
     kbo:activity kbo:2003_70201,
         kbo:2003_70203,
@@ -65,36 +81,22 @@ ns:object a ns:Type, kbo:Enterprise ;
     kbo:establishment kbo:2277343234 ;
     kbo:status kbo:Status_AC .
 
-ns:object_status 
-      legal:lastSeen "SomeDate";
-      legal:status kbo:Active.
-
 ns:object_address 
     locn:postName "Ghent";
     locn:postCode 9000;
     locn:fullAddress "Appelstraat 2, 9000 Gent".
+${graphEnd}
+
 `;
   }
 
-  if (graph) {
-    const df = new DataFactory();
-
-    return new Parser().parse(str).map((quad) => {
-      return df.quad(
-        quad.subject,
-        quad.predicate,
-        quad.object,
-        <Quad_Graph>graph,
-      );
-    });
-  } else {
-    return new Parser().parse(str);
-  }
+  return new Parser().parse(str);
 };
 
-type ShapeType = "Closed" | "OpenMinimal" | "OpenFull" | "Open";
+type ShapeType = "Closed" | "OpenMinimal" | "OpenFull" | "Open" | "None";
 const ShapeId = "http://test.com/shape";
 const GenerateShape = (ty: ShapeType) => {
+  if (ty == "None") return [];
   let str: string;
   if (ty === "Open") {
     str = `
@@ -185,6 +187,23 @@ function prefix(i: number, value?: string): string {
   return `http://prefix.com/${i}#${value ?? ""}`;
 }
 
+function createStore(): RdfStore {
+  return new RdfStore<number>({
+    indexCombinations: [
+      ["graph", "subject", "predicate", "object"],
+      ["graph", "predicate", "object", "subject"],
+      ["graph", "object", "subject", "predicate"],
+    ],
+    indexConstructor: (subOptions) =>
+      new RdfStoreIndexNestedMapQuoted(subOptions),
+    dictionary: new TermDictionaryQuotedIndexed(
+      new TermDictionaryNumberRecordFullTerms(),
+    ),
+    dataFactory: new DataFactory(),
+    termsCardinalitySets: [<QuadTermName>"graph"],
+  });
+}
+
 function addToSuite(
   suite: Benchmark.Suite,
   ty: ShapeType,
@@ -194,9 +213,9 @@ function addToSuite(
   members: number,
   total: number,
   storeName: string,
-  createStore: () => Store,
+  name?: string,
 ) {
-  const id = `store=${storeName}&shape=${ty}&type=${dataType}&graph=${graph}&bulk=${bulk}&count=${members}&total=${total}`;
+  const id = name || `store=${storeName}&shape=${ty}&type=${dataType}&graph=${graph}&bulk=${bulk}&count=${members}&total=${total}`;
   // const id = `shape=${ty}/data=${dataType}/graph=${graph}/bulk=${bulk}/store=${storeName}/${members}/${total}`;
   const df = new DataFactory();
 
@@ -226,19 +245,34 @@ function addToSuite(
         df.namedNode(prefix(i, "object")),
       );
 
+      const allGraphs = [...new Array(total)].map((_, i) =>
+        df.namedNode(prefix(i, "object")),
+      );
+
       (<CBDShapeExtractor>global.extractor!)
-        .bulkExtract(global.dataStore!, graphs, df.namedNode(ShapeId), graphs)
+        .bulkExtract(
+          global.dataStore!,
+          graphs,
+          (ty != "None" && df.namedNode(ShapeId)) || undefined,
+          allGraphs,
+        )
         .then((members) => {
           for (let member of members) {
-            // if (member.quads.length !== 18) {
-            //   throw "Unexpected amount of quads: got " + member.quads.length;
-            // }
+            if (member.quads.length !== 18) {
+              console.error(
+              "Unexpected amount of quads: got " + member.quads.length,
+              );
+            }
           }
         })
         .then(() => res.resolve());
     };
   } else {
     fn = async function (res: Benchmark.Deferred) {
+      const allGraphs = [...new Array(total)].map((_, i) =>
+        df.namedNode(prefix(i, "object")),
+      );
+
       const graphs = [...new Array(members)].map((_, i) =>
         df.namedNode(prefix(i, "object")),
       );
@@ -247,11 +281,19 @@ function addToSuite(
           (p, id) =>
             p.then(() =>
               (<CBDShapeExtractor>global.extractor!)
-                .extract(global.dataStore!, id, df.namedNode(ShapeId))
+                .extract(
+                  global.dataStore!,
+                  id,
+                  (ty != "None" && df.namedNode(ShapeId)) || undefined,
+                  allGraphs,
+                )
                 .then((x) => {
-                  // if (x.length !== 18) {
-                  //   throw "Unexpected amount of quads: got " + x.length;
-                  // }
+                  if (x.length !== 18) {
+                    console.error(
+                      "Unexpected amount of quads: got " + x.length,
+                    );
+                    // throw ";
+                  }
                 }),
             ),
           Promise.resolve(),
@@ -260,34 +302,40 @@ function addToSuite(
     };
   }
 
-  suite.add({ fn, setup, name: id, defer: true });
+  suite.add(<Options>{
+    fn,
+    setup,
+    name: id,
+    defer: true,
+    entityCount: members,
+  });
 }
 
-async function main() {
-  const df = new DataFactory();
-  for (let ty of ["Closed", "OpenMinimal", "OpenFull"]) {
-    const shape = GenerateShape(<ShapeType>ty);
-    console.log("Shape", ty, shape.length);
-    const shapeStore = RdfStore.createDefault();
-    shape.forEach((x) => shapeStore.addQuad(x));
-    const extractor = new CBDShapeExtractor(shapeStore);
-    for (let ty of ["CBD", "NamedNodes"]) {
-      for (let graph of [df.namedNode("http://prefix.com/graph"), undefined]) {
-        const data = GenerateData("http://prefix.com/", <DataType>ty, graph);
-        const dataStore = RdfStore.createDefault();
-        data.forEach((x) => dataStore.addQuad(x));
-        const id = df.namedNode("http://prefix.com/object");
-        const found = await extractor.extract(
-          dataStore,
-          id,
-          df.namedNode(ShapeId),
-        );
-        console.log("ty", ty, graph?.value, data.length, found.length);
-      }
-    }
-  }
-}
-main();
+// async function main() {
+//   const df = new DataFactory();
+//   for (let ty of ["Closed", "OpenMinimal", "OpenFull"]) {
+//     const shape = GenerateShape(<ShapeType>ty);
+//     console.log("Shape", ty, shape.length);
+//     const shapeStore = RdfStore.createDefault();
+//     shape.forEach((x) => shapeStore.addQuad(x));
+//     const extractor = new CBDShapeExtractor(shapeStore);
+//     for (let ty of ["CBD", "NamedNodes"]) {
+//       for (let graph of [df.namedNode("http://prefix.com/graph"), undefined]) {
+//         const data = GenerateData("http://prefix.com/", <DataType>ty, graph);
+//         const dataStore = RdfStore.createDefault();
+//         data.forEach((x) => dataStore.addQuad(x));
+//         const id = df.namedNode("http://prefix.com/object");
+//         const found = await extractor.extract(
+//           dataStore,
+//           id,
+//           df.namedNode(ShapeId),
+//         );
+//         console.log("ty", ty, graph?.value, data.length, found.length);
+//       }
+//     }
+//   }
+// }
+// main();
 
 const suite = new Benchmark.Suite(undefined);
 
@@ -295,12 +343,14 @@ const shapeTypes: ShapeType[] = ["Closed", "OpenFull", "OpenMinimal", "Open"];
 const dataTypes: DataType[] = ["CBD", "NamedNodes"];
 
 async function DataAndShapeTypes() {
-  for (let members of [100]) {
-    for (let shape of shapeTypes) {
-      for (let dt of dataTypes) {
-        for (let graph of [false]) {
-          for (let bulk of [false]) {
-            for (let total of [100, 500, 1000, 2000]) {
+  for (let totalI = 1; totalI < 250; totalI += 10) {
+    const total = totalI * 100;
+    for (let members of [100]) {
+      for (let shape of <ShapeType[]>["OpenMinimal"]) {
+        for (let dt of <DataType[]>["NamedNodes"]) {
+          for (let graph of [true, false]) {
+            for (let bulk of [true, false]) {
+              // for (let total of [100, 500, 2000]) {
               if (members > total) continue;
               addToSuite(
                 suite,
@@ -310,8 +360,7 @@ async function DataAndShapeTypes() {
                 bulk,
                 members,
                 total,
-                `default`,
-                () => RdfStore.createDefault(),
+                `pr-ed`,
               );
             }
           }
@@ -321,7 +370,21 @@ async function DataAndShapeTypes() {
   }
 }
 
-DataAndShapeTypes();
+// DataAndShapeTypes();
+
+function NewTest() {
+  // named graph / shape named nodes / shape CBD / no shape CBD
+  addToSuite(suite, "OpenMinimal", "CBD", true, false, 100, 100, "", "* - NamedGraph");
+  // addToSuite(suite, "OpenMinimal", "NamedNodes", true, false, 100, 100, "");
+  addToSuite(suite, "OpenFull", "CBD", false, false, 100, 100, "", "Full Shape - BlankNodes");
+  addToSuite(suite, "OpenFull", "NamedNodes", false, false, 100, 100, "", "Full Shape - NamedNodes");
+  // addToSuite(suite, "OpenFull", "NamedNodes", true, false, 100, 100, "");
+  addToSuite(suite, "OpenMinimal", "NamedNodes", false, false, 100, 100, "", "Shape - NamedNodes");
+  addToSuite(suite, "OpenMinimal", "CBD", false, false, 100, 100, "", "Shape - BlankNodes");
+  addToSuite(suite, "None", "CBD", false, false, 100, 100, "", "No shape - CBD");
+}
+
+NewTest();
 
 const options: QuadTermName[] = ["graph", "subject", "predicate", "object"];
 function* generateCombinations(
@@ -342,145 +405,6 @@ function* generateCombinations(
   }
 }
 
-function All_Stores() {
-  for (let graph of [true, false]) {
-    addToSuite(
-      suite,
-      "OpenMinimal",
-      "CBD",
-      graph,
-      false,
-      500,
-      2000,
-      "default",
-      () => RdfStore.createDefault(),
-    );
-  }
-  for (let offset = 0; offset < 4; offset += 1) {
-    for (let first of options) {
-      const combinations = [...generateCombinations(first, offset)];
-
-      for (let graph of [true, false]) {
-        addToSuite(
-          suite,
-          "OpenMinimal",
-          "CBD",
-          graph,
-          false,
-          500,
-          2000,
-          combinations
-            .map((x) => x.map((x) => x[0]).join(""))
-            .join("&")
-            .toUpperCase(),
-          () =>
-            new RdfStore<number>({
-              indexCombinations: combinations,
-              indexConstructor: (subOptions) =>
-                new RdfStoreIndexNestedMap(subOptions),
-              dictionary: new TermDictionaryNumberRecordFullTerms(),
-              dataFactory: new DataFactory(),
-            }),
-        );
-      }
-    }
-  }
-}
-
-class TestStore implements Store {
-  quads: Quad[] = [];
-  addQuad(quad: Quad): void {
-    this.quads.push(quad);
-  }
-  getQuads(
-    subject: Term | null,
-    predicate: Term | null,
-    object: Term | null,
-    graph: Term | null,
-  ): Quad[] {
-    return this.quads.filter(
-      (x) =>
-        (!subject || subject.equals(x.subject)) &&
-        (!predicate || predicate.equals(x.predicate)) &&
-        (!object || object.equals(x.object)) &&
-        (!graph || graph.equals(x.graph)),
-    );
-  }
-  import(stream: Stream<Quad>): any {
-    const out = new EventEmitter();
-    stream.on("data", (x) => this.quads.push(x));
-    stream.on("end", () => out.emit("end"));
-    return out;
-  }
-}
-
-function All_Stores_Single() {
-  for (let graph of [true, false]) {
-    addToSuite(
-      suite,
-      "OpenMinimal",
-      "CBD",
-      graph,
-      false,
-      500,
-      2000,
-      "RdfStore",
-      () => RdfStore.createDefault(),
-    );
-  }
-  for (let graph of [true, false]) {
-    addToSuite(
-      suite,
-      "OpenMinimal",
-      "CBD",
-      graph,
-      false,
-      500,
-      2000,
-      "N3Store",
-      () => new N3Store(),
-    );
-  }
-
-  for (let first of options) {
-    for (let second of options) {
-      if (second == first) continue;
-      for (let third of options) {
-        if (third == first || third == second) continue;
-
-        for (let fourth of options) {
-          if (fourth == first || fourth == second || fourth == third) continue;
-          const combinations = [[first, second, third, fourth], []];
-
-          for (let graph of [true, false]) {
-            addToSuite(
-              suite,
-              "OpenMinimal",
-              "CBD",
-              graph,
-              false,
-              500,
-              2000,
-              combinations
-                .map((x) => x.map((x) => x[0]).join(""))
-                .join("&")
-                .toUpperCase(),
-              () =>
-                new RdfStore<number>({
-                  indexCombinations: combinations,
-                  indexConstructor: (subOptions) =>
-                    new RdfStoreIndexNestedMap(subOptions),
-                  dictionary: new TermDictionaryNumberRecordFullTerms(),
-                  dataFactory: new DataFactory(),
-                }),
-            );
-          }
-        }
-      }
-    }
-  }
-}
-
 // All_Stores_Single();
 //add listeners
 suite
@@ -488,14 +412,15 @@ suite
     console.log(String(event.target));
   })
   // add listeners
-  .on("complete", function () {
+  .on("complete", function (c) {
+    console.log(c);
     const results = this.map((test) => {
       return {
         name: test.name,
-        opsPerSecond: test.hz,
+        opsPerSecond: test.hz * test.entityCount,
         samples: test.stats.sample.length,
-        mean: test.stats.mean,
-        deviation: test.stats.deviation,
+        mean: test.stats.mean / test.entityCount,
+        deviation: test.stats.deviation / test.entityCount,
       };
     });
 

@@ -1,226 +1,44 @@
 [
   {
-    "name": "store=default&shape=Closed&type=CBD&graph=false&bulk=false&count=100&total=100",
-    "opsPerSecond": 192.96796652230304,
-    "samples": 76,
-    "mean": 0.005182207275239235,
-    "deviation": 0.0003242312493194851
+    "name": "* - NamedGraph",
+    "opsPerSecond": 26941.440274006043,
+    "samples": 65,
+    "mean": 0.000037117540481487606,
+    "deviation": 0.000007848091109799674
   },
   {
-    "name": "store=default&shape=Closed&type=CBD&graph=false&bulk=false&count=100&total=500",
-    "opsPerSecond": 186.0770121699459,
-    "samples": 59,
-    "mean": 0.005374118964714946,
-    "deviation": 0.0003408047335943704
+    "name": "Full Shape - BlankNodes",
+    "opsPerSecond": 9803.51032013275,
+    "samples": 68,
+    "mean": 0.00010200427880882357,
+    "deviation": 0.000015804602720751048
   },
   {
-    "name": "store=default&shape=Closed&type=CBD&graph=false&bulk=false&count=100&total=1000",
-    "opsPerSecond": 185.50514451411044,
-    "samples": 47,
-    "mean": 0.005390686078379541,
-    "deviation": 0.0002548132269521398
+    "name": "Full Shape - NamedNodes",
+    "opsPerSecond": 17398.20470507993,
+    "samples": 72,
+    "mean": 0.00005747719474228394,
+    "deviation": 0.000008056636615190779
   },
   {
-    "name": "store=default&shape=Closed&type=CBD&graph=false&bulk=false&count=100&total=2000",
-    "opsPerSecond": 166.0306395672539,
-    "samples": 34,
-    "mean": 0.006022984688888889,
-    "deviation": 0.000668643919532511
+    "name": "Shape - NamedNodes",
+    "opsPerSecond": 17724.51898994195,
+    "samples": 72,
+    "mean": 0.000056419020486111095,
+    "deviation": 0.000008573803086683052
   },
   {
-    "name": "store=default&shape=Closed&type=NamedNodes&graph=false&bulk=false&count=100&total=100",
-    "opsPerSecond": 191.4887454516552,
-    "samples": 76,
-    "mean": 0.005222239028415736,
-    "deviation": 0.00030958661546411515
+    "name": "Shape - BlankNodes",
+    "opsPerSecond": 12795.359062919615,
+    "samples": 67,
+    "mean": 0.00007815333630597017,
+    "deviation": 0.000010758451805711959
   },
   {
-    "name": "store=default&shape=Closed&type=NamedNodes&graph=false&bulk=false&count=100&total=500",
-    "opsPerSecond": 189.53134637309554,
-    "samples": 60,
-    "mean": 0.005276172090454545,
-    "deviation": 0.0001483419029174895
-  },
-  {
-    "name": "store=default&shape=Closed&type=NamedNodes&graph=false&bulk=false&count=100&total=1000",
-    "opsPerSecond": 182.28631390684777,
-    "samples": 47,
-    "mean": 0.005485875371373308,
-    "deviation": 0.00048155002857569825
-  },
-  {
-    "name": "store=default&shape=Closed&type=NamedNodes&graph=false&bulk=false&count=100&total=2000",
-    "opsPerSecond": 180.80334537898707,
-    "samples": 32,
-    "mean": 0.0055308711125,
-    "deviation": 0.0002702813035906901
-  },
-  {
-    "name": "store=default&shape=OpenFull&type=CBD&graph=false&bulk=false&count=100&total=100",
-    "opsPerSecond": 187.72166674004282,
-    "samples": 75,
-    "mean": 0.005327035591393939,
-    "deviation": 0.00019609536919638155
-  },
-  {
-    "name": "store=default&shape=OpenFull&type=CBD&graph=false&bulk=false&count=100&total=500",
-    "opsPerSecond": 177.71953258373168,
-    "samples": 60,
-    "mean": 0.005626843518333332,
-    "deviation": 0.00020037968224282903
-  },
-  {
-    "name": "store=default&shape=OpenFull&type=CBD&graph=false&bulk=false&count=100&total=1000",
-    "opsPerSecond": 166.50617590359786,
-    "samples": 47,
-    "mean": 0.006005783236406621,
-    "deviation": 0.00016139128530770995
-  },
-  {
-    "name": "store=default&shape=OpenFull&type=CBD&graph=false&bulk=false&count=100&total=2000",
-    "opsPerSecond": 160.2809662026551,
-    "samples": 32,
-    "mean": 0.006239043996875,
-    "deviation": 0.0004911797632642614
-  },
-  {
-    "name": "store=default&shape=OpenFull&type=NamedNodes&graph=false&bulk=false&count=100&total=100",
-    "opsPerSecond": 331.88841761856014,
-    "samples": 75,
-    "mean": 0.0030130608569453048,
-    "deviation": 0.0002636336726227061
-  },
-  {
-    "name": "store=default&shape=OpenFull&type=NamedNodes&graph=false&bulk=false&count=100&total=500",
-    "opsPerSecond": 314.18761552733736,
-    "samples": 58,
-    "mean": 0.00318281164049571,
-    "deviation": 0.00019724571982721875
-  },
-  {
-    "name": "store=default&shape=OpenFull&type=NamedNodes&graph=false&bulk=false&count=100&total=1000",
-    "opsPerSecond": 312.31143536199494,
-    "samples": 45,
-    "mean": 0.00320193206771605,
-    "deviation": 0.00022142440400288333
-  },
-  {
-    "name": "store=default&shape=OpenFull&type=NamedNodes&graph=false&bulk=false&count=100&total=2000",
-    "opsPerSecond": 309.3994847794356,
-    "samples": 33,
-    "mean": 0.0032320674377104373,
-    "deviation": 0.00017367477213696457
-  },
-  {
-    "name": "store=default&shape=OpenMinimal&type=CBD&graph=false&bulk=false&count=100&total=100",
-    "opsPerSecond": 255.6371788398092,
-    "samples": 79,
-    "mean": 0.003911794068994297,
-    "deviation": 0.00027986821376068175
-  },
-  {
-    "name": "store=default&shape=OpenMinimal&type=CBD&graph=false&bulk=false&count=100&total=500",
-    "opsPerSecond": 239.3677940014094,
-    "samples": 61,
-    "mean": 0.004177671453972258,
-    "deviation": 0.00024158504125611273
-  },
-  {
-    "name": "store=default&shape=OpenMinimal&type=CBD&graph=false&bulk=false&count=100&total=1000",
-    "opsPerSecond": 223.19647253836342,
-    "samples": 47,
-    "mean": 0.0044803575460992924,
-    "deviation": 0.00019017070954192592
-  },
-  {
-    "name": "store=default&shape=OpenMinimal&type=CBD&graph=false&bulk=false&count=100&total=2000",
-    "opsPerSecond": 219.79321348199792,
-    "samples": 33,
-    "mean": 0.004549731013791764,
-    "deviation": 0.00021237279629534109
-  },
-  {
-    "name": "store=default&shape=OpenMinimal&type=NamedNodes&graph=false&bulk=false&count=100&total=100",
-    "opsPerSecond": 337.4269066059786,
-    "samples": 77,
-    "mean": 0.0029636047998025353,
-    "deviation": 0.00024133492061174106
-  },
-  {
-    "name": "store=default&shape=OpenMinimal&type=NamedNodes&graph=false&bulk=false&count=100&total=500",
-    "opsPerSecond": 322.2978934670897,
-    "samples": 59,
-    "mean": 0.0031027196276171487,
-    "deviation": 0.00014454074600769808
-  },
-  {
-    "name": "store=default&shape=OpenMinimal&type=NamedNodes&graph=false&bulk=false&count=100&total=1000",
-    "opsPerSecond": 292.9233436220084,
-    "samples": 43,
-    "mean": 0.0034138624379844965,
-    "deviation": 0.0005936118366849435
-  },
-  {
-    "name": "store=default&shape=OpenMinimal&type=NamedNodes&graph=false&bulk=false&count=100&total=2000",
-    "opsPerSecond": 264.27260558720485,
-    "samples": 30,
-    "mean": 0.0037839714705882347,
-    "deviation": 0.0003965093087242746
-  },
-  {
-    "name": "store=default&shape=Open&type=CBD&graph=false&bulk=false&count=100&total=100",
-    "opsPerSecond": 328.5811125347814,
-    "samples": 59,
-    "mean": 0.003043388563285562,
-    "deviation": 0.0005805167234124983
-  },
-  {
-    "name": "store=default&shape=Open&type=CBD&graph=false&bulk=false&count=100&total=500",
-    "opsPerSecond": 308.44269477204693,
-    "samples": 47,
-    "mean": 0.003242093318951986,
-    "deviation": 0.0006183723446755651
-  },
-  {
-    "name": "store=default&shape=Open&type=CBD&graph=false&bulk=false&count=100&total=1000",
-    "opsPerSecond": 277.75638891826196,
-    "samples": 34,
-    "mean": 0.0036002772209653097,
-    "deviation": 0.0008140776944514256
-  },
-  {
-    "name": "store=default&shape=Open&type=CBD&graph=false&bulk=false&count=100&total=2000",
-    "opsPerSecond": 308.28634574484505,
-    "samples": 25,
-    "mean": 0.0032437375634782593,
-    "deviation": 0.0005664058356961222
-  },
-  {
-    "name": "store=default&shape=Open&type=NamedNodes&graph=false&bulk=false&count=100&total=100",
-    "opsPerSecond": 756.2564939439691,
-    "samples": 74,
-    "mean": 0.00132230269492944,
-    "deviation": 0.00013652875850644547
-  },
-  {
-    "name": "store=default&shape=Open&type=NamedNodes&graph=false&bulk=false&count=100&total=500",
-    "opsPerSecond": 735.3819579852025,
-    "samples": 59,
-    "mean": 0.001359837549917321,
-    "deviation": 0.00008651230626825776
-  },
-  {
-    "name": "store=default&shape=Open&type=NamedNodes&graph=false&bulk=false&count=100&total=1000",
-    "opsPerSecond": 680.5594845401785,
-    "samples": 43,
-    "mean": 0.001469379272078843,
-    "deviation": 0.00021492411793129384
-  },
-  {
-    "name": "store=default&shape=Open&type=NamedNodes&graph=false&bulk=false&count=100&total=2000",
-    "opsPerSecond": 629.7199050445248,
-    "samples": 31,
-    "mean": 0.0015880076078098472,
-    "deviation": 0.00013968091950094283
+    "name": "No shape - CBD",
+    "opsPerSecond": 23114.791864381175,
+    "samples": 68,
+    "mean": 0.00004326234066338074,
+    "deviation": 0.000005098359156055337
   }
 ]

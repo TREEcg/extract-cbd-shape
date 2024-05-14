@@ -60,44 +60,39 @@ export class CBDShapeExtractor {
     store: RdfStore,
     ids: Array<Term>,
     shapeId?: Term,
-    graphsToIgnore?: Array<Term>,
+    graphsToIgnore: Array<Term> = [],
     itemExtracted?: (member: { subject: Term; quads: Quad[] }) => void,
   ): Promise<Array<{ subject: Term; quads: Quad[] }>> {
+    const graphs = [];
+    //let graphSet = new Set(store.getGraphs().map((graph) => graph.value));
+    let graphsToIgnoreSet = new Set(graphsToIgnore.map((graph) => graph.value));
+    //Add extra graphs that are not in the ignore list
+    graphs.push(
+      ...store
+        .getGraphs()
+        // Now filter on graphs that are not in the graphsToIgnore list
+        .filter((graph) => {
+          return !graphsToIgnoreSet.has(graph.value);
+        }),
+    );
+
     const out: Array<{ subject: Term; quads: Quad[] }> = [];
-    const idSet = new Set(ids.map((x) => x.value));
-
-    const memberSpecificQuads: { [id: string]: Array<Quad> } = {};
     for (let id of ids) {
-      memberSpecificQuads[id.value] = [];
-    }
-    const newStore = RdfStore.createDefault();
-    for (let quad of store.readQuads(null, null, null, null)) {
-      if (quad.graph.termType == "NamedNode" && idSet.has(quad.graph.value)) {
-        memberSpecificQuads[quad.graph.value].push(quad);
-      } else {
-        newStore.addQuad(quad);
-      }
-    }
+      graphs.push(id);
+      const extractInstance = new ExtractInstance(
+        store,
+        this.dereferencer,
+        graphsToIgnore,
+        this.options,
+        this.shapesGraph,
+        graphs,
+      );
+      const quads = await extractInstance.extract(id, false, shapeId);
 
-    const promises = [];
-    for (let id of ids) {
-      const promise = this.extract(
-        newStore,
-        id,
-        shapeId,
-        (graphsToIgnore || []).slice(),
-      ).then((quads) => {
-        quads.push(...memberSpecificQuads[id.value]);
-        if (itemExtracted) {
-          itemExtracted({ subject: id, quads });
-        }
+      graphs.pop();
 
-        out.push({ subject: id, quads });
-      });
-      promises.push(promise);
+      out.push({ subject: id, quads });
     }
-
-    await Promise.all(promises);
 
     return out;
   }
@@ -236,7 +231,7 @@ class ExtractInstance {
 
   dereferencer: RdfDereferencer;
   options: CBDShapeExtractorOptions;
-  graphs: Term [] | undefined;
+  graphs: Term[] | undefined;
 
   shapesGraph?: ShapesGraph;
 
@@ -246,21 +241,30 @@ class ExtractInstance {
     graphsToIgnore: Term[],
     options: CBDShapeExtractorOptions,
     shapesGraph?: ShapesGraph,
+    graphs?: Term[],
   ) {
     this.store = store;
     this.dereferencer = dereferencer;
     this.shapesGraph = shapesGraph;
-    //Turn graphs To Ignore into graphs
-    this.graphs = [];
-    //let graphSet = new Set(store.getGraphs().map((graph) => graph.value));
-    let graphsToIgnoreSet = new Set(graphsToIgnore.map((graph) => graph.value));
-    //Add extra graphs that are not in the ignore list
-    this.graphs.push(... store.getGraphs()
-            // Now filter on graphs that are not in the graphsToIgnore list
-            .filter((graph) => {
-              return !graphsToIgnoreSet.has(graph.value);
-            })
-    );
+    if (!graphs) {
+      //Turn graphs To Ignore into graphs
+      this.graphs = [];
+      //let graphSet = new Set(store.getGraphs().map((graph) => graph.value));
+      let graphsToIgnoreSet = new Set(
+        graphsToIgnore.map((graph) => graph.value),
+      );
+      //Add extra graphs that are not in the ignore list
+      this.graphs.push(
+        ...store
+          .getGraphs()
+          // Now filter on graphs that are not in the graphsToIgnore list
+          .filter((graph) => {
+            return !graphsToIgnoreSet.has(graph.value);
+          }),
+      );
+    } else {
+      this.graphs = graphs;
+    }
     this.options = options;
   }
 
@@ -287,26 +291,27 @@ class ExtractInstance {
     offline: boolean,
     shapeId?: Term | ShapeTemplate,
   ) {
+    const graphResults = this.store.getQuads(null, null, null, id);
     const result = await this.maybeExtractRecursively(
       id,
       new CbdExtracted(),
       offline,
+      graphResults,
       shapeId,
     );
-
-    result.push(...this.store.getQuads(null, null, null, id));
 
     if (result.length === 0) {
       if (await this.dereference(id.value)) {
         // retry
-        const result = await this.maybeExtractRecursively(
+        const newResult = await this.maybeExtractRecursively(
           id,
           new CbdExtracted(),
           offline,
+          result,
           shapeId,
         );
 
-        return result.filter((value: Quad, index: number, array: Quad[]) => {
+        return newResult.filter((value: Quad, index: number, array: Quad[]) => {
           return index === array.findIndex((x) => x.equals(value));
         });
       }
@@ -321,22 +326,24 @@ class ExtractInstance {
     id: Term,
     extracted: CbdExtracted,
     offline: boolean,
+    result: Quad[],
     shapeId?: Term | ShapeTemplate,
   ): Promise<Array<Quad>> {
     if (extracted.cbdExtracted(id)) {
       return [];
     }
     extracted.addShapeTerm(id);
-    return this.extractRecursively(id, extracted, offline, shapeId);
+    return this.extractRecursively(id, extracted, offline, result, shapeId);
   }
 
   private async extractRecursively(
     id: Term,
     extracted: CbdExtracted,
     offline: boolean,
+    result: Quad[],
     shapeId?: Term | ShapeTemplate,
   ): Promise<Array<Quad>> {
-    const result: Quad[] = [];
+    // const result: Quad[] = [];
 
     let shape: ShapeTemplate | undefined;
     if (shapeId instanceof ShapeTemplate) {
@@ -393,6 +400,7 @@ class ExtractInstance {
               match.target,
               match.cbdExtracted,
               offline,
+              [],
               nodeLink.link,
             )),
           );
@@ -406,7 +414,7 @@ class ExtractInstance {
         if (problems) {
           if (await this.dereference(id.value)) {
             // retry
-            return this.extractRecursively(id, extracted, offline, shapeId);
+            return this.extractRecursively(id, extracted, offline, [], shapeId);
           } else {
             log(
               `${
@@ -436,14 +444,14 @@ class ExtractInstance {
     graphs?: Array<Term>,
   ) {
     extractedStar.addCBDTerm(id);
-    let quads : Quad[] = [];
+    let quads: Quad[] = [];
     if (graphs) {
-      for (const graph of graphs) { 
+      for (const graph of graphs) {
         quads.push(...this.store.getQuads(id, null, null, graph));
       }
     } else {
       //search all graphs if graphs is not set
-      quads = this.store.getQuads(id, null, null, null)
+      quads = this.store.getQuads(id, null, null, null);
     }
 
     for (const q of quads) {
