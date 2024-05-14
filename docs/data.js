@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1715696724191,
+  "lastUpdate": 1715696838950,
   "repoUrl": "https://github.com/TREEcg/extract-cbd-shape",
   "entries": {
     "Extraction algorithm Benchmark for inband data": [
@@ -2636,6 +2636,58 @@ window.BENCHMARK_DATA = {
             "range": "±2.17%",
             "unit": "ops/sec",
             "extra": "82 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "pieter.colpaert@ugent.be",
+            "name": "Pieter Colpaert",
+            "username": "pietercolpaert"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f468973afd72ac842fbb615d76bd4c2c36a0dd2f",
+          "message": "Merge pull request #31 from TREEcg/fix-22\n\nFixing issue 22: zeroOrMorePaths should return all options, not just one",
+          "timestamp": "2024-05-14T16:23:41+02:00",
+          "tree_id": "26a80031aa0076bd8ea79cc77631b1b1a6a8ec27",
+          "url": "https://github.com/TREEcg/extract-cbd-shape/commit/f468973afd72ac842fbb615d76bd4c2c36a0dd2f"
+        },
+        "date": 1715696837870,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "Extract1#ExtractionCollectionMembers",
+            "value": 259,
+            "range": "±3.81%",
+            "unit": "ops/sec",
+            "extra": "75 samples"
+          },
+          {
+            "name": "Extract2#ExtractionMembersPartialOutBand",
+            "value": 259,
+            "range": "±5.82%",
+            "unit": "ops/sec",
+            "extra": "73 samples"
+          },
+          {
+            "name": "Extract3#ExtractionMembersOutBand",
+            "value": 275,
+            "range": "±5.21%",
+            "unit": "ops/sec",
+            "extra": "75 samples"
+          },
+          {
+            "name": "Extract4#ExtractionCollection1000Members",
+            "value": 297,
+            "range": "±2.23%",
+            "unit": "ops/sec",
+            "extra": "80 samples"
           }
         ]
       }
