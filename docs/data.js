@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1714985452216,
+  "lastUpdate": 1715696724191,
   "repoUrl": "https://github.com/TREEcg/extract-cbd-shape",
   "entries": {
     "Extraction algorithm Benchmark for inband data": [
@@ -1648,6 +1648,72 @@ window.BENCHMARK_DATA = {
             "name": "CBDAndShaclExtendedComplex",
             "value": 56416,
             "range": "±3.73%",
+            "unit": "ops/sec",
+            "extra": "133 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "pieter.colpaert@ugent.be",
+            "name": "Pieter Colpaert",
+            "username": "pietercolpaert"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f468973afd72ac842fbb615d76bd4c2c36a0dd2f",
+          "message": "Merge pull request #31 from TREEcg/fix-22\n\nFixing issue 22: zeroOrMorePaths should return all options, not just one",
+          "timestamp": "2024-05-14T16:23:41+02:00",
+          "tree_id": "26a80031aa0076bd8ea79cc77631b1b1a6a8ec27",
+          "url": "https://github.com/TREEcg/extract-cbd-shape/commit/f468973afd72ac842fbb615d76bd4c2c36a0dd2f"
+        },
+        "date": 1715696723780,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "CBDAndBlankNode",
+            "value": 78244,
+            "range": "±5.82%",
+            "unit": "ops/sec",
+            "extra": "131 samples"
+          },
+          {
+            "name": "CBDAndNamedGraphs",
+            "value": 84291,
+            "range": "±2.31%",
+            "unit": "ops/sec",
+            "extra": "132 samples"
+          },
+          {
+            "name": "CBDAndSimpleShape",
+            "value": 73572,
+            "range": "±3.33%",
+            "unit": "ops/sec",
+            "extra": "133 samples"
+          },
+          {
+            "name": "CBDAndSimpleShapeAndNamedGraphs",
+            "value": 82429,
+            "range": "±0.82%",
+            "unit": "ops/sec",
+            "extra": "133 samples"
+          },
+          {
+            "name": "CBDAndShaclExtended",
+            "value": 67221,
+            "range": "±1.26%",
+            "unit": "ops/sec",
+            "extra": "135 samples"
+          },
+          {
+            "name": "CBDAndShaclExtendedComplex",
+            "value": 59122,
+            "range": "±3.19%",
             "unit": "ops/sec",
             "extra": "133 samples"
           }
