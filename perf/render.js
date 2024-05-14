@@ -22,11 +22,13 @@ const renderResults = (prefix, results) => {
 };
 
 const renderAsTikz = (results) => {
-  const names = results.map((x) => x.name.replaceAll("#", "\\#")).join(",");
+  const names = results.map((x) =>
+    x.name.replaceAll("#", "\\#").replaceAll("&", "\\&")
+  ).join(",\n");
   const coords = results.map((x) =>
-    `         (${x.name}, ${x.mean * 1000 * 1000}) +- (0, ${
-      x.deviation * 1000 * 1000
-    })`
+    `         (${x.name.replaceAll("&", "\\&")}, ${
+      x.mean * 1000 * 1000
+    }) +- (0, ${x.deviation * 1000 * 1000})`
   ).join("\n");
 
   const tikz = `
@@ -39,7 +41,9 @@ const renderAsTikz = (results) => {
             legend style={at={(0.5,-0.15)},
             anchor=north,legend columns=-1},
             ylabel={Duration per extraction ($\\mu s$)},
-            symbolic x coords={${names}},
+            symbolic x coords={
+${names}
+            },
             xtick=data,
             x tick label style={font=\\footnotesize,rotate=45, anchor=east},
             nodes near coords align={horizontal},

@@ -1,0 +1,73 @@
+<!doctype html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Benchmark Results</title>
+          <script src="https://cdn.tailwindcss.com"></script>
+          <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        </head>
+        <body>
+        <h1 class="text-2xl font-bold">Benchmark Results</h1>
+        <div class="rounded-md bg-blue-50 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg
+            class="h-5 w-5 text-blue-400"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
+        <div class="ml-3 flex-1 md:flex md:justify-between">
+          <dl class="text-blue-700 grid grid-cols-2">
+            <dt class="font-bold">Platform</dt>
+            <dd>linux</dd>
+            <dt class="font-bold">Distro</dt>
+            <dd>EndeavourOS</dd>
+            <dt class="font-bold">Arch</dt>
+            <dd>x64</dd>
+            <dt class="font-bold">Release</dt>
+            <dd>rolling</dd>
+            <dt class="font-bold">CPU</dt>
+            <dd>Intel Gen Intel® Core™ i7-1185G7</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+          <canvas id="chart"></canvas>
+          <script>
+            const labels = ["shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=default/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=default/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GSPO&GSOP&GPSO&GPOS&GOSP&GOPS/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GSPO&GSOP&GPSO&GPOS&GOSP&GOPS/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=SGPO&SGOP&SPGO&SPOG&SOGP&SOPG/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=SGPO&SGOP&SPGO&SPOG&SOGP&SOPG/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=PGSO&PGOS&PSGO&PSOG&POGS&POSG/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=PGSO&PGOS&PSGO&PSOG&POGS&POSG/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=OGSP&OGPS&OSGP&OSPG&OPGS&OPSG/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=OGSP&OGPS&OSGP&OSPG&OPGS&OPSG/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=SGPO&SGOP&PGSO&PGOS&OGSP&OGPS/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=SGPO&SGOP&PGSO&PGOS&OGSP&OGPS/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GSPO&GSOP&PSGO&PSOG&OSGP&OSPG/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GSPO&GSOP&PSGO&PSOG&OSGP&OSPG/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GPSO&GPOS&SPGO&SPOG&OPGS&OPSG/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GPSO&GPOS&SPGO&SPOG&OPGS&OPSG/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GOSP&GOPS&SOGP&SOPG&POGS&POSG/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GOSP&GOPS&SOGP&SOPG&POGS&POSG/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=SPGO&SOGP&PSGO&POGS&OSGP&OPGS/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=SPGO&SOGP&PSGO&POGS&OSGP&OPGS/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GPSO&GOSP&PGSO&POSG&OGSP&OPSG/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GPSO&GOSP&PGSO&POSG&OGSP&OPSG/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GSPO&GOPS&SGPO&SOPG&OGPS&OSPG/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GSPO&GOPS&SGPO&SOPG&OGPS&OSPG/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GSOP&GPOS&SGOP&SPOG&PGOS&PSOG/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GSOP&GPOS&SGOP&SPOG&PGOS&PSOG/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=SPOG&SOPG&PSOG&POSG&OSPG&OPSG/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=SPOG&SOPG&PSOG&POSG&OSPG&OPSG/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GPOS&GOPS&PGOS&POGS&OGPS&OPGS/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GPOS&GOPS&PGOS&POGS&OGPS&OPGS/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GSOP&GOSP&SGOP&SOGP&OGSP&OSGP/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GSOP&GOSP&SGOP&SOGP&OGSP&OSGP/500/2000","shape=OpenMinimal/data=CBD/graph=true/bulk=false/store=GSPO&GPSO&SGPO&SPGO&PGSO&PSGO/500/2000","shape=OpenMinimal/data=CBD/graph=false/bulk=false/store=GSPO&GPSO&SGPO&SPGO&PGSO&PSGO/500/2000"];
+            const data = [2.205312786633144,49.3865908703736,2.0396220666539433,44.235271809431595,3.7098487586141626,4.005330851273471,17.16455212789149,31.46309197219017,0.22072058464747454,0.2914566844759787,4.127736624856044,4.450430053091528,2.4054110979382908,27.74262157783366,20.473951840519767,32.12354942688282,21.228019622213345,27.907599725462607,0.1771386163152232,0.219533967274648,0.0839327992112276,35.37771423777243,26.251612423256805,38.35856421093984,24.843677188185396,34.45854167249997,0.15254220135876803,0.15256632531811365,0.03608833505690871,0.6537472210879837,23.678628847977894,27.44400787623511,24.55009933497564,33.48780390024261];
+            const chart = new Chart('chart', {
+              type: 'bar',
+              data: {
+                labels: labels,
+                datasets: [
+                  {
+                    label: 'Ops/Second',
+                    data: data,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                  },
+                ],
+              },
+              options: {
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                  },
+                },
+              },
+            });
+          </script>
+        </body>
+      </html>
+    

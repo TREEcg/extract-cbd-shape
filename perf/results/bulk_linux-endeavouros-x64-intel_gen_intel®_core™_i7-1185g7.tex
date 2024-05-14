@@ -8,7 +8,14 @@
             legend style={at={(0.5,-0.15)},
             anchor=north,legend columns=-1},
             ylabel={Duration per extraction ($\mu s$)},
-            symbolic x coords={CBDAndBlankNode,CBDAndNamedGraphs,CBDAndSimpleShape,CBDAndSimpleShapeAndNamedGraphs,CBDAndShaclExtended,CBDAndShaclExtendedComplex},
+            symbolic x coords={
+* - NamedGraph,
+Full Shape - BlankNodes,
+Full Shape - NamedNodes,
+Shape - NamedNodes,
+Shape - BlankNodes,
+No shape - CBD
+            },
             xtick=data,
             x tick label style={font=\footnotesize,rotate=45, anchor=east},
             nodes near coords align={horizontal},
@@ -18,12 +25,12 @@
                 y dir=both,
                 y explicit
             ] coordinates {
-         (CBDAndBlankNode, 11.063370677196545) +- (0, 0.8712384083996434)
-         (CBDAndNamedGraphs, 15.217862123925167) +- (0, 1.2088651348887458)
-         (CBDAndSimpleShape, 11.975056336911239) +- (0, 1.0046364406179427)
-         (CBDAndSimpleShapeAndNamedGraphs, 18.523247927563368) +- (0, 1.8735627632238423)
-         (CBDAndShaclExtended, 16.760628339328065) +- (0, 1.7036244375897358)
-         (CBDAndShaclExtendedComplex, 17.51703759120106) +- (0, 1.7942769973185504)
+         (* - NamedGraph, 37.1175404814876) +- (0, 7.848091109799674)
+         (Full Shape - BlankNodes, 102.00427880882357) +- (0, 15.804602720751047)
+         (Full Shape - NamedNodes, 57.47719474228394) +- (0, 8.05663661519078)
+         (Shape - NamedNodes, 56.419020486111094) +- (0, 8.573803086683053)
+         (Shape - BlankNodes, 78.15333630597017) +- (0, 10.75845180571196)
+         (No shape - CBD, 43.26234066338073) +- (0, 5.098359156055337)
 
              };
         \end{axis}

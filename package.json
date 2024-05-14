@@ -24,7 +24,7 @@
     "jsdom": "^23.0.1",
     "n3": "^1.17.0",
     "rdf-data-factory": "^1.1.2",
-    "rdf-stores": "^1.0.0"
+    "rdf-stores": "github:pietercolpaert/rdf-stores.js#feature-termcardinalities"
   },
   "devDependencies": {
     "@rdfjs/types": "*",

@@ -1,0 +1,44 @@
+[
+  {
+    "name": "* - NamedGraph",
+    "opsPerSecond": 26941.440274006043,
+    "samples": 65,
+    "mean": 0.000037117540481487606,
+    "deviation": 0.000007848091109799674
+  },
+  {
+    "name": "Full Shape - BlankNodes",
+    "opsPerSecond": 9803.51032013275,
+    "samples": 68,
+    "mean": 0.00010200427880882357,
+    "deviation": 0.000015804602720751048
+  },
+  {
+    "name": "Full Shape - NamedNodes",
+    "opsPerSecond": 17398.20470507993,
+    "samples": 72,
+    "mean": 0.00005747719474228394,
+    "deviation": 0.000008056636615190779
+  },
+  {
+    "name": "Shape - NamedNodes",
+    "opsPerSecond": 17724.51898994195,
+    "samples": 72,
+    "mean": 0.000056419020486111095,
+    "deviation": 0.000008573803086683052
+  },
+  {
+    "name": "Shape - BlankNodes",
+    "opsPerSecond": 12795.359062919615,
+    "samples": 67,
+    "mean": 0.00007815333630597017,
+    "deviation": 0.000010758451805711959
+  },
+  {
+    "name": "No shape - CBD",
+    "opsPerSecond": 23114.791864381175,
+    "samples": 68,
+    "mean": 0.00004326234066338074,
+    "deviation": 0.000005098359156055337
+  }
+]

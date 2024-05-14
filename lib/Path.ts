@@ -11,7 +11,7 @@ export interface Path {
     store: RdfStore,
     extracted: CbdExtracted,
     focusNode: Term,
-    graphsToIgnore?: Array<string>,
+    graphs?: Array<Term>,
     inverse?: boolean,
   ): PathResult[];
 }
@@ -35,14 +35,24 @@ export class PredicatePath implements Path {
     store: RdfStore,
     extracted: CbdExtracted,
     focusNode: Term,
-    graphsToIgnore: Array<string>,
+    graphs: Array<Term>,
     inverse: boolean = false,
   ): PathResult[] {
-    let quads = (
-      inverse
-        ? store.getQuads(null, this.predicate, focusNode, null)
-        : store.getQuads(focusNode, this.predicate, null, null)
-    ).filter((q) => !graphsToIgnore.includes(q.graph.value));
+    let quads: Quad[] = [];
+    if (graphs) {
+      for (let graph of graphs) {
+        quads.push(... 
+          inverse? 
+            store.getQuads(null, this.predicate, focusNode, graph) :
+            store.getQuads(focusNode, this.predicate, null, graph)
+          );
+      }
+    } else {
+      //search all graphs if graphs is not set
+      quads = inverse? 
+      store.getQuads(null, this.predicate, focusNode, null) :
+      store.getQuads(focusNode, this.predicate, null, null);
+    }
 
     if (quads.length > 0) {
       let cbd: CbdExtracted = extracted.push(this.predicate, inverse);
@@ -82,7 +92,7 @@ export class SequencePath implements Path {
     store: RdfStore,
     extracted: CbdExtracted,
     focusNode: Term,
-    graphsToIgnore: Array<string>,
+    graphs: Array<Term>,
     inverse: boolean = false,
   ): PathResult[] {
     let results: PathResult[] = [
@@ -98,7 +108,7 @@ export class SequencePath implements Path {
           store,
           res.cbdExtracted,
           res.target,
-          graphsToIgnore,
+          graphs,
           inverse,
         );
         return nexts.map((n) => ({
@@ -135,11 +145,11 @@ export class AlternativePath implements Path {
     store: RdfStore,
     extracted: CbdExtracted,
     focusNode: Term,
-    graphsToIgnore: Array<string>,
+    graphs: Array<Term>,
     inverse: boolean = false,
   ): PathResult[] {
     return this.alternatives.flatMap((path) =>
-      path.match(store, extracted, focusNode, graphsToIgnore, inverse),
+      path.match(store, extracted, focusNode, graphs, inverse),
     );
   }
 }
@@ -163,14 +173,14 @@ export class InversePath implements Path {
     store: RdfStore,
     extracted: CbdExtracted,
     focusNode: Term,
-    graphsToIgnore: Array<string>,
+    graphs: Array<Term>,
     inverse: boolean = false,
   ): PathResult[] {
     return this.path.match(
       store,
       extracted,
       focusNode,
-      graphsToIgnore,
+      graphs,
       !inverse,
     );
   }
@@ -193,7 +203,7 @@ export abstract class MultiPath implements Path {
     store: RdfStore,
     extracted: CbdExtracted,
     focusNode: Term,
-    graphsToIgnore: Array<string>,
+    graphs: Array<Term>,
     inverse: boolean = false,
   ): PathResult[] {
     const out: PathResult[] = [];
@@ -215,7 +225,7 @@ export abstract class MultiPath implements Path {
           store,
           t.cbdExtracted,
           t.target,
-          graphsToIgnore,
+          graphs,
           inverse,
         )) {
           if (this.filter(i, found)) {

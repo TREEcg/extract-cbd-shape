@@ -21,7 +21,6 @@ class DereferenceNeeded {
 }
 
 type CBDShapeExtractorOptions = {
-  cbdDefaultGraph: boolean;
   fetch?: typeof fetch;
 };
 
@@ -44,7 +43,7 @@ export class CBDShapeExtractor {
     options: Partial<CBDShapeExtractorOptions> = {},
   ) {
     // Assign with default options
-    this.options = Object.assign({ cbdDefaultGraph: false }, options);
+    this.options = Object.assign({}, options);
 
     if (!dereferencer) {
       this.dereferencer = rdfDereference;
@@ -62,44 +61,41 @@ export class CBDShapeExtractor {
     store: RdfStore,
     ids: Array<Term>,
     shapeId?: Term,
-    graphsToIgnore?: Array<Term>,
+    graphsToIgnore: Array<Term> = [],
     itemExtracted?: (member: { subject: Term; quads: Quad[] }) => void,
   ): Promise<Array<{ subject: Term; quads: Quad[] }>> {
+    const graphs = [];
+    //let graphSet = new Set(store.getGraphs().map((graph) => graph.value));
+    let graphsToIgnoreSet = new Set(graphsToIgnore.map((graph) => graph.value));
+    //Add extra graphs that are not in the ignore list
+    graphs.push(
+      ...store
+        .getGraphs()
+        // Now filter on graphs that are not in the graphsToIgnore list
+        .filter((graph) => {
+          return !graphsToIgnoreSet.has(graph.value);
+        }),
+    );
+
     const out: Array<{ subject: Term; quads: Quad[] }> = [];
-    const idSet = new Set(ids.map((x) => x.value));
-
-    const memberSpecificQuads: { [id: string]: Array<Quad> } = {};
     for (let id of ids) {
-      memberSpecificQuads[id.value] = [];
-    }
-    const newStore = RdfStore.createDefault();
-    for (let quad of store.readQuads(null, null, null, null)) {
-      if (quad.graph.termType == "NamedNode" && idSet.has(quad.graph.value)) {
-        memberSpecificQuads[quad.graph.value].push(quad);
-      } else {
-        newStore.addQuad(quad);
-      }
-    }
+      graphs.push(id);
+      const extractInstance = new ExtractInstance(
+        store,
+        this.dereferencer,
+        graphsToIgnore,
+        this.options,
+        this.shapesGraph,
+        graphs,
+      );
+      const quads = await extractInstance.extract(id, false, shapeId);
 
-    const promises = [];
-    for (let id of ids) {
-      const promise = this.extract(
-        newStore,
-        id,
-        shapeId,
-        (graphsToIgnore || []).slice(),
-      ).then((quads) => {
-        quads.push(...memberSpecificQuads[id.value]);
-        if (itemExtracted) {
-          itemExtracted({ subject: id, quads });
-        }
+      graphs.pop();
 
-        out.push({ subject: id, quads });
-      });
-      promises.push(promise);
+      const entity = { subject: id, quads };
+      out.push(entity);
+      if (itemExtracted) itemExtracted(entity);
     }
-
-    await Promise.all(promises);
 
     return out;
   }
@@ -124,16 +120,14 @@ export class CBDShapeExtractor {
     graphsToIgnore?: Array<Term>,
   ): Promise<Array<Quad>> {
     // First extract everything except for something within the graphs to ignore, or within the graph of the current entity, as that’s going to be added anyway later on
-    let dontExtractFromGraph: Array<string> = (
-      graphsToIgnore ? graphsToIgnore : []
-    ).map((item) => {
-      return item.value;
-    });
+    if (!graphsToIgnore) {
+      graphsToIgnore = [];
+    }
 
     const extractInstance = new ExtractInstance(
       store,
       this.dereferencer,
-      dontExtractFromGraph,
+      graphsToIgnore,
       this.options,
       this.shapesGraph,
     );
@@ -240,21 +234,40 @@ class ExtractInstance {
 
   dereferencer: RdfDereferencer;
   options: CBDShapeExtractorOptions;
-  graphsToIgnore: string[];
+  graphs: Term[] | undefined;
 
   shapesGraph?: ShapesGraph;
 
   constructor(
     store: RdfStore,
     dereferencer: RdfDereferencer,
-    graphsToIgnore: string[],
+    graphsToIgnore: Term[],
     options: CBDShapeExtractorOptions,
     shapesGraph?: ShapesGraph,
+    graphs?: Term[],
   ) {
     this.store = store;
     this.dereferencer = dereferencer;
     this.shapesGraph = shapesGraph;
-    this.graphsToIgnore = graphsToIgnore;
+    if (!graphs) {
+      //Turn graphs To Ignore into graphs
+      this.graphs = [];
+      //let graphSet = new Set(store.getGraphs().map((graph) => graph.value));
+      let graphsToIgnoreSet = new Set(
+        graphsToIgnore.map((graph) => graph.value),
+      );
+      //Add extra graphs that are not in the ignore list
+      this.graphs.push(
+        ...store
+          .getGraphs()
+          // Now filter on graphs that are not in the graphsToIgnore list
+          .filter((graph) => {
+            return !graphsToIgnoreSet.has(graph.value);
+          }),
+      );
+    } else {
+      this.graphs = graphs;
+    }
     this.options = options;
   }
 
@@ -281,26 +294,27 @@ class ExtractInstance {
     offline: boolean,
     shapeId?: Term | ShapeTemplate,
   ) {
+    const graphResults = this.store.getQuads(null, null, null, id);
     const result = await this.maybeExtractRecursively(
       id,
       new CbdExtracted(),
       offline,
+      graphResults,
       shapeId,
     );
-
-    result.push(...this.store.getQuads(null, null, null, id));
 
     if (result.length === 0) {
       if (await this.dereference(id.value)) {
         // retry
-        const result = await this.maybeExtractRecursively(
+        const newResult = await this.maybeExtractRecursively(
           id,
           new CbdExtracted(),
           offline,
+          result,
           shapeId,
         );
 
-        return result.filter((value: Quad, index: number, array: Quad[]) => {
+        return newResult.filter((value: Quad, index: number, array: Quad[]) => {
           return index === array.findIndex((x) => x.equals(value));
         });
       }
@@ -315,22 +329,24 @@ class ExtractInstance {
     id: Term,
     extracted: CbdExtracted,
     offline: boolean,
+    result: Quad[],
     shapeId?: Term | ShapeTemplate,
   ): Promise<Array<Quad>> {
     if (extracted.cbdExtracted(id)) {
       return [];
     }
     extracted.addShapeTerm(id);
-    return this.extractRecursively(id, extracted, offline, shapeId);
+    return this.extractRecursively(id, extracted, offline, result, shapeId);
   }
 
   private async extractRecursively(
     id: Term,
     extracted: CbdExtracted,
     offline: boolean,
+    result: Quad[],
     shapeId?: Term | ShapeTemplate,
   ): Promise<Array<Quad>> {
-    const result: Quad[] = [];
+    // const result: Quad[] = [];
 
     let shape: ShapeTemplate | undefined;
     if (shapeId instanceof ShapeTemplate) {
@@ -340,7 +356,11 @@ class ExtractInstance {
     }
 
     if (!shape?.closed) {
-      this.CBD(id, result, extracted, this.graphsToIgnore);
+      // Remove the current id from the member graph: these quads are going to be extracted through the named graph.
+      let CBDGraphs = this.graphs?.filter((graph) => {
+        return !graph.equals(id);
+      });
+      this.CBD(id, result, extracted, CBDGraphs);
     }
 
     // Next, on our newly fetched data,
@@ -359,7 +379,7 @@ class ExtractInstance {
       )) {
         if (!path.found(extracted) || shape.closed) {
           let pathQuads = path
-            .match(this.store, extracted, id, this.graphsToIgnore)
+            .match(this.store, extracted, id, this.graphs)
             .flatMap((pathResult) => {
               return pathResult.path;
             });
@@ -373,7 +393,7 @@ class ExtractInstance {
           this.store,
           extracted,
           id,
-          this.graphsToIgnore,
+          this.graphs,
         );
 
         // I don't know how to do this correctly, but this is not the way
@@ -383,6 +403,7 @@ class ExtractInstance {
               match.target,
               match.cbdExtracted,
               offline,
+              [],
               nodeLink.link,
             )),
           );
@@ -396,7 +417,7 @@ class ExtractInstance {
         if (problems) {
           if (await this.dereference(id.value)) {
             // retry
-            return this.extractRecursively(id, extracted, offline, shapeId);
+            return this.extractRecursively(id, extracted, offline, [], shapeId);
           } else {
             log(
               `${
@@ -423,17 +444,20 @@ class ExtractInstance {
     id: Term,
     result: Quad[],
     extractedStar: CbdExtracted,
-    graphsToIgnore: Array<string>,
+    graphs?: Array<Term>,
   ) {
     extractedStar.addCBDTerm(id);
-    const graph = this.options.cbdDefaultGraph ? df.defaultGraph() : null;
-    const quads = this.store.getQuads(id, null, null, graph);
+    let quads: Quad[] = [];
+    if (graphs) {
+      for (const graph of graphs) {
+        quads.push(...this.store.getQuads(id, null, null, graph));
+      }
+    } else {
+      //search all graphs if graphs is not set
+      quads = this.store.getQuads(id, null, null, null);
+    }
 
     for (const q of quads) {
-      // Ignore quads in the graphs to ignore
-      if (graphsToIgnore?.includes(q.graph.value)) {
-        continue;
-      }
       result.push(q);
 
       const next = extractedStar.push(q.predicate, false);
@@ -443,7 +467,7 @@ class ExtractInstance {
         q.object.termType === "BlankNode" &&
         !extractedStar.cbdExtracted(q.object)
       ) {
-        await this.CBD(q.object, result, next, graphsToIgnore);
+        await this.CBD(q.object, result, next, graphs);
       }
     }
   }
