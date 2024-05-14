@@ -81,6 +81,15 @@ describe("Check whether paths trigger the right extraction process", function ()
     //writer.end((err, res) => {console.error(res);});
     assert.equal(result.length, 2);
   });
+  it("Test a zeroOrMore path where zero and multiple both match", async () => {
+    let result = await extractor.extract(
+      dataStore,
+      new NamedNode("http://example.org/B"),
+      new NamedNode("http://example.org/ZeroOrMorePathShape2"),
+    );
+    //ISSUE 22: the triple ex:B ex:p2 ex:C also matches the zeroOrMorePath, but this is not being returned
+    assert.equal(result.length, 3);
+  });
   it("Test a oneOrMore path", async () => {
     let result = await extractor.extract(
       dataStore,

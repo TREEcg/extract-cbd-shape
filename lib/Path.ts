@@ -211,6 +211,10 @@ export abstract class MultiPath implements Path {
       const newTargets: PathResult[] = [];
 
       for (const t of targets) {
+        if (this.filter(i, t)) {
+          out.push(t);
+        }
+
         for (const found of this.path.match(
           store,
           t.cbdExtracted,
@@ -218,14 +222,11 @@ export abstract class MultiPath implements Path {
           graphsToIgnore,
           inverse,
         )) {
-          if (this.filter(i, found)) {
-            out.push({
-              path: [...t.path, ...found.path],
-              cbdExtracted: t.cbdExtracted,
-              target: found.target,
-            });
-          }
-          newTargets.push(found);
+          newTargets.push({
+            path: [...t.path, ...found.path],
+            cbdExtracted: t.cbdExtracted,
+            target: found.target,
+          });
         }
       }
 
