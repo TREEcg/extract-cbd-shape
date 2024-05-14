@@ -91,7 +91,9 @@ export class CBDShapeExtractor {
 
       graphs.pop();
 
-      out.push({ subject: id, quads });
+      const entity = { subject: id, quads };
+      out.push(entity);
+      if (itemExtracted) itemExtracted(entity);
     }
 
     return out;
