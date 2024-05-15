@@ -1,6 +1,6 @@
 {
   "name": "extract-cbd-shape",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Extract an entity based on CBD and a SHACL shape",
   "main": "dist/lib/extract-cbd-shape.js",
   "types": "dist/lib/extract-cbd-shape.d.ts",
