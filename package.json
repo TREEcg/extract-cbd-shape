@@ -1,6 +1,6 @@
 {
   "name": "extract-cbd-shape",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Extract an entity based on CBD and a SHACL shape",
   "main": "dist/lib/extract-cbd-shape.js",
   "types": "dist/lib/extract-cbd-shape.d.ts",
@@ -20,6 +20,7 @@
   "license": "MIT",
   "dependencies": {
     "@treecg/types": "^0.4.5",
+    "rdf-dereference": "2.x",
     "debug": "^4.3.4",
     "jsdom": "^23.0.1",
     "n3": "^1.17.0",
@@ -45,7 +46,6 @@
     "ts-node": "^10.9.1"
   },
   "peerDependencies": {
-    "rdf-dereference": "2.x",
     "rdf-js": "x"
   }
 }
