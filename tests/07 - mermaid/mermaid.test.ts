@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { DataFactory } from "rdf-data-factory";
 import { RdfStore } from "rdf-stores";
-import rdfDereference from "rdf-dereference";
+import {rdfDereferencer} from "rdf-dereference";
 import {ShapesGraph} from "../../lib/ShapesGraph";
 import fs from "fs/promises";
 
@@ -12,7 +12,7 @@ describe("Test whether the correct Mermaid text is generated for a ShapesGraph",
   let shapesGraph: ShapesGraph;
   before(async () => {
     let readStream = (
-      await rdfDereference.dereference("./tests/07 - mermaid/shape.ttl", {
+      await rdfDereferencer.dereference("./tests/07 - mermaid/shape.ttl", {
         localFiles: true,
       })
     ).data;

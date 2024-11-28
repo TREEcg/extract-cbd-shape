@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { NamedNode, Parser, StreamParser, Term, Writer } from "n3";
 import { RdfStore } from "rdf-stores";
 import { CBDShapeExtractor } from "../../lib/CBDShapeExtractor";
-import rdfDereference from "rdf-dereference";
+import {rdfDereferencer} from "rdf-dereference";
 
 describe("Extracting logical edge cases", function () {
   this.timeout(25000);
@@ -12,7 +12,7 @@ describe("Extracting logical edge cases", function () {
   let dataStore = RdfStore.createDefault();
   before(async () => {
     let readStream = (
-      await rdfDereference.dereference(
+      await rdfDereferencer.dereference(
         "./tests/04 - logical edge cases/shape.ttl",
         { localFiles: true },
       )
@@ -22,7 +22,7 @@ describe("Extracting logical edge cases", function () {
     });
     extractor = new CBDShapeExtractor(shapeStore);
     let readStream2 = (
-      await rdfDereference.dereference(
+      await rdfDereferencer.dereference(
         "./tests/04 - logical edge cases/data.ttl",
         { localFiles: true },
       )
