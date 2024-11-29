@@ -1,6 +1,6 @@
 const Benchmark = require("benchmark");
 const { RdfStore } = require("rdf-stores");
-const rdfDereference = require("rdf-dereference").default;
+const { rdfDereferencer } = require("rdf-dereference");
 const NamedNode = require("n3").NamedNode;
 const { performance } = require("perf_hooks");
 const { JSDOM } = require("jsdom");
@@ -56,28 +56,28 @@ let main = async function () {
 
   //Load the quads from the file
   let memberDataStream = (
-    await rdfDereference.dereference("./perf/resources/member.ttl", {
+    await rdfDereferencer.dereference("./perf/resources/member.ttl", {
       localFiles: true,
     })
   ).data;
 
   //Load the quads from the file
   let memberDataStream1000members = (
-    await rdfDereference.dereference("./perf/resources/member-1000.ttl", {
+    await rdfDereferencer.dereference("./perf/resources/member-1000.ttl", {
       localFiles: true,
     })
   ).data;
 
   //Load the quads from the file
   let memberDataStreamOutBand = (
-    await rdfDereference.dereference("./perf/resources/member-outband.ttl", {
+    await rdfDereferencer.dereference("./perf/resources/member-outband.ttl", {
       localFiles: true,
     })
   ).data;
 
   //Load the quads from the file
   let memberDataStreamOutBandPartial = (
-    await rdfDereference.dereference(
+    await rdfDereferencer.dereference(
       "./perf/resources/member-partial-outband.ttl",
       {
         localFiles: true,
@@ -87,7 +87,7 @@ let main = async function () {
 
   //load the shacl shape from the file
   let memberShaclStream = (
-    await rdfDereference.dereference("./perf/resources/shacl-member.ttl", {
+    await rdfDereferencer.dereference("./perf/resources/shacl-member.ttl", {
       localFiles: true,
     })
   ).data;

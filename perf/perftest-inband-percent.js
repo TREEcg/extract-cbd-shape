@@ -1,7 +1,7 @@
 const Benchmark = require("benchmark");
 const Store = require("n3").Store;
 const { RdfStore } = require("rdf-stores");
-const rdfDereference = require("rdf-dereference").default;
+const {rdfDereferencer} = require("rdf-dereference");
 const NamedNode = require("n3").NamedNode;
 
 const CBDShapeExtractor =
@@ -19,28 +19,28 @@ let main = async function () {
   let shaclKBO = RdfStore.createDefault();
   //Load the quads from the file
   let kboDataStream = (
-    await rdfDereference.dereference("./perf/resources/kbo.ttl", {
+    await rdfDereferencer.dereference("./perf/resources/kbo.ttl", {
       localFiles: true,
     })
   ).data;
 
   //load the shacl shape from the file
   let kboDataStream130Quads = (
-    await rdfDereference.dereference("./perf/resources/kbo-130-quads.ttl", {
+    await rdfDereferencer.dereference("./perf/resources/kbo-130-quads.ttl", {
       localFiles: true,
     })
   ).data;
 
   //load the shacl shape from the file
   let kboDataStream1300Quads = (
-    await rdfDereference.dereference("./perf/resources/kbo-1300-quads.ttl", {
+    await rdfDereferencer.dereference("./perf/resources/kbo-1300-quads.ttl", {
       localFiles: true,
     })
   ).data;
 
   //load the shacl shape from the file
   let kboShaclStream = (
-    await rdfDereference.dereference(
+    await rdfDereferencer.dereference(
       "./perf/resources/shacl-kbo.ttl",
       // "./tests/06 - shapes and named graphs/shape.ttl",
       { localFiles: true }
