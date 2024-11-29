@@ -25,9 +25,14 @@ ex:shape a sh:NodeShape ;
       sh:path dc:modified
     ], [
       sh:minCount 1 ;
-      sh:nodeKind sh:IRI ;
+      sh:node ex:VersionOfShape ;
       sh:path dc:isVersionOf
-    ], [ sh:path skos:note ], [ sh:path skos:historyNote ], [
+    ].
+    
+ex:VersionOfShape sh:property
+    [ sh:path skos:note ], 
+    [ sh:path skos:historyNote ], 
+    [
       sh:datatype gsp:wktLiteral ;
       sh:maxCount 1 ;
       sh:minCount 1 ;

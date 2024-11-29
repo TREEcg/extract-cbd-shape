@@ -7,6 +7,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix ex:  <http://example.org/> .
 
+ex:C tree:member kbo:0877248501.2022.11 .
 kbo:0877248501.2022.11 a legal:legalEntity,
         kbo:Enterprise ;
     terms:isVersionOf kbo:0877248501 ;
@@ -20,8 +21,8 @@ kbo:0877248501.2022.11 a legal:legalEntity,
         kbo:2008_68203 ;
     kbo:establishment kbo:2277343234 ;
     kbo:status kbo:Status_AC .
-
 #Named Graph
+ex:C tree:member kbo:0417199869.2022.11 .
 kbo:0417199869.2022.11{
 kbo:0417199869.2022.11 a legal:legalEntity,
         kbo:Enterprise ;
@@ -37,6 +38,8 @@ kbo:0417199869.2022.11 a legal:legalEntity,
     kbo:status kbo:Status_AC .
 kbo:2003_70203 a kbo:Activity .}
 
+ex:C tree:member kbo:Owner0001 .
+
 #Extended SHACL
 kbo:Owner0001 ex:own kbo:0877248501.2023.11.
 kbo:0877248501.2023.11 a legal:legalEntity,
@@ -51,3 +54,4 @@ kbo:0877248501.2023.11 a legal:legalEntity,
         kbo:2008_68203 ;
     kbo:establishment kbo:2277343234 ;
     kbo:status kbo:Status_AC .
+# @group end

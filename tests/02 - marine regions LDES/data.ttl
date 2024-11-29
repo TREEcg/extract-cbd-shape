@@ -20,65 +20,6 @@
   ].
 
 <http://marineregions.org/feed> a ldes:EventStream;
-  tree:shape [
-    a sh:NodeShape;
-    sh:nodeKind sh:IRI;
-    sh:property [
-      sh:datatype xsd:dateTime;
-      sh:minCount 1;
-      sh:path dc:modified;
-    ], [
-      sh:minCount 1;
-      sh:nodeKind sh:IRI;
-      sh:path dc:isVersionOf;
-    ], [ sh:path skos:note ], [ sh:path skos:historyNote ], [
-      sh:datatype gsp:wktLiteral;
-      sh:maxCount 1;
-      sh:minCount 1;
-      sh:path dcat:centroid;
-    ], [
-      sh:datatype gsp:wktLiteral;
-      sh:maxCount 1;
-      sh:minCount 0;
-      sh:path dcat:bbox;
-    ], [
-      sh:minCount 0;
-      sh:nodekind sh:IRI;
-      sh:path mr:hasGeometry;
-    ], [
-      sh:minCount 0;
-      sh:node [
-        a sh:NodeShape;
-        sh:nodeKind sh:IRI;
-        sh:property [
-          sh:class schema:PropertyValue;
-          sh:maxCount 1;
-          sh:minCount 1;
-          sh:path schema:identifier;
-        ], [
-          sh:maxCount 1;
-          sh:minCount 1;
-          sh:nodeKind sh:IRI;
-          sh:path schema:url;
-        ];
-      ];
-      sh:path skos:exactMatch;
-    ], [
-      sh:datatype rdf:langString;
-      sh:minCount 1;
-      sh:path skos:prefLabel;
-    ], [
-      sh:datatype rdf:langString;
-      sh:minCount 0;
-      sh:path skos:altLabel;
-    ], [
-      sh:class mr:MRGeoObject;
-      sh:minCount 0;
-      sh:nodeKind sh:IRI;
-      sh:path mr:isRelatedTo;
-    ];
-    sh:targetClass mr:MRGeoObject;
-  ];
   tree:view <http://marineregions.org/feed?page=2023-07-24T14%3A00%3A00Z%2F2023-07-24T15%3A00%3A00Z>;
   tree:member <http://marineregions.org/mrgid/4212?t=1690208097>,
     <http://marineregions.org/mrgid/7513?t=1690208097>,
