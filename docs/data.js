@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1732880812351,
+  "lastUpdate": 1732880909833,
   "repoUrl": "https://github.com/TREEcg/extract-cbd-shape",
   "entries": {
     "Extraction algorithm Benchmark for inband data": [
@@ -2872,6 +2872,58 @@ window.BENCHMARK_DATA = {
             "range": "±2.34%",
             "unit": "ops/sec",
             "extra": "76 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "pieter.colpaert@ugent.be",
+            "name": "Pieter Colpaert",
+            "username": "pietercolpaert"
+          },
+          "committer": {
+            "email": "pieter.colpaert@ugent.be",
+            "name": "Pieter Colpaert",
+            "username": "pietercolpaert"
+          },
+          "distinct": true,
+          "id": "33a00dd6c9543e7620a20294809db6b41cb5cc77",
+          "message": "Fix perf tests",
+          "timestamp": "2024-11-29T12:45:06+01:00",
+          "tree_id": "990637871767000488f5468ad660c47cbea2f2fe",
+          "url": "https://github.com/TREEcg/extract-cbd-shape/commit/33a00dd6c9543e7620a20294809db6b41cb5cc77"
+        },
+        "date": 1732880909486,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "Extract1#ExtractionCollectionMembers",
+            "value": 288,
+            "range": "±3.61%",
+            "unit": "ops/sec",
+            "extra": "77 samples"
+          },
+          {
+            "name": "Extract2#ExtractionMembersPartialOutBand",
+            "value": 324,
+            "range": "±3.70%",
+            "unit": "ops/sec",
+            "extra": "79 samples"
+          },
+          {
+            "name": "Extract3#ExtractionMembersOutBand",
+            "value": 342,
+            "range": "±2.89%",
+            "unit": "ops/sec",
+            "extra": "79 samples"
+          },
+          {
+            "name": "Extract4#ExtractionCollection1000Members",
+            "value": 312,
+            "range": "±2.40%",
+            "unit": "ops/sec",
+            "extra": "73 samples"
           }
         ]
       }
