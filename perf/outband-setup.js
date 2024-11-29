@@ -6,6 +6,11 @@ const PORT = 8080;
 const FILES_DIRECTORY = './resources/members';
 
 const server = http.createServer((req, res) => {
+    if (path.normalize(decodeURI(req.url)) !== decodeURI(req.url)) {
+        res.statusCode = 403;
+        res.end();
+        return;
+    }
     // Extract the filename from the URL
     const filename = req.url.slice(1); // Remove leading '/'
     const filePath = path.join(__dirname, FILES_DIRECTORY, filename);
