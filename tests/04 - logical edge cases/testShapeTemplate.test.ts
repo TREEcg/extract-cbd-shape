@@ -9,7 +9,7 @@ import {
 } from "n3";
 import { RdfStore } from "rdf-stores";
 import { ShapeTemplate } from "../../lib/Shape";
-import rdfDereference from "rdf-dereference";
+import {rdfDereferencer} from "rdf-dereference";
 import {ShapesGraph} from "../../lib/ShapesGraph";
 
 const { namedNode } = DataFactory;
@@ -18,7 +18,7 @@ describe("Test shape template of the logical edge cases", function () {
   let shapesGraph: ShapesGraph;
   before(async () => {
     let readStream = (
-      await rdfDereference.dereference(
+      await rdfDereferencer.dereference(
         "./tests/04 - logical edge cases/shape.ttl",
         { localFiles: true },
       )

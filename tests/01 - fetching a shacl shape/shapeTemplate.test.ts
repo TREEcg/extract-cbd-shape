@@ -1,4 +1,4 @@
-import rdfDereference from "rdf-dereference";
+import {rdfDereferencer} from "rdf-dereference";
 import { RdfStore } from "rdf-stores";
 import {ShapesGraph} from "../../lib/ShapesGraph";
 describe("Test shape template of the SHACL SHACL", function () {
@@ -6,7 +6,7 @@ describe("Test shape template of the SHACL SHACL", function () {
   let shapesGraph: ShapesGraph;
   before(async () => {
     let readStream = (
-      await rdfDereference.dereference(
+      await rdfDereferencer.dereference(
         "./tests/01 - fetching a shacl shape/shacl-shacl.ttl",
         { localFiles: true },
       )

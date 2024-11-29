@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { DataFactory, NamedNode, Store } from "n3";
-import rdfDereference from "rdf-dereference";
+import {rdfDereferencer} from "rdf-dereference";
 import { CbdExtracted } from "../../lib/CBDShapeExtractor";
 const { namedNode } = DataFactory;
 import { RdfStore } from "rdf-stores";
@@ -10,7 +10,7 @@ describe("Test whether the Patterns are correctly created", function () {
   let shapesGraph: ShapesGraph;
   before(async () => {
     let readStream = (
-      await rdfDereference.dereference("./tests/05 - paths/shape.ttl", {
+      await rdfDereferencer.dereference("./tests/05 - paths/shape.ttl", {
         localFiles: true,
       })
     ).data;
@@ -33,7 +33,7 @@ describe("Test whether the Patterns are correctly matched", function () {
   let shapesGraph: ShapesGraph;
   before(async () => {
     let readStream = (
-      await rdfDereference.dereference("./tests/05 - paths/shape.ttl", {
+      await rdfDereferencer.dereference("./tests/05 - paths/shape.ttl", {
         localFiles: true,
       })
     ).data;
@@ -43,7 +43,7 @@ describe("Test whether the Patterns are correctly matched", function () {
     shapesGraph = new ShapesGraph(shapeStore);
 
     let readStream2 = (
-      await rdfDereference.dereference("./tests/05 - paths/data.ttl", {
+      await rdfDereferencer.dereference("./tests/05 - paths/data.ttl", {
         localFiles: true,
       })
     ).data;

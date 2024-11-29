@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { NamedNode, Parser, Store, StreamParser, Term, Writer } from "n3";
 import { CBDShapeExtractor } from "../../lib/CBDShapeExtractor";
-import rdfDereference from "rdf-dereference";
+import {rdfDereferencer} from "rdf-dereference";
 import { RdfStore } from "rdf-stores";
 describe("Check whether paths trigger the right extraction process", function () {
   let shapeStore = RdfStore.createDefault();
@@ -9,7 +9,7 @@ describe("Check whether paths trigger the right extraction process", function ()
   let dataStore = RdfStore.createDefault();
   before(async () => {
     let readStream = (
-      await rdfDereference.dereference("./tests/05 - paths/shape.ttl", {
+      await rdfDereferencer.dereference("./tests/05 - paths/shape.ttl", {
         localFiles: true,
       })
     ).data;
@@ -18,7 +18,7 @@ describe("Check whether paths trigger the right extraction process", function ()
     });
     extractor = new CBDShapeExtractor(shapeStore);
     let readStream2 = (
-      await rdfDereference.dereference("./tests/05 - paths/data.ttl", {
+      await rdfDereferencer.dereference("./tests/05 - paths/data.ttl", {
         localFiles: true,
       })
     ).data;

@@ -1,9 +1,8 @@
 import { assert } from "chai";
-import { Writer } from "n3";
 import { DataFactory } from "rdf-data-factory";
 import { RdfStore } from "rdf-stores";
 import { CBDShapeExtractor } from "../../lib/extract-cbd-shape";
-import rdfDereference from "rdf-dereference";
+import {rdfDereferencer} from "rdf-dereference";
 import { TREE } from "@treecg/types";
 const df = new DataFactory();
 describe("Check whether a member from the MRG source can be fully extracted", function () {
@@ -11,7 +10,7 @@ describe("Check whether a member from the MRG source can be fully extracted", fu
   it("Extract a shape from MRG and check whether it successfully did a call to a geometry it needs", async () => {
     let shapeStore =RdfStore.createDefault();
     let readStream = (
-      await rdfDereference.dereference(
+      await rdfDereferencer.dereference(
         "./tests/02 - marine regions LDES/shacl.ttl",
         { localFiles: true },
       )
@@ -22,7 +21,7 @@ describe("Check whether a member from the MRG source can be fully extracted", fu
     let extractor = new CBDShapeExtractor(shapeStore);
     let dataStore =RdfStore.createDefault();
     let readStream2 = (
-      await rdfDereference.dereference(
+      await rdfDereferencer.dereference(
         "./tests/02 - marine regions LDES/data.ttl",
         { localFiles: true },
       )

@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { RdfStore } from "rdf-stores";
 import { ShapesGraph } from "../lib/ShapesGraph";
 import { DataFactory } from "rdf-data-factory";
-import rdfDereference from "rdf-dereference";
+import {rdfDereferencer} from "rdf-dereference";
 import fs from "fs/promises";
 import * as process from 'process';
 import { Term } from "rdf-js";
@@ -26,7 +26,7 @@ async function main () {
     let shapesGraph: ShapesGraph;
     let shapeTerm: Term = df.namedNode(iri);
     let readStream = (
-      await rdfDereference.dereference(iri, {
+      await rdfDereferencer.dereference(iri, {
         localFiles: true,
       })
     ).data;
@@ -44,7 +44,7 @@ async function main () {
         console.error('GET ' + shapeTerm.value);
         //Try to dereference this one as well. If it works, nice, if it doesn’t, too bad, we’ll continue without notice.
         let readStream2 = (
-            await rdfDereference.dereference(shapeTerm.value, {
+            await rdfDereferencer.dereference(shapeTerm.value, {
               localFiles: true,
             })
         ).data;
