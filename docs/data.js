@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1732868485103,
+  "lastUpdate": 1732868587940,
   "repoUrl": "https://github.com/TREEcg/extract-cbd-shape",
   "entries": {
     "Extraction algorithm Benchmark for inband data": [
@@ -2754,6 +2754,58 @@ window.BENCHMARK_DATA = {
             "range": "±2.23%",
             "unit": "ops/sec",
             "extra": "80 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "pieter.colpaert@ugent.be",
+            "name": "Pieter Colpaert",
+            "username": "pietercolpaert"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "509fca91023901238a453a9c89e5fc9863829fb8",
+          "message": "Merge pull request #33 from JafarAkhondali/main\n\nFixing a Path Traversal Vulnerability",
+          "timestamp": "2024-11-29T09:19:42+01:00",
+          "tree_id": "caed66a8431f4a2886168cceeba8277c66abe7bc",
+          "url": "https://github.com/TREEcg/extract-cbd-shape/commit/509fca91023901238a453a9c89e5fc9863829fb8"
+        },
+        "date": 1732868587464,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "Extract1#ExtractionCollectionMembers",
+            "value": 274,
+            "range": "±4.47%",
+            "unit": "ops/sec",
+            "extra": "76 samples"
+          },
+          {
+            "name": "Extract2#ExtractionMembersPartialOutBand",
+            "value": 322,
+            "range": "±3.67%",
+            "unit": "ops/sec",
+            "extra": "78 samples"
+          },
+          {
+            "name": "Extract3#ExtractionMembersOutBand",
+            "value": 325,
+            "range": "±3.03%",
+            "unit": "ops/sec",
+            "extra": "78 samples"
+          },
+          {
+            "name": "Extract4#ExtractionCollection1000Members",
+            "value": 306,
+            "range": "±2.34%",
+            "unit": "ops/sec",
+            "extra": "76 samples"
           }
         ]
       }
