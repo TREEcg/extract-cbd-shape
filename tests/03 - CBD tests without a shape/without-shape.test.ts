@@ -2,14 +2,14 @@ import { assert } from "chai";
 import { NamedNode, Parser, Store, StreamParser, Term, Writer } from "n3";
 import { CBDShapeExtractor } from "../../lib/extract-cbd-shape";
 import { RdfStore } from "rdf-stores";
-import rdfDereference from "rdf-dereference";
+import {rdfDereferencer} from "rdf-dereference";
 
 describe("Tests whether plain CBD works using the data from 01 and 02", function () {
   it("Example 01 should return 11 triples with CBD", async () => {
     let extractor = new CBDShapeExtractor();
     let dataStore = RdfStore.createDefault();
     let readStream = (
-      await rdfDereference.dereference(
+      await rdfDereferencer.dereference(
         "./tests/01 - fetching a shacl shape/shacl-catalog.ttl",
         { localFiles: true },
       )
@@ -30,7 +30,7 @@ describe("Tests whether plain CBD works using the data from 01 and 02", function
     let extractor = new CBDShapeExtractor();
     let dataStore = RdfStore.createDefault();
     let readStream = (
-      await rdfDereference.dereference(
+      await rdfDereferencer.dereference(
         "./tests/02 - marine regions LDES/data.ttl",
         { localFiles: true },
       )
@@ -54,7 +54,7 @@ describe("Test CBD with nested blank nodes", async () => {
     let extractor = new CBDShapeExtractor();
     let dataStore = RdfStore.createDefault();
     let readStream = (
-      await rdfDereference.dereference(
+      await rdfDereferencer.dereference(
         "./tests/03 - CBD tests without a shape/data.ttl",
         { localFiles: true },
       )
@@ -78,7 +78,7 @@ describe("Test CBD with named graph", () => {
     let extractor = new CBDShapeExtractor();
     let dataStore = RdfStore.createDefault();
     let readStream = (
-      await rdfDereference.dereference(
+      await rdfDereferencer.dereference(
         "./tests/03 - CBD tests without a shape/data.ttl",
         { localFiles: true },
       )
@@ -99,7 +99,7 @@ describe("Test CBD with named graph", () => {
     let extractor = new CBDShapeExtractor();
     let dataStore = RdfStore.createDefault();
     let readStream = (
-      await rdfDereference.dereference(
+      await rdfDereferencer.dereference(
         "./tests/03 - CBD tests without a shape/data.ttl",
         { localFiles: true },
       )
@@ -120,7 +120,7 @@ describe("Test CBD with named graph", () => {
     let extractor = new CBDShapeExtractor();
     let dataStore = RdfStore.createDefault();
     let readStream = (
-      await rdfDereference.dereference(
+      await rdfDereferencer.dereference(
         "./tests/03 - CBD tests without a shape/data.ttl",
         { localFiles: true },
       )

@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { DataFactory } from "rdf-data-factory";
 import { RdfStore } from "rdf-stores";
 import { ShapeTemplate } from "../../lib/Shape";
-import rdfDereference from "rdf-dereference";
+import {rdfDereferencer} from "rdf-dereference";
 import {ShapesGraph} from "../../lib/ShapesGraph";
 
 const df = new DataFactory();
@@ -12,7 +12,7 @@ describe("Test whether the SHACL template is well extracted based on paths", fun
   let shapesGraph: ShapesGraph;
   before(async () => {
     let readStream = (
-      await rdfDereference.dereference("./tests/05 - paths/shape.ttl", {
+      await rdfDereferencer.dereference("./tests/05 - paths/shape.ttl", {
         localFiles: true,
       })
     ).data;

@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { CBDShapeExtractor } from "../../lib/CBDShapeExtractor";
-import rdfDereference from "rdf-dereference";
+import {rdfDereferencer} from "rdf-dereference";
 import { Quad, Term as RTerm } from "@rdfjs/types";
 import { RdfStore } from "rdf-stores";
 import { DataFactory } from "rdf-data-factory";
@@ -11,7 +11,7 @@ describe("Check weather all selected quads can be extracted", function () {
   let dataStore = RdfStore.createDefault();
   before(async () => {
     let readStream = (
-      await rdfDereference.dereference(
+      await rdfDereferencer.dereference(
         "./tests/06 - shapes and named graphs/shape-example.ttl",
         {
           localFiles: true,
@@ -23,7 +23,7 @@ describe("Check weather all selected quads can be extracted", function () {
     });
     extractor = new CBDShapeExtractor(shapeStore);
     let readStream2 = (
-      await rdfDereference.dereference(
+      await rdfDereferencer.dereference(
         "./tests/06 - shapes and named graphs/data-example.ttl",
         {
           localFiles: true,

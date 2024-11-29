@@ -3,7 +3,7 @@ import { CBDShapeExtractor } from '../lib/CBDShapeExtractor';
 import { Writer } from 'n3';
 import { DataFactory } from 'rdf-data-factory';
 import { RdfStore } from 'rdf-stores';
-import rdfDereference from 'rdf-dereference';
+import {rdfDereferencer} from 'rdf-dereference';
 
 const df = new DataFactory();
 
@@ -14,7 +14,7 @@ if (process.argv.length <= 2) {
 }
 
 async function loadShape(shapeURL: string, shapeStore: RdfStore) {
-    let readStream = (await rdfDereference.dereference(shapeURL)).data;
+    let readStream = (await rdfDereferencer.dereference(shapeURL)).data;
     let requested : string[] = [shapeURL]
     await new Promise ((resolve, reject) => {
         shapeStore.import(readStream).on("end",resolve)
@@ -28,7 +28,7 @@ async function loadShape(shapeURL: string, shapeStore: RdfStore) {
     for (let imp of importsURLs) {
         if (!requested.includes(imp)) {
             requested.push(imp);
-            let newReadStream = (await rdfDereference.dereference(imp)).data;
+            let newReadStream = (await rdfDereferencer.dereference(imp)).data;
             await new Promise ((resolve, reject) => {
                 shapeStore.import(newReadStream).on("end",resolve)
                 .on("error", reject);
