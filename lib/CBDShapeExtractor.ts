@@ -6,6 +6,7 @@ import {RdfStore} from "rdf-stores";
 import {Quad, Term} from "@rdfjs/types";
 import debug from "debug";
 import {ShapesGraph} from "./ShapesGraph";
+import { Writer } from "n3";
 
 const log = debug("extract-cbd-shape");
 
@@ -420,7 +421,7 @@ class ExtractInstance {
     * @param id starting subject
     * @param graphsToIgnore
     */
-   private async CBD(
+   private CBD(
       id: Term,
       result: Quad[],
       extractedStar: CbdExtracted,
@@ -444,7 +445,7 @@ class ExtractInstance {
             q.object.termType === "BlankNode" &&
             !extractedStar.cbdExtracted(q.object)
          ) {
-            await this.CBD(q.object, result, next, graphsToIgnore);
+            this.CBD(q.object, result, next, graphsToIgnore);
          }
       }
    }
