@@ -36,6 +36,72 @@ describe("Check whether paths trigger the right extraction process", function ()
     );
     // It should only have 2 quads: one outside of the named graph, and one in the named graph that is not part of the other named graphs
     assert.equal(result.length, 2);
+
+  });
+});
+
+describe("regression tests", () => {
+  it("blank nodes break extraction 1", async () => {
+    const quadsString = `
+<https://example.com/ns#testing> a <http://schema.org/Movie>;
+    <http://schema.org/actor> _:b1_n3-0, _:b1_n3-1, _:b1_n3-2, _:b1_n3-3;
+    <http://purl.org/dc/terms/isVersionOf> <http://yikes.dog/namespaces/movies/Alien>;
+    <http://www.w3.org/ns/prov#generatedAtTime> "2024-12-03T13:10:42.331Z"^^<http://www.w3.org/2001/XMLSchema#dateTime>.
+`;
+    const quads = new Parser().parse(quadsString);
+    const extractor = new CBDShapeExtractor();
+    const store = RdfStore.createDefault();
+    quads.forEach(x => store.addQuad(x));
+    const extracted = await extractor.extract(store, new NamedNode("https://example.com/ns#testing"));
+
+    assert.equal(extracted.length, 7);
   });
 
+  it("blank nodes break extraction 2", async () => {
+    const quadsString = `
+<https://example.com/ns#testing> a <http://schema.org/Movie>;
+    <http://schema.org/actor> _:b1_n3-0, _:b1_n3-1, _:b1_n3-2;
+    <http://purl.org/dc/terms/isVersionOf> <http://yikes.dog/namespaces/movies/Alien>;
+    <http://www.w3.org/ns/prov#generatedAtTime> "2024-12-03T13:10:42.331Z"^^<http://www.w3.org/2001/XMLSchema#dateTime>.
+`;
+    const quads = new Parser().parse(quadsString);
+    const extractor = new CBDShapeExtractor();
+    const store = RdfStore.createDefault();
+    quads.forEach(x => store.addQuad(x));
+    const extracted = await extractor.extract(store, new NamedNode("https://example.com/ns#testing"));
+
+    assert.equal(extracted.length, 6);
+  });
+
+  it("blank nodes break extraction 3", async () => {
+    const quadsString = `
+<https://example.com/ns#testing> a <http://schema.org/Movie>;
+    <http://purl.org/dc/terms/isVersionOf> <http://yikes.dog/namespaces/movies/Alien>;
+    <http://www.w3.org/ns/prov#generatedAtTime> "2024-12-03T13:10:42.331Z"^^<http://www.w3.org/2001/XMLSchema#dateTime>;
+    <http://schema.org/actor> _:b1_n3-0, _:b1_n3-1, _:b1_n3-2.
+`;
+    const quads = new Parser().parse(quadsString);
+    const extractor = new CBDShapeExtractor();
+    const store = RdfStore.createDefault();
+    quads.forEach(x => store.addQuad(x));
+    const extracted = await extractor.extract(store, new NamedNode("https://example.com/ns#testing"));
+
+    assert.equal(extracted.length, 6);
+  });
+
+  it("blank nodes break extraction 4", async () => {
+    const quadsString = `
+<https://example.com/ns#testing> a <http://schema.org/Movie>;
+    <http://purl.org/dc/terms/isVersionOf> <http://yikes.dog/namespaces/movies/Alien>;
+    <http://www.w3.org/ns/prov#generatedAtTime> "2024-12-03T13:10:42.331Z"^^<http://www.w3.org/2001/XMLSchema#dateTime>;
+    <http://schema.org/actor> _:b1_n3-0, _:b1_n3-1, _:b1_n3-2, _:b1_n3-3.
+`;
+    const quads = new Parser().parse(quadsString);
+    const extractor = new CBDShapeExtractor();
+    const store = RdfStore.createDefault();
+    quads.forEach(x => store.addQuad(x));
+    const extracted = await extractor.extract(store, new NamedNode("https://example.com/ns#testing"));
+
+    assert.equal(extracted.length, 7);
+  });
 });
