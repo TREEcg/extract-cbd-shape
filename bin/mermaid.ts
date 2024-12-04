@@ -5,7 +5,7 @@ import { DataFactory } from "rdf-data-factory";
 import {rdfDereferencer} from "rdf-dereference";
 import fs from "fs/promises";
 import * as process from 'process';
-import { Term } from "rdf-js";
+import { Term } from "@rdfjs/types";
 import { deflate} from "pako";
 import { fromUint8Array } from 'js-base64';
 
