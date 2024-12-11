@@ -38,11 +38,6 @@ This is an extension of [CBD](https://www.w3.org/submissions/CBD/). It extracts:
  2. all quads with a named graph matching the entity we’re looking up
  3. It takes hints from a Shape Template (see ↓)
 
-To be discussed:
- 1. _Should it also extract all RDF reification quads?_ (Included in the original CBD)
- 2. _Should it also extract all singleton properties?_
- 3. _Should it also extract RDF* annnotations?_
-
 The first focus node is set by the user.
  1a. If a shape is set, create a shape template and execute the shape template extraction algorithm
  1b. If no shape was set, extract all quads with subject the focus node, and recursively include its blank nodes (see also [CBD](https://www.w3.org/submissions/CBD/))
@@ -76,7 +71,7 @@ A Shape Template has
  * __Node Links:__ A nodelink contains a reference to another Shape Template, as well as a path. All quads, after a potential HTTP request, matching this path MUST be added to the Member set. The targets MUST be processed again using the shape template extraction algorithm on that 
  * __atLeastOneLists__: Each atLeastOneList is an array of at least one shape with one or more required paths and atLeastOneLists that must be set. If none of the shapes match, it will trigger an HTTP request. Only the quads from paths matching valid shapes are included in the Member.
 
-Note: Certain quads are going to be matched by the algorithm multiple times. Each quad will of course be part of the member only once.
+Note: RDF has set semantics, so while certain quads are going to be matched by the algorithm multiple times, each quad will of course be part of the member only once.
 
 This results in this algorithm:
  1. If it is open, a client MUST extract all quads, after a potential HTTP request to the focus node, with subject the focus node, and recursively include its blank nodes (see also [CBD](https://www.w3.org/submissions/CBD/))
@@ -103,13 +98,9 @@ Note: The way we process SHACL shapes into Shape Template is important to unders
 Note: it only takes _hints_ (it does not guarantee a result that validates) from an optional SHACL shapes graph. It only uses the parts relevant for discovery from the [SHACL Core Constraint Components](https://www.w3.org/TR/shacl/#core-components). It does not support SPARQL or Javascript.
 
 It won’t:
- 1. Process more complex validation instructions that are part of SHACL such as `sh:class`, inLanguage, pattern, value, qualified value shapes, etc. It is the data publisher’s responsibility to provide valid data, or it is the responsibility of the user of the library to validate the quads afterwards.
+ 1. Process more complex validation instructions that are part of SHACL such as `sh:class`, languageIn, pattern, value, qualified value shapes, etc. It is the data publisher’s responsibility to provide valid data, or it is the responsibility of the user of the library to validate the quads afterwards.
  2. Do automatic target selection based on e.g., targetClass: you need to set the target.
-
-### Creating the Shape Template from ShEx
-
-_TODO_
-
+ 3. Explicitly look for reified statements or triples that are quoted elsewhere: these are not part of the member. Only when a triple term can be found through a star pattern.
 
 ### Logging
 
