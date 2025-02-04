@@ -11,9 +11,9 @@ ex:Person2 a ex:Person ;
     ex:name "Person 2" ;
     ex:knows ex:Person1.
 
-ex:Person3 a ex:Person; 
+ex:Person3 a ex:Person;
     ex:name "Person 3";
-    ex:knows <https://raw.githubusercontent.com/pietercolpaert/extract-cbd-shape/main/tests/04%20-%20logical%20edge%20cases/name.ttl#Person1> .
+    ex:knows <https://test.com/name.ttl#Person1> .
 
 ex:Person4 a ex:Person ;
     ex:qualifiedName ex:NamePerson4 .
@@ -23,8 +23,8 @@ ex:NamePerson4  ex:name "Person 4" .
 
 ## This one, if configured with ex:TriggersHTTPShape, will trigger an HTTP request to be done
 
-ex:Person5 a ex:Person; 
-    ex:qualifiedName <https://raw.githubusercontent.com/pietercolpaert/extract-cbd-shape/main/tests/04%20-%20logical%20edge%20cases/name.ttl> .
+ex:Person5 a ex:Person;
+    ex:qualifiedName <https://test.com/name.ttl> .
 
 ex:Person6 a ex:Person ;
     ex:name "Person6" ;

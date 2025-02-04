@@ -1,6 +1,0 @@
-@prefix ex: <http://example.org/> .
-@prefix foaf: <http://xmlns.com/foaf/0.1/>.
-
-<./name.ttl> ex:name "Pieter" .
-
-<https://raw.githubusercontent.com/pietercolpaert/extract-cbd-shape/main/tests/04%20-%20logical%20edge%20cases/name.ttl#Person1> ex:name "Peterson" .
