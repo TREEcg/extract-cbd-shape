@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1739800966486,
+  "lastUpdate": 1739801063315,
   "repoUrl": "https://github.com/TREEcg/extract-cbd-shape",
   "entries": {
     "Extraction algorithm Benchmark for inband data": [
@@ -3580,6 +3580,58 @@ window.BENCHMARK_DATA = {
             "range": "±3.45%",
             "unit": "ops/sec",
             "extra": "73 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "smessie@smessie.com",
+            "name": "smessie",
+            "username": "smessie"
+          },
+          "committer": {
+            "email": "smessie@smessie.com",
+            "name": "smessie",
+            "username": "smessie"
+          },
+          "distinct": true,
+          "id": "c7ae4faa6eb2029d5030ffaf4a246a5f0f554455",
+          "message": "ci(deps): Add `rollup` as devDependency",
+          "timestamp": "2025-02-17T15:00:52+01:00",
+          "tree_id": "af5431f794745f38223362faa158ccef909de71e",
+          "url": "https://github.com/TREEcg/extract-cbd-shape/commit/c7ae4faa6eb2029d5030ffaf4a246a5f0f554455"
+        },
+        "date": 1739801062440,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "Extract1#ExtractionCollectionMembers",
+            "value": 258,
+            "range": "±3.75%",
+            "unit": "ops/sec",
+            "extra": "73 samples"
+          },
+          {
+            "name": "Extract2#ExtractionMembersPartialOutBand",
+            "value": 312,
+            "range": "±2.70%",
+            "unit": "ops/sec",
+            "extra": "80 samples"
+          },
+          {
+            "name": "Extract3#ExtractionMembersOutBand",
+            "value": 320,
+            "range": "±3.17%",
+            "unit": "ops/sec",
+            "extra": "81 samples"
+          },
+          {
+            "name": "Extract4#ExtractionCollection1000Members",
+            "value": 281,
+            "range": "±2.78%",
+            "unit": "ops/sec",
+            "extra": "69 samples"
           }
         ]
       }
