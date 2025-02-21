@@ -19,13 +19,13 @@
   "author": "Pieter Colpaert",
   "license": "MIT",
   "dependencies": {
-    "@treecg/types": "^0.4.5",
-    "debug": "^4.3.4",
-    "jsdom": "^23.0.1",
+    "@treecg/types": "^0.4.6",
+    "debug": "^4.4.0",
+    "jsdom": "^26.0.0",
     "n3": "^1.23.1",
-    "rdf-data-factory": "^1.1.2",
+    "rdf-data-factory": "^2.0.2",
     "rdf-dereference": "4.x",
-    "rdf-stores": "^1.0.0"
+    "rdf-stores": "^2.1.1"
   },
   "devDependencies": {
     "@rdfjs/types": "*",
@@ -45,7 +45,7 @@
     "rollup-plugin-polyfill-node": "^0.13.0",
     "sinon": "^19.0.2",
     "systeminformation": "^5.21.20",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "typescript": "5.5.4"
   }
 }
