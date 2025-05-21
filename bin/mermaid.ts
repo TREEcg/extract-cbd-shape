@@ -80,6 +80,6 @@ async function main () {
     const json = JSON.stringify(defaultState);
     const serialized = serialize(json);
     console.log();
-    console.log('Mermaid Live: https://mermaid.live/edit#pako:'+ serialized);
+    console.log('Mermaid Live: https://mermaid.live/view#pako:'+ serialized);
 }
 main();
