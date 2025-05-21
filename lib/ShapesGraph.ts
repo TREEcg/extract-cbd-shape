@@ -127,11 +127,16 @@ export class ShapesGraph {
 
   /**
    * This function removes < and > from a path.
+   * It also adds the invisible character ‎ after 'http(s):' and after 'www' to avoid
+   * the path being interpreted as a link. See https://github.com/orgs/community/discussions/106690.  
    * @param path - The path from which to remove the < and >.
    * @private
    */
   private cleanPath(path: string): string {
     path = path.replace(/</g, '');
+    path = path.replace(/http:/g, 'http:‎');
+    path = path.replace(/https:/g, 'https:‎');
+    path = path.replace(/www/g, 'www‎');
     return path.replace(/>/g, '');
   }
 
