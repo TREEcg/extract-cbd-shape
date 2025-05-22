@@ -32,6 +32,7 @@ const SHACL = createTermNamespace(
   "and",
   "xone",
   "or",
+  "targetClass",
   "NodeShape",
 );
 
@@ -133,11 +134,11 @@ export class ShapesGraph {
    * @private
    */
   private cleanPath(path: string): string {
-    path = path.replace(/</g, '');
-    path = path.replace(/http:/g, 'http:‎');
-    path = path.replace(/https:/g, 'https:‎');
-    path = path.replace(/www/g, 'www‎');
-    return path.replace(/>/g, '');
+    return path.replace(/</g, '')
+      .replace(/http:/g, 'http:‎')
+      .replace(/https:/g, 'https:‎')
+      .replace(/www/g, 'www‎')
+      .replace(/>/g, '');
   }
 
   /**
@@ -372,14 +373,28 @@ export class ShapesGraph {
     nodeShapeId: Term,
     shape: ShapeTemplate,
   ) {
-    // Extract label
+    // Extract label following this strategy:
+    // first look for rdfs:label
+    // fallback to sh:targetClass (if any)
+    // fallback to last part of the node shape ID or the ID itself if it's a blank node
     const rdfsLabel = getObjects(shapeStore, nodeShapeId, RDFS.terms.label)[0];
     if (rdfsLabel) {
       shape.label = rdfsLabel.value;
     } else {
-      shape.label = nodeShapeId.termType === "BlankNode" ?
-        nodeShapeId.value :
-        nodeShapeId.value.split("/")[nodeShapeId.value.split("/").length - 1];
+      const targetClass = getObjects(
+        shapeStore,
+        nodeShapeId,
+        SHACL.targetClass,
+        null,
+      )[0];
+      if (targetClass) {
+        // Make sure that IRIs are visible as node labels in mermaid diagrams
+        shape.label = this.cleanPath(targetClass.value);
+      } else {
+        shape.label = nodeShapeId.termType === "BlankNode" ?
+          nodeShapeId.value :
+          nodeShapeId.value.split("/")[nodeShapeId.value.split("/").length - 1];
+      }
     }
 
     //Check if it's closed or open
@@ -469,7 +484,7 @@ export class ShapesGraph {
    * @param item
    * @returns
    */
-  protected* rdfListToGenerator(
+  protected * rdfListToGenerator(
     shapeStore: RdfStore,
     item: Term,
   ): Generator<Term> {
