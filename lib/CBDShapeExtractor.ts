@@ -6,7 +6,6 @@ import {RdfStore} from "rdf-stores";
 import {Quad, Term} from "@rdfjs/types";
 import debug from "debug";
 import {ShapesGraph} from "./ShapesGraph";
-import { Writer } from "n3";
 
 const log = debug("extract-cbd-shape");
 

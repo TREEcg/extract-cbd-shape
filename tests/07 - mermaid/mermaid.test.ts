@@ -1,8 +1,8 @@
 import { assert } from "chai";
 import { DataFactory } from "rdf-data-factory";
 import { RdfStore } from "rdf-stores";
-import {rdfDereferencer} from "rdf-dereference";
-import {ShapesGraph} from "../../lib/ShapesGraph";
+import { rdfDereferencer } from "rdf-dereference";
+import { ShapesGraph } from "../../lib/ShapesGraph";
 import fs from "fs/promises";
 
 const df = new DataFactory();
@@ -140,5 +140,11 @@ describe("Test whether the correct Mermaid text is generated for a ShapesGraph",
     assert.isDefined(error);
     // @ts-ignore
     assert.equal(error.message, `No shape found for term "${term}"`);
+  });
+
+  it("Uses the sh:targetClass and sh:datatype properties for labels", async () => {
+    const actualMermaid = shapesGraph.toMermaid(df.namedNode("http://example.org/LabeledShape"));
+    const expectedMermaid = await fs.readFile('./tests/07 - mermaid/labeled-shape.txt', 'utf-8');
+    assert.equal(actualMermaid, expectedMermaid);
   });
 });

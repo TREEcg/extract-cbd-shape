@@ -33,6 +33,7 @@ const SHACL = createTermNamespace(
   "xone",
   "or",
   "targetClass",
+  "datatype",
   "NodeShape",
 );
 
@@ -77,7 +78,7 @@ export class ShapesGraph {
       let p = nodeLink.pathPattern.toString();
       const isPathRequired = this.isPathRequired(p, shape.requiredPaths);
       alreadyProcessedPaths.push(p);
-      p = this.cleanPath(p);
+      p = this.clean(p);
       const linkedShape = this.shapes.get(nodeLink.link);
 
       if (!linkedShape) {
@@ -127,13 +128,13 @@ export class ShapesGraph {
   }
 
   /**
-   * This function removes < and > from a path.
+   * This function removes < and > from a label.
    * It also adds the invisible character ‎ after 'http(s):' and after 'www' to avoid
    * the path being interpreted as a link. See https://github.com/orgs/community/discussions/106690.  
    * @param path - The path from which to remove the < and >.
    * @private
    */
-  private cleanPath(path: string): string {
+  private clean(path: string): string {
     return path.replace(/</g, '')
       .replace(/http:/g, 'http:‎')
       .replace(/https:/g, 'https:‎')
@@ -170,6 +171,7 @@ export class ShapesGraph {
     let mermaid = '';
 
     paths.forEach(path => {
+      const literalType = path.literalType ? this.clean(path.literalType.value) : null;
       let p = path.toString();
 
       if (alreadyProcessedPaths.includes(p)) {
@@ -177,14 +179,14 @@ export class ShapesGraph {
       }
 
       alreadyProcessedPaths.push(p);
-      p = this.cleanPath(p);
+      p = this.clean(p);
 
       if (this.isRealInversePath(p)) {
         p = this.getRealPath(p);
-        mermaid += `  S${shapedId}_${this.counter}[ ]${link}|"${p}"|S${shapedId}\n`;
+        mermaid += `  S${shapedId}_${this.counter}[${literalType || " "}]${link}|"${p}"|S${shapedId}\n`;
       } else {
         p = this.getRealPath(p);
-        mermaid += `  S${shapedId}${link}|"${p}"|S${shapedId}_${this.counter}[ ]\n`;
+        mermaid += `  S${shapedId}${link}|"${p}"|S${shapedId}_${this.counter}[${literalType || " "}]\n`;
       }
 
       this.counter++;
@@ -224,7 +226,8 @@ export class ShapesGraph {
     return found[1];
   }
 
-  protected constructPathPattern(shapeStore: RdfStore, listItem: Term): Path {
+  protected constructPathPattern(shapeStore: RdfStore, listItem: Term, literalType?: Term): Path {
+
     if (listItem.termType === "BlankNode") {
       //Look for special types
       let zeroOrMorePathObjects = getObjects(
@@ -259,37 +262,37 @@ export class ShapesGraph {
       );
       if (zeroOrMorePathObjects[0]) {
         return new ZeroOrMorePath(
-          this.constructPathPattern(shapeStore, zeroOrMorePathObjects[0]),
+          this.constructPathPattern(shapeStore, zeroOrMorePathObjects[0], literalType),
         );
       } else if (oneOrMorePathObjects[0]) {
         return new OneOrMorePath(
-          this.constructPathPattern(shapeStore, oneOrMorePathObjects[0]),
+          this.constructPathPattern(shapeStore, oneOrMorePathObjects[0], literalType),
         );
       } else if (zeroOrOnePathObjects[0]) {
         return new ZeroOrOnePath(
-          this.constructPathPattern(shapeStore, zeroOrOnePathObjects[0]),
+          this.constructPathPattern(shapeStore, zeroOrOnePathObjects[0], literalType),
         );
       } else if (inversePathObjects[0]) {
         return new InversePath(
-          this.constructPathPattern(shapeStore, inversePathObjects[0]),
+          this.constructPathPattern(shapeStore, inversePathObjects[0], literalType),
         );
       } else if (alternativePathObjects[0]) {
         let alternativeListArray = this.rdfListToArray(
           shapeStore,
           alternativePathObjects[0],
         ).map((value: Term) => {
-          return this.constructPathPattern(shapeStore, value);
+          return this.constructPathPattern(shapeStore, value, literalType);
         });
         return new AlternativePath(alternativeListArray);
       } else {
         const items = this.rdfListToArray(shapeStore, listItem);
         return new SequencePath(
-          items.map((x) => this.constructPathPattern(shapeStore, x)),
+          items.map((x) => this.constructPathPattern(shapeStore, x, literalType)),
         );
       }
     }
 
-    return new PredicatePath(listItem);
+    return new PredicatePath(listItem, literalType);
   }
 
   /**
@@ -316,13 +319,21 @@ export class ShapesGraph {
       return true; //Success: doesn't matter what kind of thing it was, it's deactivated so let's just proceed
     }
 
+    // Check if sh:datatype is defined
+    const literalType = getObjects(
+      shapeStore,
+      propertyShapeId,
+      SHACL.datatype,
+      null,
+    )[0];
+
     let path = getObjects(shapeStore, propertyShapeId, SHACL.path, null)[0];
     //Process the path now and make sure there's a match function
     if (!path) {
       return false; //this isn't a property shape...
     }
 
-    let pathPattern = this.constructPathPattern(shapeStore, path);
+    let pathPattern = this.constructPathPattern(shapeStore, path, literalType);
 
     let minCount = getObjects(
       shapeStore,
@@ -389,7 +400,7 @@ export class ShapesGraph {
       )[0];
       if (targetClass) {
         // Make sure that IRIs are visible as node labels in mermaid diagrams
-        shape.label = this.cleanPath(targetClass.value);
+        shape.label = this.clean(targetClass.value);
       } else {
         shape.label = nodeShapeId.termType === "BlankNode" ?
           nodeShapeId.value :

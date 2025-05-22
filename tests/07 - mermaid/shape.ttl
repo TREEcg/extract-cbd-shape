@@ -164,3 +164,12 @@ ex:NestedWithOptionalShape a sh:NodeShape ;
             ]
         ]
     ] .
+
+# Shape with sh:targetClass and sh:datatype properties
+ex:LabeledShape a sh:NodeShape ;
+    sh:targetClass ex:Person ;
+    sh:property [
+        sh:path ex:label ;
+        sh:datatype xsd:string ;
+        sh:minCount 1
+    ] .

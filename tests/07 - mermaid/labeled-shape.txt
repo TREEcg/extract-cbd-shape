@@ -1,0 +1,3 @@
+flowchart LR
+  S1((http:‎//example.org/Person))
+  S1-->|"http:‎//example.org/label"|S1_0[http:‎//www‎.w3.org/2001/XMLSchema#string]
