@@ -1,5 +1,5 @@
 flowchart LR
   S1((NestedWithOptionalShape))
-  S1-.->|"http://example.org/subject"|S1_0[ ]
+  S1-.->|"http:‎//example.org/subject"|S1_0[ ]
   S1_0((OptionalNestedNodeShape))
-  S1_0-->|"http://www.w3.org/2000/01/rdf-schema#label"|S1_0_1[ ]
+  S1_0-->|"http:‎//www‎.w3.org/2000/01/rdf-schema#label"|S1_0_1[ ]

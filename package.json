@@ -20,9 +20,9 @@
   "license": "MIT",
   "dependencies": {
     "@treecg/types": "^0.4.6",
-    "debug": "^4.4.0",
-    "jsdom": "^26.0.0",
-    "n3": "^1.23.1",
+    "debug": "^4.4.1",
+    "jsdom": "^26.1.0",
+    "n3": "^1.25.2",
     "rdf-data-factory": "^2.0.2",
     "rdf-dereference": "4.x",
     "rdf-stores": "^2.1.1"
@@ -30,22 +30,22 @@
   "devDependencies": {
     "@rdfjs/types": "*",
     "@types/benchmark": "^2.1.5",
-    "@types/chai": "^4.3.5",
+    "@types/chai": "^5.2.2",
     "@types/debug": "^4.1.12",
-    "@types/mocha": "^10.0.1",
-    "@types/n3": "^1.21.1",
+    "@types/mocha": "^10.0.10",
+    "@types/n3": "^1.24.2",
     "@types/pako": "^2.0.3",
-    "@types/sinon": "^10.0.16",
+    "@types/sinon": "^17.0.4",
     "benchmark": "^2.1.4",
-    "chai": "^4.3.7",
+    "chai": "^5.2.0",
     "js-base64": "^3.7.7",
-    "mocha": "^10.2.0",
+    "mocha": "^11.4.0",
     "pako": "^2.1.0",
-    "rollup": "^4.34.8",
+    "rollup": "^4.41.0",
     "rollup-plugin-polyfill-node": "^0.13.0",
-    "sinon": "^19.0.2",
-    "systeminformation": "^5.21.20",
+    "sinon": "^20.0.0",
+    "systeminformation": "^5.25.11",
     "ts-node": "^10.9.2",
-    "typescript": "5.5.4"
+    "typescript": "5.8.3"
   }
 }

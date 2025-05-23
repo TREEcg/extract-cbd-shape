@@ -1,8 +1,10 @@
 import { Quad, Term } from "@rdfjs/types";
 import { RdfStore } from "rdf-stores";
-import { CbdExtracted, Extracted } from "./CBDShapeExtractor";
+import { CbdExtracted } from "./CBDShapeExtractor";
 
 export interface Path {
+  literalType?: Term;
+
   toString(): string;
 
   found(cbd: CbdExtracted, inverse?: boolean): CbdExtracted | undefined;
@@ -17,9 +19,11 @@ export interface Path {
 }
 
 export class PredicatePath implements Path {
+  public literalType?: Term;
   private predicate: Term;
 
-  constructor(predicate: Term) {
+  constructor(predicate: Term, literalType?: Term) {
+    this.literalType = literalType;
     this.predicate = predicate;
   }
 
@@ -58,9 +62,11 @@ export class PredicatePath implements Path {
 }
 
 export class SequencePath implements Path {
+  public literalType?: Term;
   private sequence: Path[];
 
-  constructor(sequence: Path[]) {
+  constructor(sequence: Path[], literalType?: Term) {
+    this.literalType = literalType;
     this.sequence = sequence;
   }
 
@@ -113,9 +119,11 @@ export class SequencePath implements Path {
 }
 
 export class AlternativePath implements Path {
+  public literalType?: Term;
   private alternatives: Path[];
 
-  constructor(alternatives: Path[]) {
+  constructor(alternatives: Path[], literalType?: Term) {
+    this.literalType = literalType;
     this.alternatives = alternatives;
   }
 
@@ -145,9 +153,11 @@ export class AlternativePath implements Path {
 }
 
 export class InversePath implements Path {
+  public literalType?: Term;
   private path: Path;
 
-  constructor(path: Path) {
+  constructor(path: Path, literalType?: Term) {
+    this.literalType = literalType;
     this.path = path;
   }
 
@@ -177,9 +187,11 @@ export class InversePath implements Path {
 }
 
 export abstract class MultiPath implements Path {
+  public literalType?: Term;
   protected path: Path;
   private maxCount?: number;
-  protected constructor(path: Path, maxCount?: number) {
+  protected constructor(path: Path, maxCount?: number, literalType?: Term) {
+    this.literalType = literalType;
     this.path = path;
     this.maxCount = maxCount;
   }
@@ -238,8 +250,8 @@ export abstract class MultiPath implements Path {
 }
 
 export class OneOrMorePath extends MultiPath {
-  constructor(path: Path) {
-    super(path);
+  constructor(path: Path, literalType?: Term) {
+    super(path, undefined, literalType);
   }
   filter(times: number, _res: PathResult): boolean {
     return times >= 1;
@@ -261,8 +273,8 @@ export class OneOrMorePath extends MultiPath {
   }
 }
 export class ZeroOrMorePath extends MultiPath {
-  constructor(path: Path) {
-    super(path);
+  constructor(path: Path, literalType?: Term) {
+    super(path, undefined, literalType);
   }
   filter(_times: number, _res: PathResult): boolean {
     return true;
@@ -282,8 +294,8 @@ export class ZeroOrMorePath extends MultiPath {
 }
 
 export class ZeroOrOnePath extends MultiPath {
-  constructor(path: Path) {
-    super(path, 1);
+  constructor(path: Path, literalType?: Term) {
+    super(path, 1, literalType);
   }
   filter(times: number, _res: PathResult): boolean {
     return times < 2;

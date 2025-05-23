@@ -1,12 +1,10 @@
-import { assert } from "chai";
 import { RdfStore } from "rdf-stores";
 import { ShapesGraph } from "../lib/ShapesGraph";
 import { DataFactory } from "rdf-data-factory";
-import {rdfDereferencer} from "rdf-dereference";
-import fs from "fs/promises";
+import { rdfDereferencer } from "rdf-dereference";
 import * as process from 'process';
 import { Term } from "@rdfjs/types";
-import { deflate} from "pako";
+import { deflate } from "pako";
 import { fromUint8Array } from 'js-base64';
 
 const df = new DataFactory();
@@ -20,42 +18,61 @@ if (process.argv.length <= 2) {
 
 let iri = process.argv[2];
 
-async function main () {
-    let df = new DataFactory();
-    let shapeStore = RdfStore.createDefault();
-    let shapesGraph: ShapesGraph;
-    let shapeTerm: Term = df.namedNode(iri);
-    let readStream = (
+async function main() {
+  let df = new DataFactory();
+  let shapeStore = RdfStore.createDefault();
+  let shapesGraph: ShapesGraph;
+  let shapeTerm: Term = df.namedNode(iri);
+  let readStream = null;
+
+  try {
+    readStream = (
       await rdfDereferencer.dereference(iri, {
         localFiles: true,
       })
     ).data;
+  } catch (err) {
+    console.error('Could not open/dereference ' + iri + ' with error message:\n' + (<Error>err).cause);
+    process.exit(1);
+  }
 
-    await new Promise((resolve, reject) => {
-      shapeStore.import(readStream).on("end", resolve).on("error", reject);
-    });
-    let tmpShapeTerm: Term[] = shapeStore.getQuads(null, df.namedNode('https://w3id.org/tree#shape'), null).map((quad) => quad.object);
-    if (tmpShapeTerm[0]) {
-        shapeTerm = tmpShapeTerm[0];
-        iri = shapeTerm.value;
-    }
-    if (tmpShapeTerm[0] && tmpShapeTerm[0].termType==='NamedNode') {
-        //Dereference the shape and add it here. The iri is not this IRI
-        console.error('GET ' + shapeTerm.value);
-        //Try to dereference this one as well. If it works, nice, if it doesn’t, too bad, we’ll continue without notice.
-        let readStream2 = (
-            await rdfDereferencer.dereference(shapeTerm.value, {
-              localFiles: true,
-            })
-        ).data;
-        await new Promise((resolve, reject) => {
-            shapeStore.import(readStream2).on("end", resolve).on("error", () => {
-                console.error('Warning: couldn’t fetch ' + iri + ' but continuing');
-                resolve(null);
-            });
+  await new Promise((resolve, reject) => {
+    shapeStore.import(readStream).on("end", resolve).on("error", reject);
+  });
+
+  let tmpShapeTerm: Term[] = shapeStore.getQuads(
+    null,
+    df.namedNode('https://w3id.org/tree#shape'),
+    null
+  ).map((quad) => quad.object);
+
+  if (tmpShapeTerm[0]) {
+    shapeTerm = tmpShapeTerm[0];
+    iri = shapeTerm.value;
+  }
+  if (tmpShapeTerm[0] && tmpShapeTerm[0].termType === 'NamedNode') {
+    //Dereference the shape and add it here. The iri is not this IRI
+    console.error('GET ' + shapeTerm.value);
+    // Try to dereference this one as well. If it works, nice, if it doesn’t, too bad, we’ll continue without notice.
+    try {
+      const readStream2 = (
+        await rdfDereferencer.dereference(shapeTerm.value, {
+          localFiles: true,
+        })
+      ).data;
+
+      await new Promise((resolve, reject) => {
+        shapeStore.import(readStream2).on("end", resolve).on("error", () => {
+          console.error('Warning: could not fetch ' + iri + ' but continuing');
+          resolve(null);
         });
+      });
+    } catch (err) {
+      console.error('Could not dereference ' + shapeTerm.value + ' with error message:\n' + (<Error>err).cause);
     }
+  }
 
+  try {
     shapesGraph = new ShapesGraph(shapeStore);
     const actualMermaid = shapesGraph.toMermaid(shapeTerm);
     console.log('```mermaid');
@@ -80,6 +97,9 @@ async function main () {
     const json = JSON.stringify(defaultState);
     const serialized = serialize(json);
     console.log();
-    console.log('Mermaid Live: https://mermaid.live/edit#pako:'+ serialized);
+    console.log('Mermaid Live: https://mermaid.live/view#pako:' + serialized);
+  } catch (err) {
+    console.error('Error: ' + (<Error>err).message);
+  }
 }
 main();

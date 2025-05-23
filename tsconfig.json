@@ -1,8 +1,8 @@
 {
     "compilerOptions": {
-      "target": "es2021",
+      "target": "es2022",
       "lib": [
-        "es2021",
+        "es2023",
         "dom"
       ],
       "declaration": true,
@@ -11,7 +11,8 @@
       "strict": true,
       "downlevelIteration": true,
       "esModuleInterop": true,
-      "module": "CommonJS"
+      "skipLibCheck": true,
+      "module": "NodeNext"
     },
     "exclude": [
       "tests",

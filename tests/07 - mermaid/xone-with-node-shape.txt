@@ -3,8 +3,8 @@ flowchart LR
   S1---X1_0{OR}
   X1_0---S1_0
   S1_0((Shape))
-  S1_0-->|"http://xmlns.com/foaf/0.1/name"|S1_0_1[ ]
+  S1_0-->|"http:‎//xmlns.com/foaf/0.1/name"|S1_0_1[ ]
   X1_0---S1_2
   S1_2((SecondXoneWithNodeShape))
-  S1_2-->|"http://example.org/qualifiedName"|S1_2_3[ ]
+  S1_2-->|"http:‎//example.org/qualifiedName"|S1_2_3[ ]
   S1_2_3((QualifiedNameShape))
