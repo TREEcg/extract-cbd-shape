@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1748008560980,
+  "lastUpdate": 1748008569303,
   "repoUrl": "https://github.com/TREEcg/extract-cbd-shape",
   "entries": {
     "Extraction algorithm Benchmark for inband data": [
@@ -4118,6 +4118,58 @@ window.BENCHMARK_DATA = {
             "range": "±1.41%",
             "unit": "ops/sec",
             "extra": "78 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "pieter.colpaert@ugent.be",
+            "name": "Pieter Colpaert",
+            "username": "pietercolpaert"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "1dfd4198060e44fe5f4d04c0abe41fc2ff66834c",
+          "message": "Merge pull request #41 from TREEcg/fix/mermaid-diagrams\n\nFix #40 + other minor improvements",
+          "timestamp": "2025-05-23T15:52:59+02:00",
+          "tree_id": "8eac7ee6131174135b0f2e9b5e0bc2ebee9faee3",
+          "url": "https://github.com/TREEcg/extract-cbd-shape/commit/1dfd4198060e44fe5f4d04c0abe41fc2ff66834c"
+        },
+        "date": 1748008568785,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "Extract1#ExtractionCollectionMembers",
+            "value": 285,
+            "range": "±2.88%",
+            "unit": "ops/sec",
+            "extra": "79 samples"
+          },
+          {
+            "name": "Extract2#ExtractionMembersPartialOutBand",
+            "value": 320,
+            "range": "±2.84%",
+            "unit": "ops/sec",
+            "extra": "78 samples"
+          },
+          {
+            "name": "Extract3#ExtractionMembersOutBand",
+            "value": 325,
+            "range": "±2.59%",
+            "unit": "ops/sec",
+            "extra": "75 samples"
+          },
+          {
+            "name": "Extract4#ExtractionCollection1000Members",
+            "value": 297,
+            "range": "±2.66%",
+            "unit": "ops/sec",
+            "extra": "72 samples"
           }
         ]
       }
