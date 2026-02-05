@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1770292074633,
+  "lastUpdate": 1770292163094,
   "repoUrl": "https://github.com/TREEcg/extract-cbd-shape",
   "entries": {
     "Extraction algorithm Benchmark for inband data": [
@@ -4286,6 +4286,58 @@ window.BENCHMARK_DATA = {
             "name": "Extract4#ExtractionCollection1000Members",
             "value": 276,
             "range": "±2.34%",
+            "unit": "ops/sec",
+            "extra": "79 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "smessie@smessie.com",
+            "name": "smessie",
+            "username": "smessie"
+          },
+          "committer": {
+            "email": "smessie@users.noreply.github.com",
+            "name": "Ieben Smessaert",
+            "username": "smessie"
+          },
+          "distinct": true,
+          "id": "6888125eeeaa21d0aca86e3fd9d402e0e464b665",
+          "message": "chore(deps): Update dependencies",
+          "timestamp": "2026-02-05T12:46:14+01:00",
+          "tree_id": "b73c74f32107bacf9e0865e69a1513ba44efceda",
+          "url": "https://github.com/TREEcg/extract-cbd-shape/commit/6888125eeeaa21d0aca86e3fd9d402e0e464b665"
+        },
+        "date": 1770292162083,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "Extract1#ExtractionCollectionMembers",
+            "value": 218,
+            "range": "±3.72%",
+            "unit": "ops/sec",
+            "extra": "74 samples"
+          },
+          {
+            "name": "Extract2#ExtractionMembersPartialOutBand",
+            "value": 260,
+            "range": "±3.07%",
+            "unit": "ops/sec",
+            "extra": "80 samples"
+          },
+          {
+            "name": "Extract3#ExtractionMembersOutBand",
+            "value": 263,
+            "range": "±2.68%",
+            "unit": "ops/sec",
+            "extra": "75 samples"
+          },
+          {
+            "name": "Extract4#ExtractionCollection1000Members",
+            "value": 254,
+            "range": "±2.97%",
             "unit": "ops/sec",
             "extra": "79 samples"
           }
