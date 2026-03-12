@@ -1,15 +1,15 @@
-import {assert} from "chai";
-import {DataFactory} from "rdf-data-factory";
-import {RdfStore} from "rdf-stores";
-import {CBDShapeExtractor} from "../../lib/extract-cbd-shape";
-import {rdfDereferencer} from "rdf-dereference";
-import sinon, {SinonStub} from "sinon";
+import { describe, it, beforeAll, afterAll, expect } from "vitest";
+import { DataFactory } from "rdf-data-factory";
+import { RdfStore } from "rdf-stores";
+import { CBDShapeExtractor } from "../../lib/extract-cbd-shape";
+import { rdfDereferencer } from "rdf-dereference";
+import sinon, { SinonStub } from "sinon";
 
 const df = new DataFactory();
 describe("Check whether a member from the MRG source can be fully extracted", function () {
    let fetchStub: SinonStub;
 
-   before(() => {
+   beforeAll(() => {
       // Mock the global fetch function
       fetchStub = sinon.stub(global, "fetch");
 
@@ -52,7 +52,7 @@ describe("Check whether a member from the MRG source can be fully extracted", fu
           `,
                {
                   status: 200,
-                  headers: {"Content-Type": "text/turtle"},
+                  headers: { "Content-Type": "text/turtle" },
                }
             )
          );
@@ -78,13 +78,13 @@ describe("Check whether a member from the MRG source can be fully extracted", fu
              `,
                {
                   status: 200,
-                  headers: {"Content-Type": "text/turtle"},
+                  headers: { "Content-Type": "text/turtle" },
                }
             )
          );
    });
 
-   after(() => {
+   afterAll(() => {
       // Restore the original fetch function
       fetchStub.restore();
    });
@@ -94,7 +94,7 @@ describe("Check whether a member from the MRG source can be fully extracted", fu
       let readStream = (
          await rdfDereferencer.dereference(
             "./tests/02 - marine regions LDES/shacl.ttl",
-            {localFiles: true},
+            { localFiles: true },
          )
       ).data;
       await new Promise((resolve, reject) => {
@@ -105,7 +105,7 @@ describe("Check whether a member from the MRG source can be fully extracted", fu
       let readStream2 = (
          await rdfDereferencer.dereference(
             "./tests/02 - marine regions LDES/data.ttl",
-            {localFiles: true},
+            { localFiles: true },
          )
       ).data;
       await new Promise((resolve, reject) => {
@@ -117,17 +117,14 @@ describe("Check whether a member from the MRG source can be fully extracted", fu
          df.namedNode("http://example.org/shape"),
       );
 
-      assert(fetchStub.calledWith("http://marineregions.org/mrgid/24983"));
-      assert(fetchStub.calledWith("http://marineregions.org/mrgid/24983/geometries?source=110&attributeValue=2004"));
+      expect(fetchStub.calledWith("http://marineregions.org/mrgid/24983")).toBeTruthy();
+      expect(fetchStub.calledWith("http://marineregions.org/mrgid/24983/geometries?source=110&attributeValue=2004")).toBeTruthy();
 
-      assert.equal(
-         result.filter((quad) => {
-            return (
-               quad.subject.value ===
-               "http://marineregions.org/mrgid/24983/geometries?source=110&attributeValue=2004"
-            );
-         }).length,
-         2,
-      ); // Test whether it actually did a call
+      expect(result.filter((quad) => {
+         return (
+            quad.subject.value ===
+            "http://marineregions.org/mrgid/24983/geometries?source=110&attributeValue=2004"
+         );
+      }).length,).toBe(2); // Test whether it actually did a call
    });
 });

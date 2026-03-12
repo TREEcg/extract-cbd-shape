@@ -1,8 +1,10 @@
-import { assert } from "chai";
-import { NamedNode, Parser, Store, StreamParser, Term, Writer } from "n3";
+import { describe, it, expect } from "vitest";
+import { DataFactory } from "rdf-data-factory";
 import { CBDShapeExtractor } from "../../lib/extract-cbd-shape";
 import { RdfStore } from "rdf-stores";
-import {rdfDereferencer} from "rdf-dereference";
+import { rdfDereferencer } from "rdf-dereference";
+
+const df = new DataFactory();
 
 describe("Tests whether plain CBD works using the data from 01 and 02", function () {
   it("Example 01 should return 11 triples with CBD", async () => {
@@ -19,12 +21,12 @@ describe("Tests whether plain CBD works using the data from 01 and 02", function
     });
     let result = await extractor.extract(
       dataStore,
-      new NamedNode("http://example.org/PersonShape"),
+      df.namedNode("http://example.org/PersonShape"),
     );
     //let writer = new Writer();
     //writer.addQuads(result);
     //writer.end((err, res) => {console.log(res);});
-    assert.equal(result.length, 11); // Only this many triples are given using plain CBD
+    expect(result.length).toBe(11); // Only this many triples are given using plain CBD
   });
   it("Example 02 should return 2 triples with CBD", async () => {
     let extractor = new CBDShapeExtractor();
@@ -40,12 +42,12 @@ describe("Tests whether plain CBD works using the data from 01 and 02", function
     });
     let result = await extractor.extract(
       dataStore,
-      new NamedNode("http://marineregions.org/mrgid/24983?t=1690208097"),
+      df.namedNode("http://marineregions.org/mrgid/24983?t=1690208097"),
     );
     //let writer = new Writer();
     //writer.addQuads(result);
     //writer.end((err, res) => {console.log(res);});
-    assert.equal(result.length, 2); // Only this many triples are given using plain CBD
+    expect(result.length).toBe(2); // Only this many triples are given using plain CBD
   });
 });
 
@@ -64,12 +66,12 @@ describe("Test CBD with nested blank nodes", async () => {
     });
     let result = await extractor.extract(
       dataStore,
-      new NamedNode("http://example.org/A"),
+      df.namedNode("http://example.org/A"),
     );
     //        let writer = new Writer();
     //        writer.addQuads(result);
     //        writer.end((err, res) => {console.log(res);});
-    assert.equal(result.length, 4); // Only this many triples are given using plain CBD
+    expect(result.length).toBe(4); // Only this many triples are given using plain CBD
   });
 });
 
@@ -88,12 +90,12 @@ describe("Test CBD with named graph", () => {
     });
     let result = await extractor.extract(
       dataStore,
-      new NamedNode("http://example.org/C"),
+      df.namedNode("http://example.org/C"),
     );
     //let writer = new Writer();
     //writer.addQuads(result);
     //writer.end((err, res) => {console.log(res);});
-    assert.equal(result.length, 4); // Only this many triples are given using plain CBD
+    expect(result.length).toBe(4); // Only this many triples are given using plain CBD
   });
   it("Should retrieve all triples within a graph and combine it with the triples found from CBD", async () => {
     let extractor = new CBDShapeExtractor();
@@ -109,12 +111,12 @@ describe("Test CBD with named graph", () => {
     });
     let result = await extractor.extract(
       dataStore,
-      new NamedNode("http://example.org/B"),
+      df.namedNode("http://example.org/B"),
     );
     //let writer = new Writer();
     //writer.addQuads(result);
     //writer.end((err, res) => {console.log(res);});
-    assert.equal(result.length, 8); // Only this many triples are given using plain CBD
+    expect(result.length).toBe(8); // Only this many triples are given using plain CBD
   });
   it("Should retrieve only the quads from that particular update in an LDES", async () => {
     let extractor = new CBDShapeExtractor();
@@ -130,12 +132,12 @@ describe("Test CBD with named graph", () => {
     });
     let result = await extractor.extract(
       dataStore,
-      new NamedNode("http://example.org/Activity1"),
+      df.namedNode("http://example.org/Activity1"),
     );
     //let writer = new Writer();
     //writer.addQuads(result);
     //writer.end((err, res) => {console.log(res);});
-    assert.equal(result.length, 6); // Only this many triples are given using plain CBD
+    expect(result.length).toBe(6); // Only this many triples are given using plain CBD
     ///// LIMITATION: You can only describe the triples that don’t overlap in the SHACL shape. From the moment you use a named graph, you cannot describe what’s inside using the tree:shape.
   });
 });

@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Extract1#ExtractionCollectionMembers",
+    "opsPerSecond": 453.3209036208179,
+    "samples": 80,
+    "mean": 0.00220594283654842,
+    "deviation": 0.00026306536694090425
+  },
+  {
+    "name": "Extract2#ExtractionMembersPartialOutBand",
+    "opsPerSecond": 361.4374274061102,
+    "samples": 81,
+    "mean": 0.002766730626588935,
+    "deviation": 0.0057833728671691205
+  },
+  {
+    "name": "Extract3#ExtractionMembersOutBand",
+    "opsPerSecond": 477.57819421677146,
+    "samples": 83,
+    "mean": 0.002093897946157279,
+    "deviation": 0.0001618438124129344
+  },
+  {
+    "name": "Extract4#ExtractionCollection1000Members",
+    "opsPerSecond": 117.90416547759105,
+    "samples": 81,
+    "mean": 0.00848146455173427,
+    "deviation": 0.0007118703532917898
+  }
+]

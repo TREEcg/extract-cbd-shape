@@ -1,6 +1,6 @@
-import { Quad, Term } from "@rdfjs/types";
-import { RdfStore } from "rdf-stores";
-import { CbdExtracted } from "./CBDShapeExtractor";
+import { Quad, Term, Store } from "@rdfjs/types";
+import { CbdExtracted, SyncStore, AsyncStore } from "./CBDShapeExtractor";
+import { streamToArray } from "./Utils";
 
 export interface Path {
   literalType?: Term;
@@ -10,12 +10,12 @@ export interface Path {
   found(cbd: CbdExtracted, inverse?: boolean): CbdExtracted | undefined;
 
   match(
-    store: RdfStore,
+    store: Store,
     extracted: CbdExtracted,
     focusNode: Term,
     graphsToIgnore?: Array<string>,
     inverse?: boolean,
-  ): PathResult[];
+  ): Promise<PathResult[]>;
 }
 
 export class PredicatePath implements Path {
@@ -35,18 +35,31 @@ export class PredicatePath implements Path {
     return cbd.enter(this.predicate, inverse);
   }
 
-  match(
-    store: RdfStore,
+  async match(
+    store: Store,
     extracted: CbdExtracted,
     focusNode: Term,
     graphsToIgnore: Array<string>,
     inverse: boolean = false,
-  ): PathResult[] {
-    let quads = (
-      inverse
-        ? store.getQuads(null, this.predicate, focusNode, null)
-        : store.getQuads(focusNode, this.predicate, null, null)
-    ).filter((q) => !graphsToIgnore.includes(q.graph.value));
+  ): Promise<PathResult[]> {
+    let quads: Quad[];
+    const s = store as Store | SyncStore | AsyncStore;
+    if ('getQuads' in s) {
+      quads = inverse
+        ? s.getQuads(null, this.predicate, focusNode, null)
+        : s.getQuads(focusNode, this.predicate, null, null);
+    } else if ('get' in s) {
+      quads = (await (inverse
+        ? s.get({ predicate: this.predicate, object: focusNode })
+        : s.get({ subject: focusNode, predicate: this.predicate }))).items;
+    } else {
+      quads = (
+        inverse
+          ? await streamToArray(store.match(null, this.predicate, focusNode, null))
+          : await streamToArray(store.match(focusNode, this.predicate, null, null))
+      );
+    }
+    quads = quads.filter((q) => !graphsToIgnore.includes(q.graph.value));
 
     if (quads.length > 0) {
       let cbd: CbdExtracted = extracted.push(this.predicate, inverse);
@@ -84,13 +97,13 @@ export class SequencePath implements Path {
     return this.sequence.map((x) => x.toString()).join("/");
   }
 
-  match(
-    store: RdfStore,
+  async match(
+    store: Store,
     extracted: CbdExtracted,
     focusNode: Term,
     graphsToIgnore: Array<string>,
     inverse: boolean = false,
-  ): PathResult[] {
+  ): Promise<PathResult[]> {
     let results: PathResult[] = [
       {
         path: [],
@@ -99,20 +112,23 @@ export class SequencePath implements Path {
       },
     ];
     for (const path of this.sequence) {
-      results = results.flatMap((res) => {
-        const nexts = path.match(
-          store,
-          res.cbdExtracted,
-          res.target,
-          graphsToIgnore,
-          inverse,
-        );
-        return nexts.map((n) => ({
-          path: [...res.path, ...n.path],
-          cbdExtracted: n.cbdExtracted,
-          target: n.target,
-        }));
-      });
+      const nextResultsArrays = await Promise.all(
+        results.map(async (res) => {
+          const nexts = await path.match(
+            store,
+            res.cbdExtracted,
+            res.target,
+            graphsToIgnore,
+            inverse,
+          );
+          return nexts.map((n) => ({
+            path: [...res.path, ...n.path],
+            cbdExtracted: n.cbdExtracted,
+            target: n.target,
+          }));
+        }),
+      );
+      results = nextResultsArrays.flat();
     }
     return results;
   }
@@ -139,16 +155,19 @@ export class AlternativePath implements Path {
     return this.alternatives.map((x) => x.toString()).join("|");
   }
 
-  match(
-    store: RdfStore,
+  async match(
+    store: Store,
     extracted: CbdExtracted,
     focusNode: Term,
     graphsToIgnore: Array<string>,
     inverse: boolean = false,
-  ): PathResult[] {
-    return this.alternatives.flatMap((path) =>
-      path.match(store, extracted, focusNode, graphsToIgnore, inverse),
+  ): Promise<PathResult[]> {
+    const resultsArrays = await Promise.all(
+      this.alternatives.map((path) =>
+        path.match(store, extracted, focusNode, graphsToIgnore, inverse),
+      ),
     );
+    return resultsArrays.flat();
   }
 }
 
@@ -169,14 +188,14 @@ export class InversePath implements Path {
     return "^" + this.path.toString();
   }
 
-  match(
-    store: RdfStore,
+  async match(
+    store: Store,
     extracted: CbdExtracted,
     focusNode: Term,
     graphsToIgnore: Array<string>,
     inverse: boolean = false,
-  ): PathResult[] {
-    return this.path.match(
+  ): Promise<PathResult[]> {
+    return await this.path.match(
       store,
       extracted,
       focusNode,
@@ -201,13 +220,13 @@ export abstract class MultiPath implements Path {
 
   abstract found(cbd: CbdExtracted): CbdExtracted | undefined;
 
-  match(
-    store: RdfStore,
+  async match(
+    store: Store,
     extracted: CbdExtracted,
     focusNode: Term,
     graphsToIgnore: Array<string>,
     inverse: boolean = false,
-  ): PathResult[] {
+  ): Promise<PathResult[]> {
     const out: PathResult[] = [];
     let targets: PathResult[] = [
       {
@@ -227,13 +246,15 @@ export abstract class MultiPath implements Path {
           out.push(t);
         }
 
-        for (const found of this.path.match(
+        const foundPaths = await this.path.match(
           store,
           t.cbdExtracted,
           t.target,
           graphsToIgnore,
           inverse,
-        )) {
+        );
+
+        for (const found of foundPaths) {
           newTargets.push({
             path: [...t.path, ...found.path],
             cbdExtracted: t.cbdExtracted,

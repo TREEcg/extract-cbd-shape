@@ -1,18 +1,20 @@
-import {assert} from "chai";
-import {NamedNode} from "n3";
-import {RdfStore} from "rdf-stores";
-import {CBDShapeExtractor} from "../../lib/CBDShapeExtractor";
-import {rdfDereferencer} from "rdf-dereference";
+import { describe, it, beforeAll, expect } from "vitest";
+import { DataFactory } from "rdf-data-factory";
+import { RdfStore } from "rdf-stores";
+import { CBDShapeExtractor } from "../../lib/CBDShapeExtractor";
+import { rdfDereferencer } from "rdf-dereference";
+
+const df = new DataFactory();
 
 describe("Check whether we can successfully extract a SHACL shape", async () => {
    let shapeStore = RdfStore.createDefault();
    let extractor: CBDShapeExtractor;
    let dataStore = RdfStore.createDefault();
-   before(async () => {
+   beforeAll(async () => {
       let readStream = (
          await rdfDereferencer.dereference(
             "./tests/01 - fetching a shacl shape/shacl-shacl.ttl",
-            {localFiles: true},
+            { localFiles: true },
          )
       ).data;
       await new Promise((resolve, reject) => {
@@ -22,7 +24,7 @@ describe("Check whether we can successfully extract a SHACL shape", async () => 
       let readStream2 = (
          await rdfDereferencer.dereference(
             "./tests/01 - fetching a shacl shape/shacl-catalog.ttl",
-            {localFiles: true},
+            { localFiles: true },
          )
       ).data;
       await new Promise((resolve, reject) => {
@@ -33,47 +35,47 @@ describe("Check whether we can successfully extract a SHACL shape", async () => 
    it("Extracts a SHACL shape from a shape catalog", async () => {
       let result = await extractor.extract(
          dataStore,
-         new NamedNode("http://example.org/PersonShape"),
-         new NamedNode("http://www.w3.org/ns/shacl-shacl#NodeShapeShape"),
+         df.namedNode("http://example.org/PersonShape"),
+         df.namedNode("http://www.w3.org/ns/shacl-shacl#NodeShapeShape"),
       );
-      assert.equal(result.length, 11); // Just testing whether there are 11 quads being returned
+      expect(result.length).toBe(11); // Just testing whether there are 11 quads being returned
    });
 
    it("Can extract another iteration with the same instance", async () => {
       let result = await extractor.extract(
          dataStore,
-         new NamedNode("http://example.org/PersonShape"),
-         new NamedNode("http://www.w3.org/ns/shacl-shacl#NodeShapeShape"),
+         df.namedNode("http://example.org/PersonShape"),
+         df.namedNode("http://www.w3.org/ns/shacl-shacl#NodeShapeShape"),
       );
       //let writer = new Writer();
       //writer.addQuads(result);
       //writer.end((err, res) => {console.log(res);});
-      assert.equal(result.length, 11); // Just testing whether there are 11 quads being returned
+      expect(result.length).toBe(11); // Just testing whether there are 11 quads being returned
    });
    it("Can extract a deeper nested organization based on an optional sh:node link", async () => {
       //console.log(extractor.shapesGraph.shapes.get("http://www.w3.org/ns/shacl-shacl#NodeShape"));
       let result = await extractor.extract(
          dataStore,
-         new NamedNode("http://example.org/OrganizationShape"),
-         new NamedNode("http://www.w3.org/ns/shacl-shacl#NodeShapeShape"),
+         df.namedNode("http://example.org/OrganizationShape"),
+         df.namedNode("http://www.w3.org/ns/shacl-shacl#NodeShapeShape"),
       );
       //let writer = new Writer();
       //writer.addQuads(result);
       //writer.end((err, res) => {console.log(res);});
-      assert.equal(result.length, 16); // Just testing whether there are 16 quads being returned now
+      expect(result.length).toBe(16); // Just testing whether there are 16 quads being returned now
    });
 
    it("Can extract itself from itself", async () => {
       let result = await extractor.extract(
          shapeStore,
-         new NamedNode("http://www.w3.org/ns/shacl-shacl#ShapeShape"),
-         new NamedNode("http://www.w3.org/ns/shacl-shacl#ShapeShape"),
+         df.namedNode("http://www.w3.org/ns/shacl-shacl#ShapeShape"),
+         df.namedNode("http://www.w3.org/ns/shacl-shacl#ShapeShape"),
       );
       /*let writer = new Writer();
           writer.addQuads(result);
           writer.end((err, res) => {console.log(res);});*/
 
       //TODO: Didn’t yet calculate how many actually should be returned here... Just assumed this number is correct...
-      assert.equal(result.length, 273); // Just testing whether there are quads being returned now
+      expect(result.length).toBe(273); // Just testing whether there are quads being returned now
    });
 });

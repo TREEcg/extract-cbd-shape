@@ -1,13 +1,16 @@
-import { assert } from "chai";
-import { NamedNode, Parser, Store, StreamParser, Term, Writer } from "n3";
+import { describe, it, beforeAll, expect } from "vitest";
+import { DataFactory } from "rdf-data-factory";
 import { CBDShapeExtractor } from "../../lib/CBDShapeExtractor";
-import {rdfDereferencer} from "rdf-dereference";
+import { rdfDereferencer } from "rdf-dereference";
 import { RdfStore } from "rdf-stores";
+
+const df = new DataFactory();
+
 describe("Check whether paths trigger the right extraction process", function () {
   let shapeStore = RdfStore.createDefault();
   let extractor: CBDShapeExtractor;
   let dataStore = RdfStore.createDefault();
-  before(async () => {
+  beforeAll(async () => {
     let readStream = (
       await rdfDereferencer.dereference("./tests/05 - paths/shape.ttl", {
         localFiles: true,
@@ -29,99 +32,99 @@ describe("Check whether paths trigger the right extraction process", function ()
   it("Test sequence path", async () => {
     let result = await extractor.extract(
       dataStore,
-      new NamedNode("http://example.org/B"),
-      new NamedNode("http://example.org/SequencePathShape"),
+      df.namedNode("http://example.org/B"),
+      df.namedNode("http://example.org/SequencePathShape"),
     );
     /*let writer = new Writer();
         writer.addQuads(result);
         writer.end((err, res) => {console.log(res);});*/
-    assert.equal(result.length, 3);
+    expect(result.length).toBe(3);
   });
   it("Test an inverse path", async () => {
     let result = await extractor.extract(
       dataStore,
-      new NamedNode("http://example.org/C"),
-      new NamedNode("http://example.org/InversePathShape"),
+      df.namedNode("http://example.org/C"),
+      df.namedNode("http://example.org/InversePathShape"),
     );
     /*let writer = new Writer();
         writer.addQuads(result);
         writer.end((err, res) => {console.log(res);});*/
-    assert.equal(result.length, 1);
+    expect(result.length).toBe(1);
   });
   it("Test a double inverse path", async () => {
     let result = await extractor.extract(
       dataStore,
-      new NamedNode("http://example.org/B"),
-      new NamedNode("http://example.org/DoubleInversePathShape"),
+      df.namedNode("http://example.org/B"),
+      df.namedNode("http://example.org/DoubleInversePathShape"),
     );
     /*let writer = new Writer();
         writer.addQuads(result);
         writer.end((err, res) => {console.log(res);});*/
-    assert.equal(result.length, 1);
+    expect(result.length).toBe(1);
   });
   it("Test an inverse with a sequence path combo", async () => {
     let result = await extractor.extract(
       dataStore,
-      new NamedNode("http://example.org/C"),
-      new NamedNode("http://example.org/SequenceAndInversePathShape"),
+      df.namedNode("http://example.org/C"),
+      df.namedNode("http://example.org/SequenceAndInversePathShape"),
     );
     /*let writer = new Writer();
         writer.addQuads(result);
         writer.end((err, res) => {console.error(res);});*/
-    assert.equal(result.length, 2);
+    expect(result.length).toBe(2);
   });
   it("Test a zeroOrMore path", async () => {
     let result = await extractor.extract(
       dataStore,
-      new NamedNode("http://example.org/A"),
-      new NamedNode("http://example.org/ZeroOrMorePathShape"),
+      df.namedNode("http://example.org/A"),
+      df.namedNode("http://example.org/ZeroOrMorePathShape"),
     );
     //let writer = new Writer();
     //writer.addQuads(result);
     //writer.end((err, res) => {console.error(res);});
-    assert.equal(result.length, 2);
+    expect(result.length).toBe(2);
   });
   it("Test a zeroOrMore path where zero and multiple both match", async () => {
     let result = await extractor.extract(
       dataStore,
-      new NamedNode("http://example.org/B"),
-      new NamedNode("http://example.org/ZeroOrMorePathShape2"),
+      df.namedNode("http://example.org/B"),
+      df.namedNode("http://example.org/ZeroOrMorePathShape2"),
     );
     //ISSUE 22: the triple ex:B ex:p2 ex:C also matches the zeroOrMorePath, but this is not being returned
-    assert.equal(result.length, 3);
+    expect(result.length).toBe(3);
   });
   it("Test a oneOrMore path", async () => {
     let result = await extractor.extract(
       dataStore,
-      new NamedNode("http://example.org/A"),
-      new NamedNode("http://example.org/OneOrMorePathShape"),
+      df.namedNode("http://example.org/A"),
+      df.namedNode("http://example.org/OneOrMorePathShape"),
     );
     //let writer = new Writer();
     //writer.addQuads(result);
     //writer.end((err, res) => {console.error(res);});
-    assert.equal(result.length, 2);
+    expect(result.length).toBe(2);
   });
   it("Test a alternative path", async () => {
     let result = await extractor.extract(
       dataStore,
-      new NamedNode("http://example.org/B"),
-      new NamedNode("http://example.org/AlternativePathShape"),
+      df.namedNode("http://example.org/B"),
+      df.namedNode("http://example.org/AlternativePathShape"),
     );
     /*let writer = new Writer();
         writer.addQuads(result);
         writer.end((err, res) => {console.error(res);});*/
-    assert.equal(result.length, 2);
+    expect(result.length).toBe(2);
   });
 
   it("Test inverse and alternate together", async () => {
     let result = await extractor.extract(
       dataStore,
-      new NamedNode("http://example.org/B"),
-      new NamedNode("http://example.org/AllTogetherPathShape"),
+      df.namedNode("http://example.org/B"),
+      df.namedNode("http://example.org/AllTogetherPathShape"),
     );
     /*let writer = new Writer();
         writer.addQuads(result);
         writer.end((err, res) => {console.error(res);});*/
-    assert.equal(result.length, 2);
+    expect(result.length).toBe(2);
   });
 });

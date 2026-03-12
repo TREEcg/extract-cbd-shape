@@ -73,7 +73,7 @@ async function main() {
   }
 
   try {
-    shapesGraph = new ShapesGraph(shapeStore);
+    shapesGraph = await ShapesGraph.fromStore(shapeStore);
     const actualMermaid = shapesGraph.toMermaid(shapeTerm);
     console.log('```mermaid');
     console.log(actualMermaid);

@@ -1,0 +1,44 @@
+[
+  {
+    "name": "CBDAndBlankNode",
+    "opsPerSecond": 208441.48994769718,
+    "samples": 43,
+    "mean": 0.000004797509364622769,
+    "deviation": 9.58380305767924e-8
+  },
+  {
+    "name": "CBDAndNamedGraphs",
+    "opsPerSecond": 142347.39257373064,
+    "samples": 42,
+    "mean": 0.000007025067210009044,
+    "deviation": 3.138371070088579e-7
+  },
+  {
+    "name": "CBDAndSimpleShape",
+    "opsPerSecond": 183154.69779125,
+    "samples": 42,
+    "mean": 0.0000054598654146438926,
+    "deviation": 1.859608878728393e-7
+  },
+  {
+    "name": "CBDAndSimpleShapeAndNamedGraphs",
+    "opsPerSecond": 130047.63292722839,
+    "samples": 44,
+    "mean": 0.0000076894902082499,
+    "deviation": 2.2367456535273362e-7
+  },
+  {
+    "name": "CBDAndShaclExtended",
+    "opsPerSecond": 145328.8136235496,
+    "samples": 43,
+    "mean": 0.000006880947935007132,
+    "deviation": 1.1058598538681243e-7
+  },
+  {
+    "name": "CBDAndShaclExtendedComplex",
+    "opsPerSecond": 139905.58892633964,
+    "samples": 41,
+    "mean": 0.000007147677284904611,
+    "deviation": 1.737624622779607e-7
+  }
+]
