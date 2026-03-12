@@ -1,9 +1,12 @@
-import {assert} from "chai";
-import {NamedNode, Parser} from "n3";
-import {RdfStore} from "rdf-stores";
-import {CBDShapeExtractor} from "../../lib/CBDShapeExtractor";
-import {rdfDereferencer} from "rdf-dereference";
-import sinon, {SinonStub} from "sinon";
+import { describe, it, beforeAll, afterAll, expect } from "vitest";
+import { DataFactory } from "rdf-data-factory";
+import { RdfStore } from "rdf-stores";
+import { Parser } from "n3";
+import { CBDShapeExtractor } from "../../lib/CBDShapeExtractor";
+import { rdfDereferencer } from "rdf-dereference";
+import sinon, { SinonStub } from "sinon";
+
+const df = new DataFactory();
 
 describe("Extracting logical edge cases", function () {
    let fetchStub: SinonStub;
@@ -11,7 +14,7 @@ describe("Extracting logical edge cases", function () {
    let shapeStore = RdfStore.createDefault();
    let extractor: CBDShapeExtractor;
    let dataStore = RdfStore.createDefault();
-   before(async () => {
+   beforeAll(async () => {
       // Mock the global fetch function
       fetchStub = sinon.stub(global, "fetch");
 
@@ -30,14 +33,14 @@ describe("Extracting logical edge cases", function () {
             `,
                {
                   status: 200,
-                  headers: {"Content-Type": "text/turtle"},
+                  headers: { "Content-Type": "text/turtle" },
                }
             )
          );
       let readStream = (
          await rdfDereferencer.dereference(
             "./tests/04 - logical edge cases/shape.ttl",
-            {localFiles: true},
+            { localFiles: true },
          )
       ).data;
       await new Promise((resolve, reject) => {
@@ -47,7 +50,7 @@ describe("Extracting logical edge cases", function () {
       let readStream2 = (
          await rdfDereferencer.dereference(
             "./tests/04 - logical edge cases/data.ttl",
-            {localFiles: true},
+            { localFiles: true },
          )
       ).data;
       await new Promise((resolve, reject) => {
@@ -55,7 +58,7 @@ describe("Extracting logical edge cases", function () {
       });
    });
 
-   after(() => {
+   afterAll(() => {
       // Restore the original fetch function
       fetchStub.restore();
    });
@@ -63,68 +66,68 @@ describe("Extracting logical edge cases", function () {
    it("Check whether the OR condition works - and check with recursion", async () => {
       let result = await extractor.extract(
          dataStore,
-         new NamedNode("http://example.org/Person1"),
-         new NamedNode("http://example.org/Shape"),
+         df.namedNode("http://example.org/Person1"),
+         df.namedNode("http://example.org/Shape"),
       );
       //let writer = new Writer();
       //writer.addQuads(result);
       //writer.end((err, res) => {console.log(res);});
-      assert.equal(result.length, 7);
+      expect(result.length).toBe(7);
    });
    it("Check whether the OR condition works a second time as well", async () => {
       let result = await extractor.extract(
          dataStore,
-         new NamedNode("http://example.org/Person2"),
-         new NamedNode("http://example.org/PersonShape"),
+         df.namedNode("http://example.org/Person2"),
+         df.namedNode("http://example.org/PersonShape"),
       );
       //let writer = new Writer();
       //writer.addQuads(result);
       //writer.end((err, res) => {console.log(res);});
-      assert.equal(result.length, 7);
+      expect(result.length).toBe(7);
    });
    it("Check whether it does an HTTP request if it doesn’t find the required properties on a node", async () => {
       let result = await extractor.extract(
          dataStore,
-         new NamedNode("http://example.org/Person3"),
-         new NamedNode("http://example.org/KnowsPieterShape"),
+         df.namedNode("http://example.org/Person3"),
+         df.namedNode("http://example.org/KnowsPieterShape"),
       );
       //let writer = new Writer();
       //writer.addQuads(result);
       //writer.end((err, res) => {console.log(res);});
-      assert.equal(result.length, 4);
+      expect(result.length).toBe(4);
    });
    it("Check whether it finds the nodelink in a xone", async () => {
       let result = await extractor.extract(
          dataStore,
-         new NamedNode("http://example.org/Person4"),
-         new NamedNode("http://example.org/XoneWithNodeShape"),
+         df.namedNode("http://example.org/Person4"),
+         df.namedNode("http://example.org/XoneWithNodeShape"),
       );
       //let writer = new Writer();
       //writer.addQuads(result);
       //writer.end((err, res) => {console.log(res);});
-      assert.equal(result.length, 3);
+      expect(result.length).toBe(3);
    });
    it("Check whether a node link in a xone in a xone triggers an HTTP request", async () => {
       let result = await extractor.extract(
          dataStore,
-         new NamedNode("http://example.org/Person5"),
-         new NamedNode("http://example.org/TriggersHTTPShape"),
+         df.namedNode("http://example.org/Person5"),
+         df.namedNode("http://example.org/TriggersHTTPShape"),
       );
       //let writer = new Writer();
       //writer.addQuads(result);
       //writer.end((err, res) => {console.log(res);});
-      assert.equal(result.length, 3);
+      expect(result.length).toBe(3);
    });
    it("Check whether a circular XONE shape works", async () => {
       let result = await extractor.extract(
          dataStore,
-         new NamedNode("http://example.org/Person6"),
-         new NamedNode("http://example.org/CircularXoneShape"),
+         df.namedNode("http://example.org/Person6"),
+         df.namedNode("http://example.org/CircularXoneShape"),
       );
       //let writer = new Writer();
       //writer.addQuads(result);
       //writer.end((err, res) => {console.log(res);});
-      assert.equal(result.length, 7);
+      expect(result.length).toBe(7);
    });
 });
 
@@ -172,16 +175,16 @@ ex:subject ex:first ex:false;
 
    const entity = await extractor.extract(
       dataStore,
-      new NamedNode("http://example.org/subject"),
-      new NamedNode("http://example.org/outerShape"),
+      df.namedNode("http://example.org/subject"),
+      df.namedNode("http://example.org/outerShape"),
    );
    it("Follows complex path inside inner node", async () => {
       const findMe = entity.find((q) => q.object.value === "Find me");
-      assert.isTrue(!!findMe, "Find me is found");
+      expect(!!findMe, "Find me is found").toBe(true);
    });
 
    it("Doesn't follow path if it is not part of the shape", async () => {
       const findMe = entity.find((q) => q.object.value === "Don't find me");
-      assert.isTrue(!findMe, "Don't find me is not found");
+      expect(!findMe, "Don't find me is not found").toBe(true);
    });
 });

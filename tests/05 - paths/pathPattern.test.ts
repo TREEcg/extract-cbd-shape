@@ -1,14 +1,16 @@
-import { assert } from "chai";
-import { DataFactory, NamedNode, Store } from "n3";
-import {rdfDereferencer} from "rdf-dereference";
+import { describe, it, beforeAll, expect } from "vitest";
+import { DataFactory } from "rdf-data-factory";
+import { rdfDereferencer } from "rdf-dereference";
 import { CbdExtracted } from "../../lib/CBDShapeExtractor";
-const { namedNode } = DataFactory;
 import { RdfStore } from "rdf-stores";
-import {ShapesGraph} from "../../lib/ShapesGraph";
+import { ShapesGraph } from "../../lib/ShapesGraph";
+
+const df = new DataFactory();
+
 describe("Test whether the Patterns are correctly created", function () {
   let shapeStore = RdfStore.createDefault();
   let shapesGraph: ShapesGraph;
-  before(async () => {
+  beforeAll(async () => {
     let readStream = (
       await rdfDereferencer.dereference("./tests/05 - paths/shape.ttl", {
         localFiles: true,
@@ -17,12 +19,10 @@ describe("Test whether the Patterns are correctly created", function () {
     await new Promise((resolve, reject) => {
       shapeStore.import(readStream).on("end", resolve).on("error", reject);
     });
-    shapesGraph = new ShapesGraph(shapeStore);
+    shapesGraph = await ShapesGraph.fromStore(shapeStore);
   });
   it("Check whether sequence paths are correctly represented", async () => {
-    assert(
-      shapesGraph.shapes.get(namedNode("http://example.org/SequencePathShape")),
-    );
+    expect(shapesGraph.shapes.get(df.namedNode("http://example.org/SequencePathShape")),).toBeTruthy();
   });
 });
 
@@ -31,7 +31,7 @@ describe("Test whether the Patterns are correctly matched", function () {
   let store = RdfStore.createDefault();
 
   let shapesGraph: ShapesGraph;
-  before(async () => {
+  beforeAll(async () => {
     let readStream = (
       await rdfDereferencer.dereference("./tests/05 - paths/shape.ttl", {
         localFiles: true,
@@ -40,7 +40,7 @@ describe("Test whether the Patterns are correctly matched", function () {
     await new Promise((resolve, reject) => {
       shapeStore.import(readStream).on("end", resolve).on("error", reject);
     });
-    shapesGraph = new ShapesGraph(shapeStore);
+    shapesGraph = await ShapesGraph.fromStore(shapeStore);
 
     let readStream2 = (
       await rdfDereferencer.dereference("./tests/05 - paths/data.ttl", {
@@ -53,28 +53,28 @@ describe("Test whether the Patterns are correctly matched", function () {
   });
 
   it("Check whether sequence paths are correctly matched", async () => {
-    let match1 =
-      shapesGraph.shapes
-        .get(namedNode("http://example.org/SequencePathShape"))!
+    const match1 =
+      await shapesGraph.shapes
+        .get(df.namedNode("http://example.org/SequencePathShape"))!
         .requiredPaths[0].match(
           store,
           new CbdExtracted(),
-          new NamedNode("http://example.org/A"),
+          df.namedNode("http://example.org/A"),
           [],
-        ).length > 0;
-    //assert(shapesGraph.shapes.get('http://example.org/SequencePathShape').requiredPaths[0].match(store, new NamedNode("http://example.org/A")));
+        );
+    expect(match1.length > 0).toBeTruthy();
   });
 
   it("Check whether a double inverse is correctly matched", async () => {
-    let match1 =
-      shapesGraph.shapes
-        .get(namedNode("http://example.org/DoubleInversePathShape"))!
+    const match1 =
+      await shapesGraph.shapes
+        .get(df.namedNode("http://example.org/DoubleInversePathShape"))!
         .requiredPaths[0].match(
           store,
           new CbdExtracted(),
-          new NamedNode("http://example.org/A"),
+          df.namedNode("http://example.org/A"),
           [],
-        ).length > 0;
-    //assert(shapesGraph.shapes.get('http://example.org/SequencePathShape').requiredPaths[0].match(store, new NamedNode("http://example.org/A")));
+        );
+    expect(match1.length > 0).toBeTruthy();
   });
 });

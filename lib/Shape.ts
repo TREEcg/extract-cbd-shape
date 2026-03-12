@@ -1,6 +1,6 @@
-import {Term} from "@rdfjs/types";
-import {Path,} from "./Path";
-import {CbdExtracted} from "./CBDShapeExtractor";
+import { Term } from "@rdfjs/types";
+import { Path, } from "./Path";
+import { CbdExtracted } from "./CBDShapeExtractor";
 
 //TODO: split this file up between Shape functionality and SHACL to our Shape class conversion steps. Also introduce a ShEx to Shape Template
 export class NodeLink {

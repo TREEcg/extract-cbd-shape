@@ -1,0 +1,30 @@
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            enlargelimits=0.15,
+            legend style={at={(0.5,-0.15)},
+            anchor=north,legend columns=-1},
+            ylabel={Duration per extraction ($\mu s$)},
+            symbolic x coords={Extract1\#ExtractionCollectionMembers,Extract2\#ExtractionMembersPartialOutBand,Extract3\#ExtractionMembersOutBand,Extract4\#ExtractionCollection1000Members},
+            xtick=data,
+            x tick label style={font=\footnotesize,rotate=45, anchor=east},
+            nodes near coords align={horizontal},
+        ]
+            \addplot+[
+                error bars/.cd,
+                y dir=both,
+                y explicit
+            ] coordinates {
+         (Extract1#ExtractionCollectionMembers, 2205.94283654842) +- (0, 263.06536694090425)
+         (Extract2#ExtractionMembersPartialOutBand, 2766.7306265889347) +- (0, 5783.372867169121)
+         (Extract3#ExtractionMembersOutBand, 2093.8979461572794) +- (0, 161.84381241293443)
+         (Extract4#ExtractionCollection1000Members, 8481.46455173427) +- (0, 711.8703532917898)
+
+             };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Graph depicting performance of inband extraction algorithm}
+\end{figure}

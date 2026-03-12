@@ -1,5 +1,4 @@
-import { RdfStore } from "rdf-stores";
-import { Term } from "@rdfjs/types";
+import { Term, Store } from "@rdfjs/types";
 import {
   AlternativePath,
   InversePath,
@@ -13,6 +12,7 @@ import {
 import { createTermNamespace, RDF, RDFS } from "@treecg/types";
 import { NodeLink, RDFMap, ShapeTemplate } from "./Shape";
 import { DataFactory } from "rdf-data-factory";
+import { clean, streamToArray } from "./Utils";
 
 const df = new DataFactory();
 
@@ -41,9 +41,45 @@ export class ShapesGraph {
   shapes: RDFMap<ShapeTemplate>;
   private counter: number;
 
-  constructor(shapeStore: RdfStore) {
-    this.shapes = this.initializeFromStore(shapeStore);
+  private constructor(shapes: RDFMap<ShapeTemplate>) {
+    this.shapes = shapes;
     this.counter = 0;
+  }
+
+  /**
+   * @param shapeStore
+   */
+  public static async fromStore(shapeStore: Store): Promise<ShapesGraph> {
+    // Get all named nodes of entities that are sh:NodeShapes which we'll recognize through their use 
+    // of sh:property (we'll find other relevant shape nodes later on)
+
+    // TODO: This is a limitation though: we only support NodeShapes with at least one sh:property set? 
+    // Other NodeShapes in this context are otherwise just meaningless?
+    const shapeNodes: Term[] = (<Term[]>[])
+      .concat(await getSubjects(shapeStore, SHACL.property, null, null))
+      .concat(await getSubjects(shapeStore, RDF.terms.type, SHACL.NodeShape, null))
+      .concat(await getObjects(shapeStore, null, SHACL.node, null))
+      // DISTINCT
+      .filter((value: Term, index: number, array: Array<Term>) => {
+        return array.findIndex((x) => x.equals(value)) === index;
+      });
+
+    let shapesGraph = new ShapesGraph(new RDFMap<ShapeTemplate>());
+    for (let shapeId of shapeNodes) {
+      let shape = new ShapeTemplate();
+      // Don't process if shape is deactivated
+      let deactivated = await getObjects(
+        shapeStore,
+        shapeId,
+        SHACL.deactivated,
+        null,
+      );
+      if (!(deactivated.length > 0 && deactivated[0].value === "true")) {
+        await shapesGraph.preprocessNodeShape(shapeStore, shapeId, shape);
+        shapesGraph.shapes.set(shapeId, shape);
+      }
+    }
+    return shapesGraph;
   }
 
   /**
@@ -74,11 +110,11 @@ export class ShapesGraph {
     let mermaid = `  S${id}((${name}))\n`;
     let alreadyProcessedPaths: string[] = [];
 
-    shape.nodeLinks.forEach(nodeLink => {
+    shape.nodeLinks.forEach((nodeLink: any) => {
       let p = nodeLink.pathPattern.toString();
       const isPathRequired = this.isPathRequired(p, shape.requiredPaths);
       alreadyProcessedPaths.push(p);
-      p = this.clean(p);
+      p = clean(p);
       const linkedShape = this.shapes.get(nodeLink.link);
 
       if (!linkedShape) {
@@ -105,12 +141,12 @@ export class ShapesGraph {
       mermaid += linkedShapeMermaid;
     });
 
-    shape.atLeastOneLists.forEach(list => {
+    shape.atLeastOneLists.forEach((list: any) => {
       if (list.length > 0) {
         const xId = `${id}_${this.counter}`;
         mermaid += `  S${id}---X${xId}{OR}\n`;
 
-        list.forEach(shape => {
+        list.forEach((shape: any) => {
           const shapeId = `${id}_${this.counter}`;
           this.counter++;
 
@@ -125,21 +161,6 @@ export class ShapesGraph {
     mermaid += this.simplePathToMermaid(shape.optionalPaths, alreadyProcessedPaths, id, '-.->');
 
     return mermaid;
-  }
-
-  /**
-   * This function removes < and > from a label.
-   * It also adds the invisible character ‎ after 'http(s):' and after 'www' to avoid
-   * the path being interpreted as a link. See https://github.com/orgs/community/discussions/106690.  
-   * @param path - The path from which to remove the < and >.
-   * @private
-   */
-  private clean(path: string): string {
-    return path.replace(/</g, '')
-      .replace(/http:/g, 'http:‎')
-      .replace(/https:/g, 'https:‎')
-      .replace(/www/g, 'www‎')
-      .replace(/>/g, '');
   }
 
   /**
@@ -171,7 +192,7 @@ export class ShapesGraph {
     let mermaid = '';
 
     paths.forEach(path => {
-      const literalType = path.literalType ? this.clean(path.literalType.value) : null;
+      const literalType = path.literalType ? clean(path.literalType.value) : null;
       let p = path.toString();
 
       if (alreadyProcessedPaths.includes(p)) {
@@ -179,7 +200,7 @@ export class ShapesGraph {
       }
 
       alreadyProcessedPaths.push(p);
-      p = this.clean(p);
+      p = clean(p);
 
       if (this.isRealInversePath(p)) {
         p = this.getRealPath(p);
@@ -226,35 +247,35 @@ export class ShapesGraph {
     return found[1];
   }
 
-  protected constructPathPattern(shapeStore: RdfStore, listItem: Term, literalType?: Term): Path {
+  protected async constructPathPattern(shapeStore: Store, listItem: Term, literalType?: Term): Promise<Path> {
 
     if (listItem.termType === "BlankNode") {
       //Look for special types
-      let zeroOrMorePathObjects = getObjects(
+      let zeroOrMorePathObjects = await getObjects(
         shapeStore,
         listItem,
         SHACL.zeroOrMorePath,
         null,
       );
-      let oneOrMorePathObjects = getObjects(
+      let oneOrMorePathObjects = await getObjects(
         shapeStore,
         listItem,
         SHACL.oneOrMorePath,
         null,
       );
-      let zeroOrOnePathObjects = getObjects(
+      let zeroOrOnePathObjects = await getObjects(
         shapeStore,
         listItem,
         SHACL.zeroOrOnePath,
         null,
       );
-      let inversePathObjects = getObjects(
+      let inversePathObjects = await getObjects(
         shapeStore,
         listItem,
         SHACL.inversePath,
         null,
       );
-      let alternativePathObjects = getObjects(
+      let alternativePathObjects = await getObjects(
         shapeStore,
         listItem,
         SHACL.alternativePath,
@@ -262,32 +283,32 @@ export class ShapesGraph {
       );
       if (zeroOrMorePathObjects[0]) {
         return new ZeroOrMorePath(
-          this.constructPathPattern(shapeStore, zeroOrMorePathObjects[0], literalType),
+          await this.constructPathPattern(shapeStore, zeroOrMorePathObjects[0], literalType),
         );
       } else if (oneOrMorePathObjects[0]) {
         return new OneOrMorePath(
-          this.constructPathPattern(shapeStore, oneOrMorePathObjects[0], literalType),
+          await this.constructPathPattern(shapeStore, oneOrMorePathObjects[0], literalType),
         );
       } else if (zeroOrOnePathObjects[0]) {
         return new ZeroOrOnePath(
-          this.constructPathPattern(shapeStore, zeroOrOnePathObjects[0], literalType),
+          await this.constructPathPattern(shapeStore, zeroOrOnePathObjects[0], literalType),
         );
       } else if (inversePathObjects[0]) {
         return new InversePath(
-          this.constructPathPattern(shapeStore, inversePathObjects[0], literalType),
+          await this.constructPathPattern(shapeStore, inversePathObjects[0], literalType),
         );
       } else if (alternativePathObjects[0]) {
-        let alternativeListArray = this.rdfListToArray(
+        let alternativeListArray = await Promise.all((await this.rdfListToArray(
           shapeStore,
           alternativePathObjects[0],
-        ).map((value: Term) => {
+        )).map((value: Term) => {
           return this.constructPathPattern(shapeStore, value, literalType);
-        });
+        }));
         return new AlternativePath(alternativeListArray);
       } else {
-        const items = this.rdfListToArray(shapeStore, listItem);
+        const items = await this.rdfListToArray(shapeStore, listItem);
         return new SequencePath(
-          items.map((x) => this.constructPathPattern(shapeStore, x, literalType)),
+          await Promise.all(items.map((x) => this.constructPathPattern(shapeStore, x, literalType))),
         );
       }
     }
@@ -302,14 +323,14 @@ export class ShapesGraph {
    * @param required
    * @returns false if it wasn't a property shape
    */
-  protected preprocessPropertyShape(
-    shapeStore: RdfStore,
+  protected async preprocessPropertyShape(
+    shapeStore: Store,
     propertyShapeId: Term,
     shape: ShapeTemplate,
     required?: boolean,
-  ): boolean {
+  ): Promise<boolean> {
     //Skip if shape has been deactivated
-    let deactivated = getObjects(
+    let deactivated = await getObjects(
       shapeStore,
       propertyShapeId,
       SHACL.deactivated,
@@ -320,22 +341,22 @@ export class ShapesGraph {
     }
 
     // Check if sh:datatype is defined
-    const literalType = getObjects(
+    const literalType = (await getObjects(
       shapeStore,
       propertyShapeId,
       SHACL.datatype,
       null,
-    )[0];
+    ))[0];
 
-    let path = getObjects(shapeStore, propertyShapeId, SHACL.path, null)[0];
+    let path = (await getObjects(shapeStore, propertyShapeId, SHACL.path, null))[0];
     //Process the path now and make sure there's a match function
     if (!path) {
       return false; //this isn't a property shape...
     }
 
-    let pathPattern = this.constructPathPattern(shapeStore, path, literalType);
+    let pathPattern = await this.constructPathPattern(shapeStore, path, literalType);
 
-    let minCount = getObjects(
+    let minCount = await getObjects(
       shapeStore,
       propertyShapeId,
       SHACL.minCount,
@@ -352,7 +373,7 @@ export class ShapesGraph {
     // Maybe to potentially point to another node, xone a datatype?
 
     // Does it link to a literal or to a new node?
-    let nodeLink = getObjects(shapeStore, propertyShapeId, SHACL.node, null);
+    let nodeLink = await getObjects(shapeStore, propertyShapeId, SHACL.node, null);
     if (nodeLink[0]) {
       shape.nodeLinks.push(new NodeLink(pathPattern, nodeLink[0]));
     }
@@ -367,10 +388,10 @@ export class ShapesGraph {
    * @param shape
    * @returns
    */
-  preprocessShape(shapeStore: RdfStore, shapeId: Term, shape: ShapeTemplate) {
-    return this.preprocessPropertyShape(shapeStore, shapeId, shape)
+  async preprocessShape(shapeStore: Store, shapeId: Term, shape: ShapeTemplate) {
+    return (await this.preprocessPropertyShape(shapeStore, shapeId, shape))
       ? true
-      : this.preprocessNodeShape(shapeStore, shapeId, shape);
+      : await this.preprocessNodeShape(shapeStore, shapeId, shape);
   }
 
   /**
@@ -379,8 +400,8 @@ export class ShapesGraph {
    * @param nodeShapeId
    * @param shape
    */
-  protected preprocessNodeShape(
-    shapeStore: RdfStore,
+  protected async preprocessNodeShape(
+    shapeStore: Store,
     nodeShapeId: Term,
     shape: ShapeTemplate,
   ) {
@@ -388,19 +409,19 @@ export class ShapesGraph {
     // first look for rdfs:label
     // fallback to sh:targetClass (if any)
     // fallback to last part of the node shape ID or the ID itself if it's a blank node
-    const rdfsLabel = getObjects(shapeStore, nodeShapeId, RDFS.terms.label)[0];
+    const rdfsLabel = (await getObjects(shapeStore, nodeShapeId, RDFS.terms.label))[0];
     if (rdfsLabel) {
       shape.label = rdfsLabel.value;
     } else {
-      const targetClass = getObjects(
+      const targetClass = (await getObjects(
         shapeStore,
         nodeShapeId,
         SHACL.targetClass,
         null,
-      )[0];
+      ))[0];
       if (targetClass) {
         // Make sure that IRIs are visible as node labels in mermaid diagrams
-        shape.label = this.clean(targetClass.value);
+        shape.label = clean(targetClass.value);
       } else {
         shape.label = nodeShapeId.termType === "BlankNode" ?
           nodeShapeId.value :
@@ -409,84 +430,51 @@ export class ShapesGraph {
     }
 
     //Check if it's closed or open
-    let closedIndicator: Term = getObjects(
+    let closedIndicator: Term = (await getObjects(
       shapeStore,
       nodeShapeId,
       SHACL.closed,
       null,
-    )[0];
+    ))[0];
     if (closedIndicator && closedIndicator.value === "true") {
       shape.closed = true;
     }
 
     //Process properties if it has any
-    let properties = getObjects(shapeStore, nodeShapeId, SHACL.property, null);
+    let properties = await getObjects(shapeStore, nodeShapeId, SHACL.property, null);
     for (let prop of properties) {
-      this.preprocessPropertyShape(shapeStore, prop, shape);
+      await this.preprocessPropertyShape(shapeStore, prop, shape);
     }
 
     // process sh:and: just add all IDs to this array
     // Process everything you can find nested in AND clauses
-    for (let andList of getObjects(shapeStore, nodeShapeId, SHACL.and, null)) {
+    for (let andList of await getObjects(shapeStore, nodeShapeId, SHACL.and, null)) {
       // Try to process it as a property shape
       //for every andList found, iterate through it and try to preprocess the property shape
-      for (let and of this.rdfListToArray(shapeStore, andList)) {
-        this.preprocessShape(shapeStore, and, shape);
+      for (let and of await this.rdfListToArray(shapeStore, andList)) {
+        await this.preprocessShape(shapeStore, and, shape);
       }
     }
     //Process zero or more sh:xone and sh:or lists in the same way -- explanation in README why they can be handled in the same way
-    for (let xoneOrOrList of getObjects(
+    for (let xoneOrOrList of (await getObjects(
       shapeStore,
       nodeShapeId,
       SHACL.xone,
       null,
-    ).concat(getObjects(shapeStore, nodeShapeId, SHACL.or, null))) {
-      let atLeastOneList: Array<ShapeTemplate> = this.rdfListToArray(
+    )).concat(await getObjects(shapeStore, nodeShapeId, SHACL.or, null))) {
+      let atLeastOneList: Array<ShapeTemplate> = await Promise.all((await this.rdfListToArray(
         shapeStore,
         xoneOrOrList,
-      ).map((val): ShapeTemplate => {
+      )).map(async (val): Promise<ShapeTemplate> => {
         let newShape = new ShapeTemplate();
         //Create a new shape and process as usual -- but mind that we don't trigger a circular shape here...
-        this.preprocessShape(shapeStore, val, newShape);
+        await this.preprocessShape(shapeStore, val, newShape);
         return newShape;
         //Add this one to the shapesgraph
-      });
+      }));
       shape.atLeastOneLists.push(atLeastOneList);
     }
     //And finally, we're just ignoring sh:not. Don't process this one
-  }
-
-  /**
-   * @param shapeStore
-   */
-  initializeFromStore(shapeStore: RdfStore): RDFMap<ShapeTemplate> {
-    //get all named nodes of entities that are sh:NodeShapes which we'll recognize through their use of sh:property (we'll find other relevant shape nodes later on)
-    //TODO: This is a limitation though: we only support NodeShapes with at least one sh:property set? Other NodeShapes in this context are otherwise just meaningless?
-    const shapeNodes: Term[] = (<Term[]>[])
-      .concat(getSubjects(shapeStore, SHACL.property, null, null))
-      .concat(getSubjects(shapeStore, RDF.terms.type, SHACL.NodeShape, null))
-      .concat(getObjects(shapeStore, null, SHACL.node, null))
-      //DISTINCT
-      .filter((value: Term, index: number, array: Array<Term>) => {
-        return array.findIndex((x) => x.equals(value)) === index;
-      });
-
-    let shapes = new RDFMap<ShapeTemplate>();
-    for (let shapeId of shapeNodes) {
-      let shape = new ShapeTemplate();
-      //Don't process if shape is deactivated
-      let deactivated = getObjects(
-        shapeStore,
-        shapeId,
-        SHACL.deactivated,
-        null,
-      );
-      if (!(deactivated.length > 0 && deactivated[0].value === "true")) {
-        this.preprocessNodeShape(shapeStore, shapeId, shape);
-        shapes.set(shapeId, shape);
-      }
-    }
-    return shapes;
   }
 
   /**
@@ -495,46 +483,46 @@ export class ShapesGraph {
    * @param item
    * @returns
    */
-  protected * rdfListToGenerator(
-    shapeStore: RdfStore,
+  protected async * rdfListToGenerator(
+    shapeStore: Store,
     item: Term,
-  ): Generator<Term> {
+  ): AsyncGenerator<Term> {
     if (
-      getObjects(
+      (await getObjects(
         shapeStore,
         item,
         df.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#first"),
         null,
-      )[0]
+      ))[0]
     ) {
-      yield getObjects(
+      yield (await getObjects(
         shapeStore,
         item,
         df.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#first"),
         null,
-      )[0];
-      let rest = getObjects(
+      ))[0];
+      let rest = (await getObjects(
         shapeStore,
         item,
         df.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"),
         null,
-      )[0];
+      ))[0];
       while (
         rest &&
         rest.value !== "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"
       ) {
-        yield getObjects(
+        yield (await getObjects(
           shapeStore,
           rest,
           df.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#first"),
           null,
-        )[0];
-        rest = getObjects(
+        ))[0];
+        rest = (await getObjects(
           shapeStore,
           rest,
           df.namedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"),
           null,
-        )[0];
+        ))[0];
       }
     } else {
       // It's not a list. It's just one element.
@@ -543,29 +531,36 @@ export class ShapesGraph {
     return;
   }
 
-  protected rdfListToArray(shapeStore: RdfStore, item: Term): Array<Term> {
-    return Array.from(this.rdfListToGenerator(shapeStore, item));
+  protected async rdfListToArray(shapeStore: Store, item: Term): Promise<Array<Term>> {
+    const list: Array<Term> = [];
+    for await (const t of this.rdfListToGenerator(shapeStore, item)) {
+      list.push(t);
+    }
+    return list;
   }
 }
 
-const getSubjects = function (
-  store: RdfStore,
+const getSubjects = async (
+  store: Store,
   predicate: Term | null,
   object: Term | null,
   graph?: Term | null,
-) {
-  return store.getQuads(null, predicate, object, graph).map((quad) => {
+) => {
+  const quadStream = store.match(null, predicate, object, graph);
+
+  return (await streamToArray(quadStream)).map((quad: any) => {
     return quad.subject;
   });
 };
 
-const getObjects = function (
-  store: RdfStore,
+const getObjects = async (
+  store: Store,
   subject: Term | null,
   predicate: Term | null,
   graph?: Term | null,
-) {
-  return store.getQuads(subject, predicate, null, graph).map((quad) => {
+) => {
+  const quadStream = store.match(subject, predicate, null, graph);
+  return (await streamToArray(quadStream)).map((quad: any) => {
     return quad.object;
   });
 };

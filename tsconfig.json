@@ -1,23 +1,29 @@
 {
-    "compilerOptions": {
-      "target": "es2022",
-      "lib": [
-        "es2023",
-        "dom"
-      ],
-      "declaration": true,
-      "sourceMap": true,
-      "outDir": "dist",
-      "strict": true,
-      "downlevelIteration": true,
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-      "module": "NodeNext"
-    },
-    "exclude": [
-      "tests",
-      "node_modules",
-      "dist",
-      "perf"
-    ]
-  }
+  "compilerOptions": {
+    "target": "es2022",
+    "lib": [
+      "es2023",
+      "dom"
+    ],
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "strict": true,
+    "downlevelIteration": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "node"
+  },
+  "tsc-alias": {
+    "resolveFullPaths": true,
+    "verbose": false
+  },
+  "exclude": [
+    "tests",
+    "node_modules",
+    "dist",
+    "perf",
+    "vitest.config.ts"
+  ]
+}

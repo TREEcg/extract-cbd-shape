@@ -1,24 +1,25 @@
-import {rdfDereferencer, RdfDereferencer} from "rdf-dereference";
-import {NodeLink, RDFMap, ShapeTemplate} from "./Shape";
-import {Path} from "./Path";
-import {DataFactory} from "rdf-data-factory";
-import {RdfStore} from "rdf-stores";
-import {Quad, Term} from "@rdfjs/types";
+import { rdfDereferencer, RdfDereferencer } from "rdf-dereference";
+import { NodeLink, RDFMap, ShapeTemplate } from "./Shape";
+import { Path } from "./Path";
+import { DataFactory } from "rdf-data-factory";
+import { RdfStore } from "rdf-stores";
+import { Quad, Term, Store } from "@rdfjs/types";
 import debug from "debug";
-import {ShapesGraph} from "./ShapesGraph";
+import { ShapesGraph } from "./ShapesGraph";
+import { streamToArray, streamToAsyncIterable } from "./Utils";
 
 const log = debug("extract-cbd-shape");
 
 const df = new DataFactory();
 
-class DereferenceNeeded {
-   target: string;
-   msg?: string;
+// As in { RdfStore } from "rdf-stores" 
+export interface SyncStore extends Store {
+   getQuads(subject?: Term | null, predicate?: Term | null, object?: Term | null, graph?: Term | null): Quad[];
+}
 
-   constructor(target: string, msg?: string) {
-      this.target = target;
-      this.msg = msg;
-   }
+// As in { Quadstore } from "quadstore"
+export interface AsyncStore extends Store {
+   get(pattern: { subject?: Term | null, predicate?: Term | null, object?: Term | null, graph?: Term | null }): Promise<{ items: Quad[] }>;
 }
 
 type CBDShapeExtractorOptions = {
@@ -35,17 +36,18 @@ type CBDShapeExtractorOptions = {
  */
 export class CBDShapeExtractor {
    dereferencer: RdfDereferencer;
-   shapesGraph?: ShapesGraph;
+   shapesGraphStore?: Store;
+   private shapesGraph?: ShapesGraph;
 
    options: CBDShapeExtractorOptions;
 
    constructor(
-      shapesGraphStore?: RdfStore,
+      shapesGraphStore?: Store,
       dereferencer?: RdfDereferencer<Quad>,
       options: Partial<CBDShapeExtractorOptions> = {},
    ) {
       // Assign with default options
-      this.options = Object.assign({cbdDefaultGraph: false}, options);
+      this.options = Object.assign({ cbdDefaultGraph: false }, options);
 
       if (!dereferencer) {
          this.dereferencer = rdfDereferencer;
@@ -55,12 +57,12 @@ export class CBDShapeExtractor {
 
       //Pre-process shape
       if (shapesGraphStore) {
-         this.shapesGraph = new ShapesGraph(shapesGraphStore);
+         this.shapesGraphStore = shapesGraphStore;
       }
    }
 
    public async bulkExtract(
-      store: RdfStore,
+      store: Store,
       ids: Array<Term>,
       shapeId?: Term,
       graphsToIgnore?: Array<Term>,
@@ -74,7 +76,7 @@ export class CBDShapeExtractor {
          memberSpecificQuads[id.value] = [];
       }
       const newStore = RdfStore.createDefault();
-      for (let quad of store.readQuads(null, null, null, null)) {
+      for await (const quad of streamToAsyncIterable(store.match(null, null, null, null))) {
          if (quad.graph.termType == "NamedNode" && idSet.has(quad.graph.value)) {
             memberSpecificQuads[quad.graph.value].push(quad);
          } else {
@@ -92,10 +94,10 @@ export class CBDShapeExtractor {
          ).then((quads) => {
             quads.push(...memberSpecificQuads[id.value]);
             if (itemExtracted) {
-               itemExtracted({subject: id, quads});
+               itemExtracted({ subject: id, quads });
             }
 
-            out.push({subject: id, quads});
+            out.push({ subject: id, quads });
          });
          promises.push(promise);
       }
@@ -112,14 +114,14 @@ export class CBDShapeExtractor {
     *  * all quads in the namedgraph of this entity,
     *  * all quads of required paths found in the shape
     *  * the same algorithm on top of all found node links
-    * @param store The RdfStore loaded with a set of initial quads
+    * @param store The Store loaded with a set of initial quads
     * @param id The entity to be described/extracted
     * @param shapeId The optional SHACL NodeShape identifier
     * @param graphsToIgnore The optional parameter of graph to ignore when other entities are mentioned in the current context
     * @returns Promise of a quad array of the described entity
     */
    public async extract(
-      store: RdfStore,
+      store: Store,
       id: Term,
       shapeId?: Term,
       graphsToIgnore?: Array<Term>,
@@ -130,6 +132,10 @@ export class CBDShapeExtractor {
       ).map((item) => {
          return item.value;
       });
+
+      if (!this.shapesGraph && this.shapesGraphStore) {
+         this.shapesGraph = await ShapesGraph.fromStore(this.shapesGraphStore);
+      }
 
       const extractInstance = new ExtractInstance(
          store,
@@ -168,7 +174,7 @@ export class CbdExtracted {
       if (topology) {
          this.topology = topology;
       } else {
-         this.topology = {forwards: {}, backwards: {}};
+         this.topology = { forwards: {}, backwards: {} };
       }
       this.cbdExtractedMap = cbdExtracted;
    }
@@ -178,7 +184,7 @@ export class CbdExtracted {
       if (t) {
          t.cbd = true;
       } else {
-         this.cbdExtractedMap.set(term, {cbd: true, shape: false});
+         this.cbdExtractedMap.set(term, { cbd: true, shape: false });
       }
    }
 
@@ -187,7 +193,7 @@ export class CbdExtracted {
       if (t) {
          t.shape = true;
       } else {
-         this.cbdExtractedMap.set(term, {cbd: true, shape: false});
+         this.cbdExtractedMap.set(term, { cbd: true, shape: false });
       }
    }
 
@@ -237,7 +243,7 @@ export class CbdExtracted {
 
 class ExtractInstance {
    dereferenced: Set<string> = new Set();
-   store: RdfStore;
+   store: Store;
 
    dereferencer: RdfDereferencer;
    options: CBDShapeExtractorOptions;
@@ -246,7 +252,7 @@ class ExtractInstance {
    shapesGraph?: ShapesGraph;
 
    constructor(
-      store: RdfStore,
+      store: Store,
       dereferencer: RdfDereferencer,
       graphsToIgnore: string[],
       options: CBDShapeExtractorOptions,
@@ -271,7 +277,14 @@ class ExtractInstance {
          shapeId,
       );
 
-      result.push(...this.store.getQuads(null, null, null, id));
+      const store = this.store as Store | SyncStore | AsyncStore;
+      if ('getQuads' in store) {
+         result.push(...store.getQuads(null, null, null, id));
+      } else if ('get' in store) {
+         result.push(...(await store.get({ graph: id })).items);
+      } else {
+         result.push(...await streamToArray(store.match(null, null, null, id)));
+      }
 
       if (result.length === 0) {
          if (await this.dereference(id.value)) {
@@ -341,7 +354,7 @@ class ExtractInstance {
       }
 
       if (!shape?.closed) {
-         this.CBD(id, result, extracted, this.graphsToIgnore);
+         await this.CBD(id, result, extracted, this.graphsToIgnore);
       }
 
       // Next, on our newly fetched data,
@@ -359,18 +372,17 @@ class ExtractInstance {
             extraPaths,
          )) {
             if (!path.found(extracted) || shape.closed) {
-               let pathQuads = path
-                  .match(this.store, extracted, id, this.graphsToIgnore)
-                  .flatMap((pathResult) => {
-                     return pathResult.path;
-                  });
+               let pathResult = await path.match(this.store, extracted, id, this.graphsToIgnore);
+               let pathQuads = pathResult.flatMap((pathRes: any) => {
+                  return pathRes.path;
+               });
 
                result.push(...pathQuads);
             }
          }
 
          for (let nodeLink of shape.nodeLinks.concat(extraNodeLinks)) {
-            let matches = nodeLink.pathPattern.match(
+            let matches = await nodeLink.pathPattern.match(
                this.store,
                extracted,
                id,
@@ -400,8 +412,7 @@ class ExtractInstance {
                   return this.extractRecursively(id, extracted, offline, shapeId);
                } else {
                   log(
-                     `${
-                        id.value
+                     `${id.value
                      } does not adhere to the shape (${problems.toString()})`,
                   );
                }
@@ -420,7 +431,7 @@ class ExtractInstance {
     * @param id starting subject
     * @param graphsToIgnore
     */
-   private CBD(
+   private async CBD(
       id: Term,
       result: Quad[],
       extractedStar: CbdExtracted,
@@ -428,7 +439,16 @@ class ExtractInstance {
    ) {
       extractedStar.addCBDTerm(id);
       const graph = this.options.cbdDefaultGraph ? df.defaultGraph() : null;
-      const quads = this.store.getQuads(id, null, null, graph);
+
+      const store = this.store as Store | SyncStore | AsyncStore;
+      let quads: Quad[];
+      if ('getQuads' in store) {
+         quads = store.getQuads(id, null, null, graph);
+      } else if ('get' in store) {
+         quads = (await store.get({ subject: id, graph })).items;
+      } else {
+         quads = await streamToArray(store.match(id, null, null, graph));
+      }
 
       for (const q of quads) {
          // Ignore quads in the graphs to ignore
@@ -444,7 +464,7 @@ class ExtractInstance {
             q.object.termType === "BlankNode" &&
             !extractedStar.cbdExtracted(q.object)
          ) {
-            this.CBD(q.object, result, next, graphsToIgnore);
+            await this.CBD(q.object, result, next, graphsToIgnore);
          }
       }
    }

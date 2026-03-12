@@ -1,0 +1,44 @@
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            enlargelimits=0.15,
+            legend style={at={(0.5,-0.15)},
+            anchor=north,legend columns=-1},
+            ylabel={Duration per extraction ($\mu s$)},
+            symbolic x coords={Extract1\#CBDAndBlankNode,Extract1.1\#CBDAndBlankNodeTenPercent,Extract1.2\#CBDAndBlankNodeOnePercent,Extract2\#CBDAndNamedGraphs,Extract2.1\#CBDAndNamedGraphsTenPercent,Extract2.2\#CBDAndNamedGraphsOnePercent,Extract3\#CBDAndSimpleShape,Extract3.1\#CBDAndSimpleShapeTenPercent,Extract3.2\#CBDAndSimpleShapeOnePercent,Extract4\#CBDAndSimpleShapeAndNamedGraphs,Extract4.1\#CBDAndSimpleShapeAndNamedGraphsTenPercent,Extract4.2\#CBDAndSimpleShapeAndNamedGraphsOnePercent,Extract5\#CBDAndShaclExtended,Extract5.1\#CBDAndShaclExtendedTenPercent,Extract5.2\#CBDAndShaclExtendedOnePercent,Extract6\#CBDAndShaclExtendedComplex,Extract6.1\#CBDAndShaclExtendedComplexTenPercent,Extract6.2\#CBDAndShaclExtendedComplexOnePercent},
+            xtick=data,
+            x tick label style={font=\footnotesize,rotate=45, anchor=east},
+            nodes near coords align={horizontal},
+        ]
+            \addplot+[
+                error bars/.cd,
+                y dir=both,
+                y explicit
+            ] coordinates {
+         (Extract1#CBDAndBlankNode, NaN) +- (0, NaN)
+         (Extract1.1#CBDAndBlankNodeTenPercent, NaN) +- (0, NaN)
+         (Extract1.2#CBDAndBlankNodeOnePercent, NaN) +- (0, NaN)
+         (Extract2#CBDAndNamedGraphs, NaN) +- (0, NaN)
+         (Extract2.1#CBDAndNamedGraphsTenPercent, NaN) +- (0, NaN)
+         (Extract2.2#CBDAndNamedGraphsOnePercent, NaN) +- (0, NaN)
+         (Extract3#CBDAndSimpleShape, NaN) +- (0, NaN)
+         (Extract3.1#CBDAndSimpleShapeTenPercent, NaN) +- (0, NaN)
+         (Extract3.2#CBDAndSimpleShapeOnePercent, NaN) +- (0, NaN)
+         (Extract4#CBDAndSimpleShapeAndNamedGraphs, NaN) +- (0, NaN)
+         (Extract4.1#CBDAndSimpleShapeAndNamedGraphsTenPercent, NaN) +- (0, NaN)
+         (Extract4.2#CBDAndSimpleShapeAndNamedGraphsOnePercent, NaN) +- (0, NaN)
+         (Extract5#CBDAndShaclExtended, NaN) +- (0, NaN)
+         (Extract5.1#CBDAndShaclExtendedTenPercent, NaN) +- (0, NaN)
+         (Extract5.2#CBDAndShaclExtendedOnePercent, NaN) +- (0, NaN)
+         (Extract6#CBDAndShaclExtendedComplex, NaN) +- (0, NaN)
+         (Extract6.1#CBDAndShaclExtendedComplexTenPercent, NaN) +- (0, NaN)
+         (Extract6.2#CBDAndShaclExtendedComplexOnePercent, NaN) +- (0, NaN)
+
+             };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Graph depicting performance of inband extraction algorithm}
+\end{figure}

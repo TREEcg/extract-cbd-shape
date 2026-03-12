@@ -1,14 +1,20 @@
 {
   "name": "extract-cbd-shape",
   "version": "0.1.15",
+  "type": "module",
   "description": "Extract an entity based on CBD and a SHACL shape",
   "main": "dist/lib/extract-cbd-shape.js",
+  "exports": {
+    "import": "./dist/lib/extract-cbd-shape.js",
+    "require": "./dist/lib/extract-cbd-shape.cjs"
+  },
   "types": "dist/lib/extract-cbd-shape.d.ts",
   "scripts": {
-    "test": "mocha",
-    "build": "tsc",
+    "test": "vitest run",
+    "build": "tsc && tsc-alias && rollup -c",
+    "prepublishOnly": "npm run build",
     "data": "npm run build && node ./perf/outband-setup.js",
-    "bench": "npm run build && node ./perf/perftest-inband.js && node ./perf/perftest-inband-percent.js && node ./perf/perftest-outband.js "
+    "bench": "npm run build && node ./perf/perftest-inband.js && node ./perf/perftest-inband-diskstore.js && node ./perf/perftest-inband-percent.js && node ./perf/perftest-outband.js"
   },
   "keywords": [
     "CBD",
@@ -17,35 +23,41 @@
     "RDF-JS"
   ],
   "author": "Pieter Colpaert",
+  "contributors": [
+    "Arthur Vercruysse",
+    "Ieben Smessaert",
+    "Xueying Deng",
+    "Pieter Heyvaert",
+    "Julián Rojas"
+  ],
   "license": "MIT",
   "dependencies": {
     "@treecg/types": "^0.4.6",
     "debug": "^4.4.3",
-    "jsdom": "^28.0.0",
-    "n3": "^2.0.1",
+    "n3": "^2.0.3",
     "rdf-data-factory": "^2.0.2",
     "rdf-dereference": "^5.0.0",
-    "rdf-stores": "^2.1.1"
+    "rdf-stores": "^2.2.0"
   },
   "devDependencies": {
-    "@rdfjs/types": "*",
+    "@rdfjs/types": "^2.0.1",
     "@types/benchmark": "^2.1.5",
-    "@types/chai": "^5.2.3",
     "@types/debug": "^4.1.12",
-    "@types/mocha": "^10.0.10",
     "@types/n3": "^1.26.1",
     "@types/pako": "^2.0.4",
-    "@types/sinon": "^17.0.4",
+    "@types/sinon": "^21.0.0",
+    "@vitest/coverage-v8": "^4.0.18",
     "benchmark": "^2.1.4",
-    "chai": "^6.2.2",
     "js-base64": "^3.7.8",
-    "mocha": "^11.7.5",
+    "jsdom": "^28.1.0",
+    "level": "^10.0.0",
     "pako": "^2.1.0",
-    "rollup": "^4.57.1",
-    "rollup-plugin-polyfill-node": "^0.13.0",
-    "sinon": "^21.0.1",
-    "systeminformation": "^5.30.7",
-    "ts-node": "^10.9.2",
-    "typescript": "5.9.3"
+    "quadstore": "^15.4.1",
+    "rollup": "^4.59.0",
+    "sinon": "^21.0.2",
+    "systeminformation": "^5.31.4",
+    "tsc-alias": "^1.8.16",
+    "typescript": "5.9.3",
+    "vitest": "^4.0.18"
   }
 }

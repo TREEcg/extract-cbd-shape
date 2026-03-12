@@ -1,14 +1,17 @@
-import { assert } from "chai";
-import { NamedNode, Parser, StreamParser, Term, Writer } from "n3";
+import { describe, it, beforeAll, expect } from "vitest";
+import { Parser } from "n3";
+import { DataFactory } from "rdf-data-factory";
 import { CBDShapeExtractor } from "../../lib/CBDShapeExtractor";
-import {rdfDereferencer} from "rdf-dereference";
+import { rdfDereferencer } from "rdf-dereference";
 import { RdfStore } from "rdf-stores";
+
+const df = new DataFactory();
 
 describe("Check whether paths trigger the right extraction process", function () {
   let shapeStore = RdfStore.createDefault();
   let extractor: CBDShapeExtractor;
   let dataStore = RdfStore.createDefault();
-  before(async () => {
+  beforeAll(async () => {
     let readStream = (
       await rdfDereferencer.dereference("./tests/06 - shapes and named graphs/shape.ttl", {
         localFiles: true,
@@ -30,12 +33,12 @@ describe("Check whether paths trigger the right extraction process", function ()
   it("Named Graphs should not conflict with the shape extraction", async () => {
     let result = await extractor.extract(
       dataStore,
-      new NamedNode("http://example.org/M1v1"),
-      new NamedNode("http://example.org/Shape"),
-      [new NamedNode("http://example.org/M1v2")] //Other members in the current context
+      df.namedNode("http://example.org/M1v1"),
+      df.namedNode("http://example.org/Shape"),
+      [df.namedNode("http://example.org/M1v2")] //Other members in the current context
     );
     // It should only have 2 quads: one outside of the named graph, and one in the named graph that is not part of the other named graphs
-    assert.equal(result.length, 2);
+    expect(result.length).toBe(2);
 
   });
 });
@@ -52,9 +55,9 @@ describe("regression tests", () => {
     const extractor = new CBDShapeExtractor();
     const store = RdfStore.createDefault();
     quads.forEach(x => store.addQuad(x));
-    const extracted = await extractor.extract(store, new NamedNode("https://example.com/ns#testing"));
+    const extracted = await extractor.extract(store, df.namedNode("https://example.com/ns#testing"));
 
-    assert.equal(extracted.length, 7);
+    expect(extracted.length).toBe(7);
   });
 
   it("blank nodes break extraction 2", async () => {
@@ -68,9 +71,9 @@ describe("regression tests", () => {
     const extractor = new CBDShapeExtractor();
     const store = RdfStore.createDefault();
     quads.forEach(x => store.addQuad(x));
-    const extracted = await extractor.extract(store, new NamedNode("https://example.com/ns#testing"));
+    const extracted = await extractor.extract(store, df.namedNode("https://example.com/ns#testing"));
 
-    assert.equal(extracted.length, 6);
+    expect(extracted.length).toBe(6);
   });
 
   it("blank nodes break extraction 3", async () => {
@@ -84,9 +87,9 @@ describe("regression tests", () => {
     const extractor = new CBDShapeExtractor();
     const store = RdfStore.createDefault();
     quads.forEach(x => store.addQuad(x));
-    const extracted = await extractor.extract(store, new NamedNode("https://example.com/ns#testing"));
+    const extracted = await extractor.extract(store, df.namedNode("https://example.com/ns#testing"));
 
-    assert.equal(extracted.length, 6);
+    expect(extracted.length).toBe(6);
   });
 
   it("blank nodes break extraction 4", async () => {
@@ -100,8 +103,8 @@ describe("regression tests", () => {
     const extractor = new CBDShapeExtractor();
     const store = RdfStore.createDefault();
     quads.forEach(x => store.addQuad(x));
-    const extracted = await extractor.extract(store, new NamedNode("https://example.com/ns#testing"));
+    const extracted = await extractor.extract(store, df.namedNode("https://example.com/ns#testing"));
 
-    assert.equal(extracted.length, 7);
+    expect(extracted.length).toBe(7);
   });
 });

@@ -1,15 +1,17 @@
-import { assert } from "chai";
+import { describe, it, beforeAll, expect } from "vitest";
 import { CBDShapeExtractor } from "../../lib/CBDShapeExtractor";
-import {rdfDereferencer} from "rdf-dereference";
+import { rdfDereferencer } from "rdf-dereference";
 import { Quad, Term as RTerm } from "@rdfjs/types";
 import { RdfStore } from "rdf-stores";
 import { DataFactory } from "rdf-data-factory";
+
 const df = new DataFactory();
+
 describe("Check weather all selected quads can be extracted", function () {
   let shapeStore = RdfStore.createDefault();
   let extractor: CBDShapeExtractor;
   let dataStore = RdfStore.createDefault();
-  before(async () => {
+  beforeAll(async () => {
     let readStream = (
       await rdfDereferencer.dereference(
         "./tests/06 - shapes and named graphs/shape-example.ttl",
@@ -41,7 +43,7 @@ describe("Check weather all selected quads can be extracted", function () {
       df.namedNode("http://example.org/shape"),
     );
     // It should only have 6 quads
-    assert.equal(result.length, 6);
+    expect(result.length).toBe(6);
   });
 
   it("bulk - All quads from example should be extracted", async () => {
@@ -49,15 +51,15 @@ describe("Check weather all selected quads can be extracted", function () {
     const cb = (member: { subject: RTerm; quads: Quad[] }) => {
       called += 1;
       if (member.subject.value == "http://example.org/line") {
-        assert.equal(member.quads.length, 6);
+        expect(member.quads.length).toBe(6);
         return;
       }
 
       if (member.subject.value == "http://example.org/important_point") {
-        assert.equal(member.quads.length, 2);
+        expect(member.quads.length).toBe(2);
         return;
       }
-      assert.fail();
+      expect.fail();
     };
 
     let result = await extractor.bulkExtract(
@@ -71,7 +73,7 @@ describe("Check weather all selected quads can be extracted", function () {
       cb,
     );
     // It should only have 6 quads
-    assert.equal(result.length, 2);
-    assert.equal(called, 2);
+    expect(result.length).toBe(2);
+    expect(called).toBe(2);
   });
 });

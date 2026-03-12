@@ -1,7 +1,7 @@
-const fs = require("fs");
-const si = require("systeminformation");
+import fs from "fs";
+import si from "systeminformation";
 
-const renderResults = (prefix, results) => {
+export const renderResults = (prefix, results) => {
   getSystemInfo().then((systemInfo) => {
     const fileSuffix =
       `${systemInfo.platform}-${systemInfo.distro}-${systemInfo.arch}-${systemInfo.cpu}`
@@ -154,4 +154,4 @@ const getSystemInfo = async () => {
   };
 };
 
-module.exports = { renderResults };
+
