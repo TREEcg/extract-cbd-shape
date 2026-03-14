@@ -1,30 +1,30 @@
 [
   {
     "name": "Extract1#ExtractionCollectionMembers",
-    "opsPerSecond": 453.3209036208179,
-    "samples": 80,
-    "mean": 0.00220594283654842,
-    "deviation": 0.00026306536694090425
+    "opsPerSecond": 198.95290944814286,
+    "samples": 71,
+    "mean": 0.0050263150349186035,
+    "deviation": 0.006477418625087209
   },
   {
     "name": "Extract2#ExtractionMembersPartialOutBand",
-    "opsPerSecond": 361.4374274061102,
-    "samples": 81,
-    "mean": 0.002766730626588935,
-    "deviation": 0.0057833728671691205
+    "opsPerSecond": 190.81675797056042,
+    "samples": 74,
+    "mean": 0.005240629862049548,
+    "deviation": 0.012021960417726229
   },
   {
     "name": "Extract3#ExtractionMembersOutBand",
-    "opsPerSecond": 477.57819421677146,
-    "samples": 83,
-    "mean": 0.002093897946157279,
-    "deviation": 0.0001618438124129344
+    "opsPerSecond": 260.55396636142274,
+    "samples": 76,
+    "mean": 0.0038379765004723358,
+    "deviation": 0.0005454707126037543
   },
   {
     "name": "Extract4#ExtractionCollection1000Members",
-    "opsPerSecond": 117.90416547759105,
-    "samples": 81,
-    "mean": 0.00848146455173427,
-    "deviation": 0.0007118703532917898
+    "opsPerSecond": 67.82348010798458,
+    "samples": 80,
+    "mean": 0.014744156424999993,
+    "deviation": 0.0014591595862001462
   }
 ]
