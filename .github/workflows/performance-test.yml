@@ -33,7 +33,7 @@ jobs:
             # Show alert with commit comment on detecting possible performance regression
             alert-threshold: '200%'
             comment-on-alert: true
-            fail-on-alert: false
+            fail-on-alert: true
             alert-comment-cc-users: '@xdxxxdx'
 
   benchmark-inband-diskstore:
@@ -61,7 +61,7 @@ jobs:
             # Show alert with commit comment on detecting possible performance regression
             alert-threshold: '200%'
             comment-on-alert: true
-            fail-on-alert: false
+            fail-on-alert: true
             alert-comment-cc-users: '@julianrojas87'
   
 
@@ -115,7 +115,7 @@ jobs:
             # Show alert with commit comment on detecting possible performance regression
             alert-threshold: '200%'
             comment-on-alert: true
-            fail-on-alert: false
+            fail-on-alert: true
             alert-comment-cc-users: '@xdxxxdx'
   
 
