@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1773526622644,
+  "lastUpdate": 1773526661513,
   "repoUrl": "https://github.com/TREEcg/extract-cbd-shape",
   "entries": {
     "Extraction algorithm Benchmark for inband data": [
@@ -4694,6 +4694,58 @@ window.BENCHMARK_DATA = {
             "range": "±2.06%",
             "unit": "ops/sec",
             "extra": "80 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "julian.rojas87@gmail.com",
+            "name": "Julian Rojas",
+            "username": "julianrojas87"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "92fd68c88acfa6625bce755e7a9bf45073b48287",
+          "message": "Merge pull request #45 from TREEcg/feat/generalize-store\n\nEstablish new baseline for outband benchmark due to missing defer=true",
+          "timestamp": "2026-03-14T23:15:40+01:00",
+          "tree_id": "ce2c6a248b8d2b86354dbab9f4738d72cc70b918",
+          "url": "https://github.com/TREEcg/extract-cbd-shape/commit/92fd68c88acfa6625bce755e7a9bf45073b48287"
+        },
+        "date": 1773526661233,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "Extract1#ExtractionCollectionMembers",
+            "value": 255,
+            "range": "±32.74%",
+            "unit": "ops/sec",
+            "extra": "77 samples"
+          },
+          {
+            "name": "Extract2#ExtractionMembersPartialOutBand",
+            "value": 216,
+            "range": "±62.66%",
+            "unit": "ops/sec",
+            "extra": "78 samples"
+          },
+          {
+            "name": "Extract3#ExtractionMembersOutBand",
+            "value": 330,
+            "range": "±3.12%",
+            "unit": "ops/sec",
+            "extra": "81 samples"
+          },
+          {
+            "name": "Extract4#ExtractionCollection1000Members",
+            "value": 74.17,
+            "range": "±2.05%",
+            "unit": "ops/sec",
+            "extra": "87 samples"
           }
         ]
       }
