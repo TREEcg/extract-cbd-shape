@@ -6,7 +6,7 @@ import { CBDShapeExtractor } from "../dist/lib/CBDShapeExtractor.js";
 import { renderResults } from "./render.js";
 
 const namedNode = new DataFactory().namedNode;
-Benchmark.options.minSamples = 10;
+Benchmark.options.minSamples = 100;
 Benchmark.options.maxTime = 2;
 
 let main = async function () {

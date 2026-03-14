@@ -2,10 +2,10 @@ import Benchmark from "benchmark";
 import { RdfStore } from "rdf-stores";
 import { rdfDereferencer } from "rdf-dereference";
 import { NamedNode } from "n3";
-import { performance } from "perf_hooks";
 import { JSDOM } from "jsdom";
 import { CBDShapeExtractor } from "../dist/lib/CBDShapeExtractor.js";
 import { renderResults } from "./render.js";
+
 const runBenchmarkInCleanContext = async (
   benchmarkName,
   benchmarkFn,
@@ -14,17 +14,15 @@ const runBenchmarkInCleanContext = async (
   const dom = new JSDOM();
   const cleanContext = dom.window.document;
 
-  const startTime = performance.now();
-
   try {
     // Pass the clean context
     await benchmarkFn(cleanContext);
   } catch (error) {
     console.error(`Benchmark ${benchmarkName} failed: ${error}`);
   } finally {
-    const endTime = performance.now();
-    // console.log(`${benchmarkName} took ${endTime - startTime} milliseconds in a clean context`);
-    deferred.resolve();
+    if (deferred) {
+      deferred.resolve();
+    }
   }
 };
 
