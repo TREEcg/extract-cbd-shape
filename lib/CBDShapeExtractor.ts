@@ -10,6 +10,9 @@ import { streamToArray, uniqueQuads } from "./Utils";
 const log = debug("extract-cbd-shape");
 
 const df = new DataFactory();
+const EMPTY_GRAPH_FILTER: GraphFilter = {
+   has: () => false,
+};
 
 // As in { RdfStore } from "rdf-stores" 
 export interface SyncStore extends Store {
@@ -143,9 +146,9 @@ export class CBDShapeExtractor {
       graphsToIgnore?: Array<Term>,
    ): Promise<Array<Quad>> {
       // First extract everything except for something within the graphs to ignore, or within the graph of the current entity, as that’s going to be added anyway later on
-      const dontExtractFromGraph = new Set(
-         (graphsToIgnore || []).map((item) => item.value),
-      );
+      const dontExtractFromGraph = graphsToIgnore?.length
+         ? new Set(graphsToIgnore.map((item) => item.value))
+         : EMPTY_GRAPH_FILTER;
 
       return this.extractWithIgnoredGraphs(
          store,
