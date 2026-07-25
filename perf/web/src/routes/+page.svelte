@@ -8,22 +8,33 @@
     type ParserOutputItem,
   } from "rdf-parser-ts/browser";
   import type { Quad } from "@rdfjs/types";
+  import { base } from "$app/paths";
   import Editor from "$lib/Editor.svelte";
   import { examples } from "$lib/examples";
 
+  type DataSource = "editor" | "url";
+
   let selectedExample = 0;
+  let dataSource: DataSource = "editor";
   let data = examples[0].data;
+  let dataUrl = "";
   let shape = examples[0].shape;
   let focusNode = examples[0].focusNode;
   let shapeNode = examples[0].shapeNode;
   let output = "# Run the extraction to see its RDF result.";
   let error = "";
+  let sourceStatus = "";
   let running = false;
   let resultCount: number | undefined;
   let duration: number | undefined;
 
-  const parse = (source: string): Quad[] => {
-    const parsed = new Parser({ format: "TriG" }).parse(source) ?? [];
+  const parse = (
+    source: string,
+    format = "application/trig",
+    baseIRI?: string,
+  ): Quad[] => {
+    const parsed =
+      new Parser({ format, baseIRI }).parse(source) ?? [];
     const quads: Quad[] = [];
     for (const item of parsed as Iterable<ParserOutputItem>) {
       quads.push((isMessageQuad(item) ? item.quad : item) as Quad);
@@ -34,19 +45,132 @@
   const loadExample = (index: number) => {
     selectedExample = index;
     const example = examples[index];
+    dataSource = "editor";
     data = example.data;
+    dataUrl = "";
     shape = example.shape;
     focusNode = example.focusNode;
     shapeNode = example.shapeNode;
     output = "# Ready to run.";
     error = "";
+    sourceStatus = "";
     resultCount = undefined;
     duration = undefined;
+  };
+
+  const selectDataSource = (source: DataSource) => {
+    dataSource = source;
+    sourceStatus = "";
+    if (
+      source === "url" &&
+      !dataUrl &&
+      typeof window !== "undefined"
+    ) {
+      dataUrl = new URL(
+        `${base}/examples/member-page.ttl`,
+        window.location.origin,
+      ).href;
+    }
+  };
+
+  const formatFromResponse = (response: Response) => {
+    const contentType = response.headers
+      .get("content-type")
+      ?.split(";", 1)[0]
+      .trim()
+      .toLowerCase();
+    const extension = new URL(response.url).pathname
+      .split(".")
+      .pop()
+      ?.toLowerCase();
+
+    const formats: Record<string, string> = {
+      "application/n-quads": "application/n-quads",
+      "application/n-triples": "application/n-triples",
+      "application/trig": "application/trig",
+      "application/x-turtle": "text/turtle",
+      "text/n3": "text/turtle",
+      "text/plain": extension === "nq"
+        ? "application/n-quads"
+        : extension === "nt"
+          ? "application/n-triples"
+          : "application/trig",
+      "text/turtle": "text/turtle",
+    };
+
+    if (contentType && formats[contentType]) {
+      return formats[contentType];
+    }
+
+    const extensionFormats: Record<string, string> = {
+      nq: "application/n-quads",
+      nt: "application/n-triples",
+      trig: "application/trig",
+      ttl: "text/turtle",
+    };
+    if (extension && extensionFormats[extension]) {
+      return extensionFormats[extension];
+    }
+
+    if (contentType) {
+      throw new Error(
+        `Unsupported RDF response type “${contentType}”. Use Turtle, TriG, N-Triples or N-Quads.`,
+      );
+    }
+    return "application/trig";
+  };
+
+  const loadData = async () => {
+    if (dataSource === "editor") {
+      const quads = parse(data);
+      sourceStatus = `${quads.length} quads parsed from the editor`;
+      return quads;
+    }
+
+    const value = dataUrl.trim();
+    if (!value) {
+      throw new Error("Enter the URL of an RDF document.");
+    }
+
+    let url: URL;
+    try {
+      url = new URL(value);
+    } catch {
+      throw new Error("Enter a valid absolute HTTP or HTTPS URL.");
+    }
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      throw new Error("Only HTTP and HTTPS data URLs are supported.");
+    }
+
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        headers: {
+          Accept:
+            "application/trig, text/turtle;q=0.9, application/n-quads;q=0.8, application/n-triples;q=0.7",
+        },
+      });
+    } catch {
+      throw new Error(
+        "The RDF URL could not be fetched. Check the URL and whether its server allows cross-origin (CORS) requests.",
+      );
+    }
+    if (!response.ok) {
+      throw new Error(
+        `The RDF URL returned HTTP ${response.status} ${response.statusText}.`,
+      );
+    }
+
+    const format = formatFromResponse(response);
+    const quads = parse(await response.text(), format, response.url);
+    sourceStatus = `${quads.length} quads loaded from ${new URL(response.url).host}`;
+    return quads;
   };
 
   const run = async () => {
     running = true;
     error = "";
+    sourceStatus = dataSource === "url" ? "Dereferencing RDF URL…" : "";
 
     try {
       if (!focusNode.trim()) {
@@ -54,7 +178,7 @@
       }
 
       const dataStore = createGraphIndexedRdfStore();
-      for (const quad of parse(data)) {
+      for (const quad of await loadData()) {
         dataStore.addQuad(quad);
       }
 
@@ -130,8 +254,8 @@
         <h1>Describe one resource.<br /><em>Keep only what matters.</em></h1>
       </div>
       <p class="lede">
-        Paste RDF data, choose a focus node, and optionally add a SHACL shape.
-        The extractor runs entirely on this page—no data is uploaded.
+        Paste an RDF member page or dereference one by URL, choose a focus
+        node, and optionally add a SHACL shape. Extraction stays in your browser.
       </p>
     </section>
 
@@ -171,11 +295,47 @@
       <article class="panel">
         <div class="panel-heading">
           <div><span class="dot data-dot"></span><strong>RDF data</strong></div>
-          <small>Turtle or TriG</small>
+          <div class="source-tabs" aria-label="RDF data source">
+            <button
+              class:active={dataSource === "editor"}
+              on:click={() => selectDataSource("editor")}
+            >
+              Paste RDF
+            </button>
+            <button
+              class:active={dataSource === "url"}
+              on:click={() => selectDataSource("url")}
+            >
+              Load URL
+            </button>
+          </div>
         </div>
-        <div class="editor-wrap">
-          <Editor bind:value={data} label="RDF data" />
-        </div>
+        {#if dataSource === "editor"}
+          <div class="editor-wrap">
+            <Editor bind:value={data} label="RDF data" />
+          </div>
+        {:else}
+          <div class="url-source">
+            <div class="url-icon" aria-hidden="true">↗</div>
+            <div>
+              <label for="data-url">RDF document URL</label>
+              <input
+                id="data-url"
+                type="url"
+                bind:value={dataUrl}
+                placeholder="https://data.example.org/members/page-1.ttl"
+              />
+              <p>
+                The server must allow CORS. Turtle, TriG, N-Triples and
+                N-Quads are supported; the response content type or file
+                extension selects the parser.
+              </p>
+              {#if sourceStatus}
+                <div class="source-status">{sourceStatus}</div>
+              {/if}
+            </div>
+          </div>
+        {/if}
       </article>
 
       <article class="panel">
@@ -568,6 +728,33 @@
     font: 10px "IBM Plex Mono", monospace;
   }
 
+  .source-tabs {
+    padding: 3px;
+    background: #eaf0ec;
+    border-radius: 7px;
+  }
+
+  .source-tabs button {
+    padding: 5px 9px;
+    color: #708078;
+    background: transparent;
+    border: 0;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .source-tabs button:hover {
+    color: #244638;
+  }
+
+  .source-tabs button.active {
+    color: #174b37;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(24, 55, 43, 0.14);
+  }
+
   .metrics span + span::before {
     margin-right: 8px;
     content: "·";
@@ -598,6 +785,68 @@
 
   .editor-wrap.output {
     height: 280px;
+  }
+
+  .url-source {
+    height: 350px;
+    padding: 54px clamp(24px, 5vw, 64px);
+    display: grid;
+    grid-template-columns: auto minmax(0, 560px);
+    justify-content: center;
+    align-content: start;
+    gap: 18px;
+    background:
+      linear-gradient(rgba(236, 244, 239, 0.65) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(236, 244, 239, 0.65) 1px, transparent 1px),
+      #fbfdfb;
+    background-size: 24px 24px;
+  }
+
+  .url-icon {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    color: #217b59;
+    background: #e3f4ea;
+    border: 1px solid #c4e4d2;
+    border-radius: 11px;
+    font-size: 20px;
+  }
+
+  .url-source label {
+    margin-bottom: 8px;
+    display: block;
+    color: #30473d;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .url-source input {
+    color: #1b352a;
+    background: #fff;
+    border-color: #bfd2c7;
+  }
+
+  .url-source input::placeholder {
+    color: #8da097;
+  }
+
+  .url-source p {
+    margin: 11px 0 0;
+    color: #718078;
+    font-size: 11px;
+    line-height: 1.55;
+  }
+
+  .source-status {
+    margin-top: 16px;
+    padding: 9px 11px;
+    color: #276348;
+    background: #e8f7ee;
+    border: 1px solid #c5e7d2;
+    border-radius: 7px;
+    font: 10px "IBM Plex Mono", monospace;
   }
 
   footer {
@@ -637,6 +886,10 @@
     .output-panel {
       grid-column: auto;
     }
+
+    .url-source {
+      justify-content: stretch;
+    }
   }
 
   @media (max-width: 560px) {
@@ -655,6 +908,19 @@
 
     .controls {
       padding: 12px;
+    }
+
+    .panel-heading {
+      padding: 8px 12px;
+      align-items: flex-start;
+      gap: 8px;
+      flex-direction: column;
+    }
+
+    .url-source {
+      height: 350px;
+      padding: 30px 18px;
+      grid-template-columns: 1fr;
     }
 
     h1 {
