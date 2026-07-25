@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784988287671,
+  "lastUpdate": 1784991472815,
   "repoUrl": "https://github.com/TREEcg/extract-cbd-shape",
   "entries": {
     "Extraction algorithm Benchmark for inband data": [
@@ -5748,6 +5748,74 @@ window.BENCHMARK_DATA = {
             "range": "±1.84%",
             "unit": "ops/sec",
             "extra": "130 samples"
+          }
+        ]
+      }
+    ],
+    "Extraction algorithm benchmark for member pages": [
+      {
+        "commit": {
+          "author": {
+            "email": "pieter.colpaert@ugent.be",
+            "name": "Pieter Colpaert",
+            "username": "pietercolpaert"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7d57826aed06b9bb7fcf02cb902a804172b29ef9",
+          "message": "Merge pull request #47 from TREEcg/feat-perf\n\nBetter perf tests and improvements",
+          "timestamp": "2026-07-25T16:57:05+02:00",
+          "tree_id": "e4a988d2cfa74307ad46c9e0e00fa3afe0975957",
+          "url": "https://github.com/TREEcg/extract-cbd-shape/commit/7d57826aed06b9bb7fcf02cb902a804172b29ef9"
+        },
+        "date": 1784991472494,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "Page1000#SequentialDefaultGraph",
+            "value": 170,
+            "range": "±3.26%",
+            "unit": "ops/sec",
+            "extra": "73 samples"
+          },
+          {
+            "name": "Page1000#BulkDefaultGraph",
+            "value": 158,
+            "range": "±3.34%",
+            "unit": "ops/sec",
+            "extra": "71 samples"
+          },
+          {
+            "name": "Page1000#SequentialNamedGraphs",
+            "value": 143,
+            "range": "±1.06%",
+            "unit": "ops/sec",
+            "extra": "72 samples"
+          },
+          {
+            "name": "Page1000#BulkNamedGraphs",
+            "value": 134,
+            "range": "±2.89%",
+            "unit": "ops/sec",
+            "extra": "70 samples"
+          },
+          {
+            "name": "Page1000#BulkWithShape",
+            "value": 151,
+            "range": "±2.85%",
+            "unit": "ops/sec",
+            "extra": "73 samples"
+          },
+          {
+            "name": "Page1000#ColdBulkWithShape",
+            "value": 150,
+            "range": "±2.73%",
+            "unit": "ops/sec",
+            "extra": "73 samples"
           }
         ]
       }
