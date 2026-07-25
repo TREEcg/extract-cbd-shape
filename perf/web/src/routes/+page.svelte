@@ -540,7 +540,7 @@
 
   .examples {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     margin-bottom: 22px;
     overflow: hidden;
     background: #fff;
@@ -550,7 +550,7 @@
 
   .examples button {
     min-height: 104px;
-    padding: 18px 20px;
+    padding: 18px 16px;
     display: grid;
     grid-template-columns: 32px 1fr;
     gap: 2px 8px;
@@ -583,7 +583,7 @@
   }
 
   .examples strong {
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .examples small {
