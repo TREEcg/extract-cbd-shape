@@ -2,6 +2,9 @@
   "name": "extract-cbd-shape",
   "version": "0.2.1",
   "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "description": "Extract an entity based on CBD and a SHACL shape",
   "main": "dist/lib/extract-cbd-shape.js",
   "exports": {
@@ -33,16 +36,15 @@
   "dependencies": {
     "@treecg/types": "^0.4.6",
     "debug": "^4.4.3",
-    "n3": "^2.0.3",
     "rdf-data-factory": "^2.0.2",
     "rdf-dereference": "^5.0.0",
-    "rdf-stores": "^2.2.0"
+    "rdf-stores": "^2.2.0",
+    "rdf-writer-ts": "^0.1.1"
   },
   "devDependencies": {
     "@rdfjs/types": "^2.0.1",
     "@types/benchmark": "^2.1.5",
     "@types/debug": "^4.1.12",
-    "@types/n3": "^1.26.1",
     "@types/pako": "^2.0.4",
     "@types/sinon": "^21.0.0",
     "@vitest/coverage-v8": "^4.0.18",
@@ -51,6 +53,7 @@
     "level": "^10.0.0",
     "pako": "^2.1.0",
     "quadstore": "^15.4.1",
+    "rdf-parser-ts": "^0.3.1",
     "rollup": "^4.59.0",
     "sinon": "^21.0.2",
     "systeminformation": "^5.31.4",

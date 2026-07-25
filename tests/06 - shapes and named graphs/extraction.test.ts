@@ -1,5 +1,5 @@
 import { describe, it, beforeAll, expect } from "vitest";
-import { Parser } from "n3";
+import { Parser } from "rdf-parser-ts";
 import { DataFactory } from "rdf-data-factory";
 import { CBDShapeExtractor } from "../../lib/CBDShapeExtractor";
 import { rdfDereferencer } from "rdf-dereference";

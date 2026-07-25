@@ -7,16 +7,15 @@
       "dependencies": {
         "@treecg/types": "^0.4.6",
         "debug": "^4.4.3",
-        "n3": "^2.0.3",
         "rdf-data-factory": "^2.0.2",
         "rdf-dereference": "^5.0.0",
         "rdf-stores": "^2.2.0",
+        "rdf-writer-ts": "^0.1.1",
       },
       "devDependencies": {
         "@rdfjs/types": "*",
         "@types/benchmark": "^2.1.5",
         "@types/debug": "^4.1.12",
-        "@types/n3": "^1.26.1",
         "@types/pako": "^2.0.4",
         "@types/sinon": "^21.0.0",
         "@vitest/coverage-v8": "^4.0.18",
@@ -25,6 +24,7 @@
         "level": "^10.0.0",
         "pako": "^2.1.0",
         "quadstore": "^15.4.1",
+        "rdf-parser-ts": "^0.3.1",
         "rollup": "^4.59.0",
         "sinon": "^21.0.1",
         "systeminformation": "^5.31.4",
@@ -307,8 +307,6 @@
 
     "@types/ms": ["@types/ms@2.1.0", "", {}, "sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA=="],
 
-    "@types/n3": ["@types/n3@1.26.1", "", { "dependencies": { "@rdfjs/types": "*", "@types/node": "*" } }, "sha512-TilYHzpU6ecXVJAbV+6o17Z8ZkWLWx6ZJD3IluaU4RiGHxqjU2or9fopxFHS6iXS6qcl5Mg1K3wSx9L8xxJaJQ=="],
-
     "@types/node": ["@types/node@22.15.21", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-EV/37Td6c+MgKAbkcLG6vqZ2zEYHD7bvSrzqqs2RIhbA6w3x+Dqz8MZM3sP6kGTeLrdoOgKZe+Xja7tUB2DNkQ=="],
 
     "@types/pako": ["@types/pako@2.0.4", "", {}, "sha512-VWDCbrLeVXJM9fihYodcLiIv0ku+AlOa/TQ1SvYOaBuyrSKgEcro95LJyIsJ4vSo6BXIxOKxiJAat04CmST9Fw=="],
@@ -583,11 +581,15 @@
 
     "rdf-isomorphic": ["rdf-isomorphic@2.0.1", "", { "dependencies": { "imurmurhash": "^0.1.4", "rdf-string": "^2.0.0", "rdf-terms": "^2.0.0" } }, "sha512-8pfA3PeDs1sVrZ2R3dCR4KRM69m3pQGhzviNQq5Az/+Zch4I+fKstjGxCZ5ADAFPsm9zxHk8zMEQ/BFcqlnLKw=="],
 
+    "rdf-parser-ts": ["rdf-parser-ts@0.3.1", "", { "dependencies": { "@rdfjs/types": "^2.0.1", "n3": "^2.0.1" }, "bin": { "rdf-parser-ts": "dist/bin/rdf-parser.js" } }, "sha512-hIul0LAVc2LgMCnkjEZmdjLwmgfXs94AMU7ZmMgouCQU9fakALVR8nA7fwp7ExWuaS2+ao1+3wPplE7y+p4yRQ=="],
+
     "rdf-stores": ["rdf-stores@2.2.0", "", { "dependencies": { "asynciterator": "^3.8.0", "rdf-data-factory": "^2.0.1", "rdf-string": "^2.0.0", "rdf-terms": "^2.0.0" } }, "sha512-HEZblb6LQA+yiZrlO96HQeFRVjpEQUeCZ7rmCoN64bBQ6eHamKWPIh0vxMLe7h8a8AF23wbA3jpLG3pHRPk1mQ=="],
 
     "rdf-string": ["rdf-string@2.0.1", "", { "dependencies": { "rdf-data-factory": "^2.0.0" } }, "sha512-SMW4ponnKNrsP9kYpOLyICeM4UJmEXIeS3zri7kPK9gzLFsHD88oiza8LnokNYxd76zW4JoYWD+v4x0g8rJBjw=="],
 
     "rdf-terms": ["rdf-terms@2.0.0", "", { "dependencies": { "rdf-data-factory": "^2.0.0", "rdf-string": "^2.0.0" } }, "sha512-9O+ifVcvY4ZktOr+uXKswoOV6airAsIKeqCr+C47kFZBB8X+NyPSqDRGgI6X+je8It6z2e9jZhWwjJiEZ8Yn5Q=="],
+
+    "rdf-writer-ts": ["rdf-writer-ts@0.1.1", "", { "dependencies": { "@rdfjs/types": "^2.0.1" } }, "sha512-eHQ2aSKmWum+9y91hxtY3Tbyb70uZGqFRMYP6RX94fGC9dcglIlUSqWJpwd3FCmBB1ILyayfIB65pBIxpSaSwg=="],
 
     "rdfa-streaming-parser": ["rdfa-streaming-parser@3.0.2", "", { "dependencies": { "htmlparser2": "^9.0.0", "rdf-data-factory": "^2.0.0", "readable-stream": "^4.0.0", "relative-to-absolute-iri": "^1.0.2" } }, "sha512-1MEkALT5PYjucVo6lNHXd9DbkgW0hSfPOJOs/TpUFe9zoZvkoreKcGIFnMFkbMmYTNLCiGFo/74LviIUnWLkIw=="],
 

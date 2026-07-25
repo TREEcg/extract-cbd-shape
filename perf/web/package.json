@@ -22,6 +22,8 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"extract-cbd-shape": "file:../.."
+		"extract-cbd-shape": "file:../..",
+		"rdf-data-factory": "^2.0.2",
+		"rdf-dereference": "^5.0.0"
 	}
 }
