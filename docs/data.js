@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784987792276,
+  "lastUpdate": 1784987833304,
   "repoUrl": "https://github.com/TREEcg/extract-cbd-shape",
   "entries": {
     "Extraction algorithm Benchmark for inband data": [
@@ -5114,6 +5114,58 @@ window.BENCHMARK_DATA = {
             "range": "±1.82%",
             "unit": "ops/sec",
             "extra": "88 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "pieter.colpaert@ugent.be",
+            "name": "Pieter Colpaert",
+            "username": "pietercolpaert"
+          },
+          "committer": {
+            "email": "pieter.colpaert@ugent.be",
+            "name": "Pieter Colpaert",
+            "username": "pietercolpaert"
+          },
+          "distinct": true,
+          "id": "fc22da7a3239c68fd373b1edd220fbb3d993aabe",
+          "message": "Fix regression",
+          "timestamp": "2026-07-25T15:55:09+02:00",
+          "tree_id": "cac2a2267a666e9cd9c87379282f18f179e31cb5",
+          "url": "https://github.com/TREEcg/extract-cbd-shape/commit/fc22da7a3239c68fd373b1edd220fbb3d993aabe"
+        },
+        "date": 1784987832390,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "Extract1#ExtractionCollectionMembers",
+            "value": 237,
+            "range": "±32.47%",
+            "unit": "ops/sec",
+            "extra": "71 samples"
+          },
+          {
+            "name": "Extract2#ExtractionMembersPartialOutBand",
+            "value": 244,
+            "range": "±43.93%",
+            "unit": "ops/sec",
+            "extra": "77 samples"
+          },
+          {
+            "name": "Extract3#ExtractionMembersOutBand",
+            "value": 322,
+            "range": "±3.04%",
+            "unit": "ops/sec",
+            "extra": "79 samples"
+          },
+          {
+            "name": "Extract4#ExtractionCollection1000Members",
+            "value": 68.48,
+            "range": "±3.39%",
+            "unit": "ops/sec",
+            "extra": "82 samples"
           }
         ]
       }
