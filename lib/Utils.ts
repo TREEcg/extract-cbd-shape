@@ -1,4 +1,4 @@
-import type { Stream, Quad } from "@rdfjs/types";
+import type { Stream, Quad, Term } from "@rdfjs/types";
 
 /**
  * Converts a Stream into an Array.
@@ -17,6 +17,44 @@ export function streamToArray(stream: Stream<Quad>): Promise<Quad[]> {
             reject(error);
         });
     });
+}
+
+export function uniqueQuads(quads: Quad[]): Quad[] {
+    const seen = new Set<string>();
+    const result: Quad[] = [];
+
+    for (const quad of quads) {
+        const key = quadKey(quad);
+        if (seen.has(key)) {
+            continue;
+        }
+        seen.add(key);
+        result.push(quad);
+    }
+
+    return result;
+}
+
+function quadKey(quad: Quad): string {
+    return [
+        termKey(quad.subject),
+        termKey(quad.predicate),
+        termKey(quad.object),
+        termKey(quad.graph),
+    ].join(" ");
+}
+
+function termKey(term: Term): string {
+    if (term.termType === "Literal") {
+        return [
+            term.termType,
+            term.value,
+            term.language,
+            term.datatype.value,
+        ].join("\0");
+    }
+
+    return [term.termType, term.value].join("\0");
 }
 
 /**

@@ -6,7 +6,7 @@ import { RdfStore } from "rdf-stores";
 import { Quad, Term, Store } from "@rdfjs/types";
 import debug from "debug";
 import { ShapesGraph } from "./ShapesGraph";
-import { streamToArray, streamToAsyncIterable } from "./Utils";
+import { streamToArray, streamToAsyncIterable, uniqueQuads } from "./Utils";
 
 const log = debug("extract-cbd-shape");
 
@@ -300,15 +300,11 @@ class ExtractInstance {
                shapeId,
             );
 
-            return result.filter((value: Quad, index: number, array: Quad[]) => {
-               return index === array.findIndex((x) => x.equals(value));
-            });
+            return uniqueQuads(result);
          }
       }
 
-      return result.filter((value: Quad, index: number, array: Quad[]) => {
-         return index === array.findIndex((x) => x.equals(value));
-      });
+      return uniqueQuads(result);
    }
 
    private async dereference(url: string): Promise<boolean> {
