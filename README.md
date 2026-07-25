@@ -1,114 +1,208 @@
 # Extract CBD Shape
 
-Given (i) an RdfStore (see [`rdf-stores`](https://github.com/rubensworks/rdf-stores.js?tab=readme-ov-file#index-combinations)) of triples, (ii) an RdfStore with a SHACL shape’s triples, and (iii) a target entity URI,
-this library will extract all triples that belong to the entity.
-If more triples of the entity are needed, extra triples are retrieved by dereferencing the relevant entity.
+Extract one logical RDF member from a page, dataset, or API response that contains many members.
 
-The algorithm is a proposal to be standardized as part of [W3C’s TREE hypermedia Community Group](https://w3id.org/tree/specification) as the member extraction algorithm. This algorithm needs to be efficient and unambiguously defined, so that various implementations of the member extraction algorithm will result in the same set of triples. As a trade-off, the resulting set of triples is not guaranteed to be validated by the SHACL shape.
+`extract-cbd-shape` is a TypeScript package for RDF-based Web APIs where a response contains a collection page, stream fragment, or batch of records, and a client needs to process one member at a time. Given a focus node, it returns the quads that describe that member.
 
-The algorithm is inspired by, and an in-between between [CBD](https://www.w3.org/Submission/CBD/) and [Shape Fragments](https://github.com/Shape-Fragments/old-shapefragments-paper/blob/main/fullpaper.pdf), thanks to [Thomas Bergwinkl and his blog post](https://www.bergnet.org/2023/03/2023/shacl-engine/) on a SHACL engine.
+The package combines two fallback strategies described in the member extraction paper:
 
-## Use it
+- a dataset-aware Concise Bounded Description (CBD) extraction rule;
+- optional SHACL-guided extraction, where shapes act as extraction hints.
+
+It works with RDF/JS stores and terms, preserves named graphs, supports blank-node closure, and can extract many members from the same page efficiently.
+
+## Install
 
 ```bash
 npm install extract-cbd-shape
 ```
 
-```javascript
-import {CBDShapeExtractor, createGraphIndexedRdfStore} from "extract-cbd-shape";
-// ...
-let extractor = new CBDShapeExtractor(shapesGraph);
-let entityquads = await extractor.extract(store, entityId, shapeId, graphsToIgnore);
+The package is ESM-first and includes TypeScript declarations.
+
+## Quick Start
+
+```ts
+import {
+  CBDShapeExtractor,
+  createGraphIndexedRdfStore,
+} from "extract-cbd-shape";
+import { DataFactory } from "rdf-data-factory";
+
+const dataStore = createGraphIndexedRdfStore();
+
+// Add RDF/JS quads from your parser of choice.
+for (const quad of dataQuads) {
+  dataStore.addQuad(quad);
+}
+
+const extractor = new CBDShapeExtractor();
+const memberQuads = await extractor.extract(
+  dataStore,
+  DataFactory.namedNode("https://example.org/member/42"),
+);
 ```
 
- * The shapesGraph is an RdfStore that contains the quads of a shape
- * The store is an RdfStore containing the quads in the current context (e.g., the quads parsed from an HTTP response, or a message received over a channel)
- * The entityId is the IRI of the entity to extract from the current context
- * The Shape ID is the IRI of the NodeShape in the shapesGraph to start from
- * The graphToIgnore are the namedgraphs in the current context (the store) to disregard when extracting the member
+With a SHACL shape:
 
-For fast extraction from pages with many named graphs, create in-memory stores with `createGraphIndexedRdfStore()`.
-This configures `rdf-stores` with graph-first indexes (`GSPO`, `GPOS`, `GOSP`) for retrieving member named graphs, plus traversal indexes (`SPOG`, `POSG`) for CBD and SHACL path lookups across graphs.
+```ts
+const shapeStore = createGraphIndexedRdfStore();
 
-When extracting several members from the same page, use `bulkExtract()`. It avoids copying the page, isolates member named graphs from each other, and automatically uses sequential extraction for synchronous stores or bounded concurrency for asynchronous stores. The concurrency can be overridden with the `bulkConcurrency` constructor option.
-
-## Test it
-
-Tests and examples provided in the [tests](tests/) library. Run them using mocha which can be invoked using `npm test`
-
-## The extraction algorithm ##
-
-This is an extension of [CBD](https://www.w3.org/submissions/CBD/). It extracts:
- 1. all quads with subject this entity, and their blank node triples (recursively)
- 2. all quads with a named graph matching the entity we’re looking up
- 3. It takes hints from a Shape Template (see ↓)
-
-The first focus node is set by the user.
- 1a. If a shape is set, create a shape template and execute the shape template extraction algorithm
- 1b. If no shape was set, extract all quads with subject the focus node, and recursively include its blank nodes (see also [CBD](https://www.w3.org/submissions/CBD/))
- 2. Extract all quads with the graph matching the focus node
- 3. When no quads were extracted from 1 and 2, a client MUST dereference the focus node and re-execute 1 and 2.
-
-### Shape Template extraction ###
-
-The Shape Template is a structure that looks as follows:
-
-```typescript
-class ShapeTemplate {
-    closed: boolean;
-    requiredPaths: Path[];
-    optionalPaths: Path[];
-    nodelinks: NodeLink[];
-    atLeastOneLists: [ Shape[] ];
+for (const quad of shapeQuads) {
+  shapeStore.addQuad(quad);
 }
-class NodeLink {
-    shape: ShapeTemplate;
-    path: Path;
-}
+
+const extractor = new CBDShapeExtractor(shapeStore);
+const memberQuads = await extractor.extract(
+  dataStore,
+  DataFactory.namedNode("https://example.org/member/42"),
+  DataFactory.namedNode("https://example.org/MemberShape"),
+);
 ```
 
-Paths in the shape templates are [SHACL Property Paths](https://www.w3.org/TR/shacl/#property-paths).
+## What It Extracts
 
-A Shape Template has
- * __Closed:__ A boolean telling whether it’s closed or not. If it’s open, a client MUST extract all quads, after a potential HTTP request to the focus node, with subject the focus node, and recursively include its blank nodes (see also [CBD](https://www.w3.org/submissions/CBD/))
- * __Required paths:__ MUST trigger an HTTP request if the member does not have this path. All quads from paths, after a potential HTTP request, matching this required path MUST be added to the Member set.
- * __Optional paths:__ All quads from paths, after a potential HTTP request, matching this path MUST be added to the Member set.
- * __Node Links:__ A nodelink contains a reference to another Shape Template, as well as a path. All quads, after a potential HTTP request, matching this path MUST be added to the Member set. The targets MUST be processed again using the shape template extraction algorithm on that 
- * __atLeastOneLists__: Each atLeastOneList is an array of at least one shape with one or more required paths and atLeastOneLists that must be set. If none of the shapes match, it will trigger an HTTP request. Only the quads from paths matching valid shapes are included in the Member.
+Without a shape, extraction is based on a dataset-aware CBD rule:
 
-Note: RDF has set semantics, so while certain quads are going to be matched by the algorithm multiple times, each quad will of course be part of the member only once.
+1. include quads where the focus node is the subject;
+2. recursively include quads for blank node objects;
+3. include quads in the named graph whose graph name is the focus node;
+4. keep RDF dataset graph names on the extracted quads.
 
-This results in this algorithm:
- 1. If it is open, a client MUST extract all quads, after a potential HTTP request to the focus node, with subject the focus node, and recursively include its blank nodes (see also [CBD](https://www.w3.org/submissions/CBD/))
- 2. If the current focus node is a named node and it was not requested before:
-    - test if all required paths are set, if not do an HTTP request, if they are set, then,
-    - test if at least one of each list in the atLeastOneLists was set. If not, do an HTTP request.
- 3. Visit all paths (required, optional, nodelinks and recursively the shapes in the atLeastOneLists if the shape is valid) paths and add all quads necessary to reach the targets to the result
- 4. For the results of nodelinks, if the target is a named node, set it as a focus node and repeat this algorithm with that nodelink’s shape as a shape
+With a SHACL shape, the shape is interpreted as an extraction topology:
 
-### Generating a shape template from SHACL ###
+1. `sh:property` paths are used as paths to include;
+2. `sh:minCount > 0` marks paths as required;
+3. `sh:node` links recursively extract related nodes with another node shape;
+4. `sh:closed true` restricts extraction to shape-selected paths;
+5. open shapes keep the normal CBD result and add shape-guided paths.
 
-If there’s a shape set, the SHACL shape MUST be processed towards a Shape Template as follows:
+This is not SHACL validation. The shape is used to decide which quads to extract. Validate the extracted quads separately if validation matters for your application.
 
- 1. Checks if the shape is deactivated (`:S sh:deactivated true`), if it is, don’t continue
- 2. Check if the shape is closed (`:S sh:closed true`), set the closed boolean to true.
- 3. All `sh:property` elements with an `sh:node` link are added to the shape’s NodeLinks array
- 4. Add all properties with `sh:minCount` > 0 to the Required Paths array, and all others to the optional paths.
- 5. Processes the [conditionals](https://www.w3.org/TR/shacl/#core-components-logical) `sh:xone`, `sh:or` and `sh:and` (but doesn’t process `sh:not`):
-    - `sh:and`: all properties on that shape template MUST be merged with the current shape template
-    - `sh:xone` and `sh:or`: in both cases, at least one item must match at least one quad for all required paths. If not, it will do an HTTP request to the current namednode.
+## API
 
-Note: The way we process SHACL shapes into Shape Template is important to understand in order to know when an HTTP request will be triggered when designing SHACL shapes. A cardinality constraint not being exactly matched or a `sh:pattern` not being respected will not trigger an HTTP request, and instead just add the invalid quads to the Member. This is a design choice: we only define triggers for HTTP request from the SHACL shape to come to a complete set of quads describing the member the data publisher pointed at using `tree:member`.
+### `new CBDShapeExtractor(shapesGraphStore?, dereferencer?, options?)`
 
-Note: it only takes _hints_ (it does not guarantee a result that validates) from an optional SHACL shapes graph. It only uses the parts relevant for discovery from the [SHACL Core Constraint Components](https://www.w3.org/TR/shacl/#core-components). It does not support SPARQL or Javascript.
+Creates an extractor.
 
-It won’t:
- 1. Process more complex validation instructions that are part of SHACL such as `sh:class`, languageIn, pattern, value, qualified value shapes, etc. It is the data publisher’s responsibility to provide valid data, or it is the responsibility of the user of the library to validate the quads afterwards.
- 2. Do automatic target selection based on e.g., targetClass: you need to set the target.
- 3. Explicitly look for reified statements or triples that are quoted elsewhere: these are not part of the member. Only when a triple term can be found through a star pattern.
+- `shapesGraphStore`: optional RDF/JS store containing SHACL shapes.
+- `dereferencer`: optional `rdf-dereference` compatible dereferencer.
+- `options.fetch`: optional `fetch` implementation used by dereferencing.
+- `options.cbdDefaultGraph`: controls default-graph CBD behavior.
+- `options.bulkConcurrency`: concurrency for `bulkExtract()` with asynchronous stores.
 
-### Logging
+### `extract(store, id, shapeId?, graphsToIgnore?)`
 
-Logging can be enabled using the `DEBUG` environment variable, `DEBUG=extract-cbd-shape:*`.
+Extracts one member.
 
+```ts
+const quads = await extractor.extract(store, id, shapeId);
+```
 
+- `store`: RDF/JS store containing the current page or dataset.
+- `id`: RDF/JS term for the member to extract.
+- `shapeId`: optional RDF/JS term identifying the SHACL node shape.
+- `graphsToIgnore`: optional list of named graphs to exclude during traversal.
+- returns: `Promise<Quad[]>`.
+
+If no local quads can satisfy required shape paths, the extractor may dereference the focus IRI and retry with the retrieved data.
+
+### `bulkExtract(store, ids, shapeId?, graphsToIgnore?, itemExtracted?)`
+
+Extracts several members from the same store.
+
+```ts
+const members = await extractor.bulkExtract(
+  dataStore,
+  memberIds,
+  DataFactory.namedNode("https://example.org/MemberShape"),
+);
+```
+
+Use this when a page contains many members. It avoids repeatedly copying the page, keeps member named graphs isolated from each other, and can process asynchronous stores with bounded concurrency.
+
+The result keeps the input order:
+
+```ts
+Array<{
+  subject: Term;
+  quads: Quad[];
+}>
+```
+
+### `createGraphIndexedRdfStore()`
+
+Creates an in-memory `rdf-stores` store with indexes tuned for member extraction.
+
+```ts
+const store = createGraphIndexedRdfStore();
+```
+
+The store includes graph-first indexes for retrieving member named graphs and traversal indexes for CBD and SHACL path lookups across graphs. Prefer it for browser use, tests, and page-scale in-memory extraction.
+
+### `path` and `shape`
+
+The package also exports internal path and shape helpers under:
+
+```ts
+import { path, shape } from "extract-cbd-shape";
+```
+
+Most consumers only need `CBDShapeExtractor` and `createGraphIndexedRdfStore()`.
+
+## SHACL Support
+
+The extractor uses a focused subset of SHACL Core:
+
+- `sh:NodeShape`
+- `sh:property`
+- `sh:path`
+- `sh:minCount`
+- `sh:node`
+- `sh:closed`
+- `sh:and`
+- `sh:or`
+- `sh:xone`
+- SHACL property paths, including sequence, inverse, alternative, zero-or-more, one-or-more, and zero-or-one paths.
+
+It does not implement full SHACL validation semantics. In particular, it does not use `sh:targetClass` for automatic target selection and does not enforce constraints such as `sh:class`, `sh:pattern`, language constraints, qualified value shapes, SPARQL constraints, or JavaScript constraints.
+
+## Named Graphs
+
+Named graphs are handled conservatively:
+
+- quads in a graph named after the focus member are included;
+- `bulkExtract()` avoids leaking one member's named graph into another member;
+- other graph names are preserved, but not treated as member boundaries unless they match the extraction rule.
+
+This makes the package useful for collection pages where each member may be represented either by subject-centric quads, by a named graph, or by a combination of both.
+
+## Browser Playground
+
+The repository includes a browser playground in `perf/web`. It demonstrates three common cases:
+
+- closed shape with nested hierarchy;
+- open shape over a default graph;
+- open shape over named graphs.
+
+Build it with:
+
+```bash
+npm run build --prefix perf/web
+```
+
+## Development
+
+```bash
+npm test
+npm run build
+```
+
+The tests in `tests/` cover CBD extraction, SHACL-guided extraction, property paths, named graphs, store-agnostic extraction, and Mermaid rendering for shapes.
+
+## Logging
+
+Enable debug logging with:
+
+```bash
+DEBUG=extract-cbd-shape npm test
+```

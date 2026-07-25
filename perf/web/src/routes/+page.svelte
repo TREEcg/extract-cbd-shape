@@ -222,16 +222,18 @@
   <title>CBD Shape Extractor Playground</title>
   <meta
     name="description"
-    content="Run CBD and SHACL-guided RDF extraction directly in your browser."
+    content="Extract one RDF collection member from a page with CBD and SHACL-guided extraction."
   />
 </svelte:head>
 
 <div class="page-shell">
   <header>
     <a class="brand" href="./" aria-label="CBD Shape Extractor home">
-      <span class="brand-mark" aria-hidden="true">
-        <span></span><span></span><span></span>
-      </span>
+      <img
+        class="tree-logo"
+        src="https://tree.linkeddatafragments.org/img/logo.svg"
+        alt="TREE"
+      />
       <span>
         <strong>CBD Shape Extractor</strong>
         <small>Browser playground</small>
@@ -250,13 +252,27 @@
   <main>
     <section class="intro">
       <div>
-        <p class="eyebrow">RDF extraction, made tangible</p>
-        <h1>Describe one resource.<br /><em>Keep only what matters.</em></h1>
+        <p class="eyebrow">Member extraction, made tangible</p>
+        <h1>Extract one member from an RDF page.</h1>
       </div>
       <p class="lede">
-        Paste an RDF member page or dereference one by URL, choose a focus
-        node, and optionally add a SHACL shape. Extraction stays in your browser.
+        RDF APIs often publish many observations, records, or events in one
+        response. This playground shows the fallback algorithms from the member
+        extraction paper: start from one focus node, keep its bounded
+        description, and use SHACL shapes as optional hints for open or closed
+        extraction.
       </p>
+      <div class="tree-context" aria-label="TREE collection context">
+        <img
+          src="https://tree.linkeddatafragments.org/img/logo.svg"
+          alt=""
+          aria-hidden="true"
+        />
+        <p>
+          TREE collections publish members across pages. This tool demonstrates
+          how a client can recover one member description from such a page.
+        </p>
+      </div>
     </section>
 
     <section class="examples" aria-label="Playground examples">
@@ -379,18 +395,14 @@
   }
 
   :global(html) {
-    background: #f4f7f4;
+    background: #ffffff;
   }
 
   :global(body) {
     margin: 0;
-    color: #17241f;
-    background:
-      radial-gradient(circle at 12% 8%, rgba(119, 205, 166, 0.14), transparent 26rem),
-      #f4f7f4;
-    font-family:
-      Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-      sans-serif;
+    color: #161616;
+    background: #ffffff;
+    font-family: Arial, Helvetica, sans-serif;
   }
 
   :global(button),
@@ -403,23 +415,31 @@
   }
 
   header {
-    min-height: 76px;
-    padding: 14px clamp(20px, 5vw, 72px);
+    min-height: 68px;
+    padding: 12px clamp(20px, 5vw, 72px);
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
     gap: 24px;
-    color: #ecf8f1;
-    background: #10251f;
-    border-bottom: 1px solid #29453b;
+    color: #f7f7f7;
+    background: #050505;
+    border-bottom: 4px solid #86bd45;
   }
 
   .brand {
     display: inline-flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     color: inherit;
     text-decoration: none;
+  }
+
+  .tree-logo {
+    width: 94px;
+    height: auto;
+    padding: 6px 8px;
+    display: block;
+    background: #ffffff;
   }
 
   .brand strong,
@@ -429,82 +449,34 @@
 
   .brand strong {
     font-size: 14px;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.01em;
   }
 
   .brand small {
     margin-top: 2px;
-    color: #9eb9ad;
+    color: #bfbfbf;
     font-size: 11px;
-  }
-
-  .brand-mark {
-    width: 38px;
-    height: 38px;
-    display: grid;
-    place-items: center;
-    position: relative;
-    border: 1px solid #4f7767;
-    border-radius: 11px;
-  }
-
-  .brand-mark span {
-    width: 6px;
-    height: 6px;
-    position: absolute;
-    background: #7de0af;
-    border-radius: 50%;
-  }
-
-  .brand-mark span:nth-child(1) {
-    transform: translate(-8px, 6px);
-  }
-
-  .brand-mark span:nth-child(2) {
-    transform: translate(8px, 6px);
-  }
-
-  .brand-mark span:nth-child(3) {
-    transform: translateY(-8px);
-  }
-
-  .brand-mark::before,
-  .brand-mark::after {
-    width: 17px;
-    height: 1px;
-    content: "";
-    position: absolute;
-    background: #4f7767;
-    transform-origin: left;
-  }
-
-  .brand-mark::before {
-    transform: translate(-6px, -4px) rotate(56deg);
-  }
-
-  .brand-mark::after {
-    transform: translate(6px, -4px) rotate(124deg);
   }
 
   .local-badge {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #a9c2b7;
+    color: #d8d8d8;
     font-size: 12px;
   }
 
   .local-badge span {
     width: 7px;
     height: 7px;
-    background: #5ee09b;
+    background: #86bd45;
     border-radius: 50%;
-    box-shadow: 0 0 0 4px rgba(94, 224, 155, 0.12);
+    box-shadow: 0 0 0 4px rgba(134, 189, 69, 0.18);
   }
 
   .github-link {
     justify-self: end;
-    color: #dcebe4;
+    color: #f2f2f2;
     font-size: 12px;
     text-decoration: none;
   }
@@ -512,20 +484,20 @@
   main {
     width: min(1500px, calc(100% - 40px));
     margin: 0 auto;
-    padding: 64px 0 56px;
+    padding: 56px 0;
   }
 
   .intro {
     display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
-    align-items: end;
-    gap: 64px;
-    margin-bottom: 46px;
+    grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.62fr) minmax(260px, 0.48fr);
+    align-items: center;
+    gap: 44px;
+    margin-bottom: 38px;
   }
 
   .eyebrow {
     margin: 0 0 14px;
-    color: #25815f;
+    color: #5d912b;
     font-size: 11px;
     font-weight: 800;
     letter-spacing: 0.16em;
@@ -534,24 +506,36 @@
 
   h1 {
     margin: 0;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(42px, 5.5vw, 78px);
-    font-weight: 400;
-    letter-spacing: -0.045em;
-    line-height: 0.96;
-  }
-
-  h1 em {
-    color: #25815f;
-    font-weight: 400;
+    font-size: clamp(38px, 4.8vw, 68px);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1;
   }
 
   .lede {
     max-width: 520px;
     margin: 0 0 5px;
-    color: #596a62;
+    color: #555555;
     font-size: 15px;
     line-height: 1.7;
+  }
+
+  .tree-context {
+    padding-left: 24px;
+    border-left: 4px solid #86bd45;
+  }
+
+  .tree-context img {
+    width: min(100%, 230px);
+    height: auto;
+    display: block;
+  }
+
+  .tree-context p {
+    margin: 18px 0 0;
+    color: #4a4a4a;
+    font-size: 14px;
+    line-height: 1.55;
   }
 
   .examples {
@@ -560,9 +544,8 @@
     margin-bottom: 22px;
     overflow: hidden;
     background: #fff;
-    border: 1px solid #dbe5de;
-    border-radius: 14px;
-    box-shadow: 0 12px 40px rgba(30, 58, 47, 0.06);
+    border: 1px solid #d9d9d9;
+    border-radius: 0;
   }
 
   .examples button {
@@ -571,11 +554,11 @@
     display: grid;
     grid-template-columns: 32px 1fr;
     gap: 2px 8px;
-    color: #33473e;
+    color: #222222;
     text-align: left;
     background: #fff;
     border: 0;
-    border-right: 1px solid #e2eae5;
+    border-right: 1px solid #e4e4e4;
     cursor: pointer;
   }
 
@@ -584,18 +567,18 @@
   }
 
   .examples button:hover {
-    background: #f5faf7;
+    background: #f7fbf2;
   }
 
   .examples button.active {
-    color: #123d2e;
-    background: #eaf6ef;
-    box-shadow: inset 0 3px #2a956d;
+    color: #17220f;
+    background: #eef7e5;
+    box-shadow: inset 0 4px #86bd45;
   }
 
   .examples button > span {
     grid-row: 1 / 3;
-    color: #91a49a;
+    color: #777777;
     font: 11px "IBM Plex Mono", monospace;
   }
 
@@ -604,7 +587,7 @@
   }
 
   .examples small {
-    color: #718078;
+    color: #666666;
     font-size: 11px;
     line-height: 1.4;
   }
@@ -615,14 +598,14 @@
     grid-template-columns: 1fr 1fr auto;
     align-items: end;
     gap: 12px;
-    background: #10251f;
-    border-radius: 14px 14px 0 0;
+    background: #050505;
+    border-radius: 0;
   }
 
   .controls label > span {
     margin: 0 0 7px 2px;
     display: block;
-    color: #a8beb4;
+    color: #d8d8d8;
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -630,7 +613,7 @@
   }
 
   .controls label small {
-    color: #607d70;
+    color: #909090;
     font-size: 9px;
   }
 
@@ -638,17 +621,17 @@
     width: 100%;
     height: 44px;
     padding: 0 13px;
-    color: #e9f6ef;
-    background: #18342b;
-    border: 1px solid #36574a;
-    border-radius: 8px;
+    color: #f2f2f2;
+    background: #1b1b1b;
+    border: 1px solid #555555;
+    border-radius: 0;
     outline: none;
     font: 12px "IBM Plex Mono", monospace;
   }
 
   input:focus {
-    border-color: #61c99a;
-    box-shadow: 0 0 0 3px rgba(97, 201, 154, 0.12);
+    border-color: #86bd45;
+    box-shadow: 0 0 0 3px rgba(134, 189, 69, 0.16);
   }
 
   .run-button {
@@ -657,17 +640,17 @@
     display: flex;
     align-items: center;
     gap: 25px;
-    color: #0e2a20;
+    color: #111111;
     font-size: 12px;
     font-weight: 800;
-    background: #75dca9;
+    background: #86bd45;
     border: 0;
-    border-radius: 8px;
+    border-radius: 0;
     cursor: pointer;
   }
 
   .run-button:hover {
-    background: #91e8bc;
+    background: #9ed15e;
   }
 
   .run-button:disabled {
@@ -677,7 +660,7 @@
 
   .error {
     padding: 12px 16px;
-    color: #8a2e2e;
+    color: #7d2222;
     background: #fff0ed;
     border: 1px solid #f0c6bd;
     border-top: 0;
@@ -686,13 +669,13 @@
   .workspace {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    background: #dbe5de;
+    background: #d9d9d9;
     gap: 1px;
-    border: 1px solid #dbe5de;
+    border: 1px solid #d9d9d9;
     border-top: 0;
-    border-radius: 0 0 14px 14px;
+    border-radius: 0;
     overflow: hidden;
-    box-shadow: 0 16px 50px rgba(30, 58, 47, 0.08);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
   }
 
   .panel {
@@ -710,9 +693,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    color: #35483f;
-    background: #f8faf8;
-    border-bottom: 1px solid #dbe5de;
+    color: #222222;
+    background: #f7f7f7;
+    border-bottom: 1px solid #d9d9d9;
     font-size: 12px;
   }
 
@@ -724,35 +707,35 @@
 
   .panel-heading small,
   .metrics {
-    color: #829188;
+    color: #777777;
     font: 10px "IBM Plex Mono", monospace;
   }
 
   .source-tabs {
     padding: 3px;
-    background: #eaf0ec;
-    border-radius: 7px;
+    background: #eeeeee;
+    border-radius: 0;
   }
 
   .source-tabs button {
     padding: 5px 9px;
-    color: #708078;
+    color: #606060;
     background: transparent;
     border: 0;
-    border-radius: 5px;
+    border-radius: 0;
     cursor: pointer;
     font-size: 10px;
     font-weight: 700;
   }
 
   .source-tabs button:hover {
-    color: #244638;
+    color: #111111;
   }
 
   .source-tabs button.active {
-    color: #174b37;
+    color: #111111;
     background: #fff;
-    box-shadow: 0 1px 3px rgba(24, 55, 43, 0.14);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   }
 
   .metrics span + span::before {
@@ -768,15 +751,15 @@
   }
 
   .data-dot {
-    background: #23916a;
+    background: #5d912b;
   }
 
   .shape-dot {
-    background: #d89e42;
+    background: #86bd45;
   }
 
   .output-dot {
-    background: #6c79d3;
+    background: #111111;
   }
 
   .editor-wrap {
@@ -796,9 +779,9 @@
     align-content: start;
     gap: 18px;
     background:
-      linear-gradient(rgba(236, 244, 239, 0.65) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(236, 244, 239, 0.65) 1px, transparent 1px),
-      #fbfdfb;
+      linear-gradient(rgba(232, 232, 232, 0.7) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232, 232, 232, 0.7) 1px, transparent 1px),
+      #ffffff;
     background-size: 24px 24px;
   }
 
@@ -807,34 +790,34 @@
     height: 42px;
     display: grid;
     place-items: center;
-    color: #217b59;
-    background: #e3f4ea;
-    border: 1px solid #c4e4d2;
-    border-radius: 11px;
+    color: #111111;
+    background: #eef7e5;
+    border: 1px solid #c9dfa8;
+    border-radius: 0;
     font-size: 20px;
   }
 
   .url-source label {
     margin-bottom: 8px;
     display: block;
-    color: #30473d;
+    color: #222222;
     font-size: 12px;
     font-weight: 800;
   }
 
   .url-source input {
-    color: #1b352a;
+    color: #111111;
     background: #fff;
-    border-color: #bfd2c7;
+    border-color: #cfcfcf;
   }
 
   .url-source input::placeholder {
-    color: #8da097;
+    color: #888888;
   }
 
   .url-source p {
     margin: 11px 0 0;
-    color: #718078;
+    color: #666666;
     font-size: 11px;
     line-height: 1.55;
   }
@@ -842,10 +825,10 @@
   .source-status {
     margin-top: 16px;
     padding: 9px 11px;
-    color: #276348;
-    background: #e8f7ee;
-    border: 1px solid #c5e7d2;
-    border-radius: 7px;
+    color: #365c19;
+    background: #eef7e5;
+    border: 1px solid #c9dfa8;
+    border-radius: 0;
     font: 10px "IBM Plex Mono", monospace;
   }
 
@@ -853,8 +836,8 @@
     padding: 24px clamp(20px, 5vw, 72px);
     display: flex;
     justify-content: space-between;
-    color: #7a8981;
-    border-top: 1px solid #dce4df;
+    color: #666666;
+    border-top: 1px solid #e0e0e0;
     font-size: 11px;
   }
 
