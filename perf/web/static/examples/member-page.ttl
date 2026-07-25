@@ -1,0 +1,38 @@
+@prefix ex: <https://example.org/> .
+@prefix tree: <https://w3id.org/tree#> .
+
+# A small same-origin page used to demonstrate URL dereferencing.
+ex:page/url-demo
+  a tree:Node ;
+  tree:member
+    ex:member/01,
+    ex:member/02,
+    ex:member/03,
+    ex:member/04,
+    ex:member/05,
+    ex:member/06,
+    ex:member/07,
+    ex:member/08,
+    ex:member/09,
+    ex:member/10,
+    ex:member/11,
+    ex:member/12,
+    ex:member/13,
+    ex:member/14,
+    ex:member/15 .
+
+ex:member/01 a ex:Reading ; ex:label "Reading 01" ; ex:value 18.1 .
+ex:member/02 a ex:Reading ; ex:label "Reading 02" ; ex:value 18.2 .
+ex:member/03 a ex:Reading ; ex:label "Reading 03" ; ex:value 18.3 .
+ex:member/04 a ex:Reading ; ex:label "Reading 04" ; ex:value 18.4 .
+ex:member/05 a ex:Reading ; ex:label "Reading 05" ; ex:value 18.5 .
+ex:member/06 a ex:Reading ; ex:label "Reading 06" ; ex:value 18.6 .
+ex:member/07 a ex:Reading ; ex:label "Reading 07" ; ex:value 18.7 .
+ex:member/08 a ex:Reading ; ex:label "Reading 08" ; ex:value 18.8 .
+ex:member/09 a ex:Reading ; ex:label "Reading 09" ; ex:value 18.9 .
+ex:member/10 a ex:Reading ; ex:label "Reading 10" ; ex:value 19.0 .
+ex:member/11 a ex:Reading ; ex:label "Reading 11" ; ex:value 19.1 .
+ex:member/12 a ex:Reading ; ex:label "Reading 12" ; ex:value 19.2 .
+ex:member/13 a ex:Reading ; ex:label "Reading 13" ; ex:value 19.3 .
+ex:member/14 a ex:Reading ; ex:label "Reading 14" ; ex:value 19.4 .
+ex:member/15 a ex:Reading ; ex:label "Reading 15" ; ex:value 19.5 .
