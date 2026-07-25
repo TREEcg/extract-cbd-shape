@@ -1,5 +1,5 @@
 import * as process from 'process';
-import { CBDShapeExtractor } from '../lib/CBDShapeExtractor';
+import { CBDShapeExtractor, createGraphIndexedRdfStore } from '../lib/extract-cbd-shape';
 import { Writer } from 'n3';
 import { DataFactory } from 'rdf-data-factory';
 import { RdfStore } from 'rdf-stores';
@@ -44,7 +44,7 @@ async function loadShape(shapeURL: string, shapeStore: RdfStore) {
 async function main() {
     // Get the command line parameter at index 2 (index 0 is the node executable and index 1 is the script file)
     const entity = process.argv[2];
-    let shapeStore: RdfStore = RdfStore.createDefault();
+    let shapeStore: RdfStore = createGraphIndexedRdfStore();
     let shapeId = "";
     if (process.argv[3]) {
         //A shape type has been set!
@@ -59,7 +59,7 @@ async function main() {
     let extractor = new CBDShapeExtractor(shapeStore);
     console.error('Processing shape ' + shapeId + ' from this shape: ', extractor.shapesGraphStore);
     let writer = new Writer();
-    let quads = await extractor.extract(RdfStore.createDefault(), df.namedNode(entity), df.namedNode(shapeId));
+    let quads = await extractor.extract(createGraphIndexedRdfStore(), df.namedNode(entity), df.namedNode(shapeId));
     writer.addQuads(quads);
     writer.end((err, res) => { console.log(res); });
 }

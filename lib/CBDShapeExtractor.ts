@@ -2,11 +2,10 @@ import { rdfDereferencer, RdfDereferencer } from "rdf-dereference";
 import { NodeLink, RDFMap, ShapeTemplate } from "./Shape";
 import { Path } from "./Path";
 import { DataFactory } from "rdf-data-factory";
-import { RdfStore } from "rdf-stores";
 import { Quad, Term, Store } from "@rdfjs/types";
 import debug from "debug";
 import { ShapesGraph } from "./ShapesGraph";
-import { streamToArray, streamToAsyncIterable, uniqueQuads } from "./Utils";
+import { createGraphIndexedRdfStore, streamToArray, streamToAsyncIterable, uniqueQuads } from "./Utils";
 
 const log = debug("extract-cbd-shape");
 
@@ -75,7 +74,7 @@ export class CBDShapeExtractor {
       for (let id of ids) {
          memberSpecificQuads[id.value] = [];
       }
-      const newStore = RdfStore.createDefault();
+      const newStore = createGraphIndexedRdfStore();
       for await (const quad of streamToAsyncIterable(store.match(null, null, null, null))) {
          if (quad.graph.termType == "NamedNode" && idSet.has(quad.graph.value)) {
             memberSpecificQuads[quad.graph.value].push(quad);

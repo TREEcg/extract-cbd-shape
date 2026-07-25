@@ -15,7 +15,7 @@ npm install extract-cbd-shape
 ```
 
 ```javascript
-import {CBDShapeExtractor} from "extract-cbd-shape";
+import {CBDShapeExtractor, createGraphIndexedRdfStore} from "extract-cbd-shape";
 // ...
 let extractor = new CBDShapeExtractor(shapesGraph);
 let entityquads = await extractor.extract(store, entityId, shapeId, graphsToIgnore);
@@ -26,6 +26,9 @@ let entityquads = await extractor.extract(store, entityId, shapeId, graphsToIgno
  * The entityId is the IRI of the entity to extract from the current context
  * The Shape ID is the IRI of the NodeShape in the shapesGraph to start from
  * The graphToIgnore are the namedgraphs in the current context (the store) to disregard when extracting the member
+
+For fast extraction from pages with many named graphs, create in-memory stores with `createGraphIndexedRdfStore()`.
+This configures `rdf-stores` with graph-first indexes (`GSPO`, `GPOS`, `GOSP`), which makes retrieving all quads in the named graph of a member efficient.
 
 ## Test it
 
@@ -105,7 +108,6 @@ It won’t:
 ### Logging
 
 Logging can be enabled using the `DEBUG` environment variable, `DEBUG=extract-cbd-shape:*`.
-
 
 
 

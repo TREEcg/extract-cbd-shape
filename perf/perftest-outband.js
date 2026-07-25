@@ -1,9 +1,9 @@
 import Benchmark from "benchmark";
-import { RdfStore } from "rdf-stores";
 import { rdfDereferencer } from "rdf-dereference";
 import { NamedNode } from "n3";
 import { JSDOM } from "jsdom";
 import { CBDShapeExtractor } from "../dist/lib/CBDShapeExtractor.js";
+import { createGraphIndexedRdfStore } from "../dist/lib/extract-cbd-shape.js";
 import { renderResults } from "./render.js";
 
 const runBenchmarkInCleanContext = async (
@@ -28,11 +28,11 @@ const runBenchmarkInCleanContext = async (
 
 let main = async function () {
   let suite = new Benchmark.Suite();
-  let memberData = RdfStore.createDefault();
-  let memberData1000Members = RdfStore.createDefault();
-  let memberOutBandData = RdfStore.createDefault();
-  let memberOutBandDataPartial = RdfStore.createDefault();
-  let shaclmember = RdfStore.createDefault();
+  let memberData = createGraphIndexedRdfStore();
+  let memberData1000Members = createGraphIndexedRdfStore();
+  let memberOutBandData = createGraphIndexedRdfStore();
+  let memberOutBandDataPartial = createGraphIndexedRdfStore();
+  let shaclmember = createGraphIndexedRdfStore();
 
   //Load the quads from the file
   let memberDataStream = (
@@ -132,7 +132,7 @@ let main = async function () {
               null,
               null
             );
-            const result = RdfStore.createDefault();
+            const result = createGraphIndexedRdfStore();
             for (const member of members) {
               for (const quad of await extractor.extract(
                 memberData,
@@ -163,7 +163,7 @@ let main = async function () {
               null,
               null
             );
-            const result = RdfStore.createDefault();
+            const result = createGraphIndexedRdfStore();
             for (const member of members) {
               let extract = await extractorWithShape.extract(
                 memberOutBandDataPartial,
@@ -195,7 +195,7 @@ let main = async function () {
               null,
               null
             );
-            const result = RdfStore.createDefault();
+            const result = createGraphIndexedRdfStore();
             for (const member of members) {
               let extract = await extractorWithShape.extract(
                 memberOutBandData,
@@ -227,7 +227,7 @@ let main = async function () {
               null,
               null
             );
-            const result = RdfStore.createDefault();
+            const result = createGraphIndexedRdfStore();
             for (const member of members) {
               for (const quad of await extractor.extract(
                 memberData1000Members,

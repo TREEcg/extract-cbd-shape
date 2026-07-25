@@ -1,4 +1,4 @@
-import { RdfStore } from "rdf-stores";
+import { createGraphIndexedRdfStore } from "../lib/extract-cbd-shape";
 import { ShapesGraph } from "../lib/ShapesGraph";
 import { DataFactory } from "rdf-data-factory";
 import { rdfDereferencer } from "rdf-dereference";
@@ -20,7 +20,7 @@ let iri = process.argv[2];
 
 async function main() {
   let df = new DataFactory();
-  let shapeStore = RdfStore.createDefault();
+  let shapeStore = createGraphIndexedRdfStore();
   let shapesGraph: ShapesGraph;
   let shapeTerm: Term = df.namedNode(iri);
   let readStream = null;

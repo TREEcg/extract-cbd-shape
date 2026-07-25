@@ -1,4 +1,24 @@
 import type { Stream, Quad, Term } from "@rdfjs/types";
+import { DataFactory } from "rdf-data-factory";
+import {
+    RdfStore,
+    RdfStoreIndexNestedMapQuoted,
+    TermDictionaryNumberRecordFullTerms,
+    TermDictionaryQuotedIndexed,
+} from "rdf-stores";
+
+export function createGraphIndexedRdfStore(): RdfStore<number> {
+    return new RdfStore<number>({
+        indexCombinations: [
+            ["graph", "subject", "predicate", "object"],
+            ["graph", "predicate", "object", "subject"],
+            ["graph", "object", "subject", "predicate"],
+        ],
+        indexConstructor: (subOptions) => new RdfStoreIndexNestedMapQuoted(subOptions),
+        dictionary: new TermDictionaryQuotedIndexed(new TermDictionaryNumberRecordFullTerms()),
+        dataFactory: new DataFactory(),
+    });
+}
 
 /**
  * Converts a Stream into an Array.

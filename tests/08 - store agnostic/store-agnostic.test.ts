@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { DataFactory } from "rdf-data-factory";
-import { CBDShapeExtractor } from "../../lib/extract-cbd-shape";
+import { CBDShapeExtractor, createGraphIndexedRdfStore } from "../../lib/extract-cbd-shape";
 import { RdfStore } from "rdf-stores";
 import { rdfDereferencer } from "rdf-dereference";
 import { Quadstore } from "quadstore";
@@ -11,6 +11,16 @@ import * as path from "path";
 
 describe("CBDShapeExtractor should work with different store implementations", function () {
   const shapeExtractor = new CBDShapeExtractor();
+
+  it("should create rdf-stores instances with graph-first indexes", () => {
+    const store = createGraphIndexedRdfStore();
+
+    expect(store.options.indexCombinations).toEqual([
+      ["graph", "subject", "predicate", "object"],
+      ["graph", "predicate", "object", "subject"],
+      ["graph", "object", "subject", "predicate"],
+    ]);
+  });
 
   it("should extract same number of triples using rdf-stores and quadstore", async () => {
     // 1. Initialize both stores

@@ -1,8 +1,8 @@
 import Benchmark from "benchmark";
-import { RdfStore } from "rdf-stores";
 import { rdfDereferencer } from "rdf-dereference";
 import { DataFactory } from "rdf-data-factory";
 import { CBDShapeExtractor } from "../dist/lib/CBDShapeExtractor.js";
+import { createGraphIndexedRdfStore } from "../dist/lib/extract-cbd-shape.js";
 import { renderResults } from "./render.js";
 
 const namedNode = new DataFactory().namedNode;
@@ -11,8 +11,8 @@ Benchmark.options.maxTime = 2;
 
 let main = async function () {
   let suite = new Benchmark.Suite(undefined, { maxTime: 2 });
-  let kboData = RdfStore.createDefault();
-  let shaclKBO = RdfStore.createDefault();
+  let kboData = createGraphIndexedRdfStore();
+  let shaclKBO = createGraphIndexedRdfStore();
   //Load the quads from the file
   let kboDataStream = (
     await rdfDereferencer.dereference("./perf/resources/kbo.ttl", {
