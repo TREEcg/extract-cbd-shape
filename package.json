@@ -13,8 +13,7 @@
     "test": "vitest run",
     "build": "tsc && tsc-alias && rollup -c",
     "prepublishOnly": "npm run build",
-    "data": "npm run build && node ./perf/outband-setup.js",
-    "bench": "npm run build && node ./perf/perftest-inband.js && node ./perf/perftest-inband-diskstore.js && node ./perf/perftest-inband-percent.js && node ./perf/perftest-outband.js"
+    "bench": "npm run build && node ./perf/perftest-inband.js && node ./perf/perftest-inband-diskstore.js && node ./perf/perftest-inband-percent.js && node ./perf/perftest-page.js"
   },
   "keywords": [
     "CBD",
@@ -49,7 +48,6 @@
     "@vitest/coverage-v8": "^4.0.18",
     "benchmark": "^2.1.4",
     "js-base64": "^3.7.8",
-    "jsdom": "^28.1.0",
     "level": "^10.0.0",
     "pako": "^2.1.0",
     "quadstore": "^15.4.1",

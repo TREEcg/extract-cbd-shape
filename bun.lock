@@ -22,7 +22,6 @@
         "@vitest/coverage-v8": "^4.0.18",
         "benchmark": "^2.1.4",
         "js-base64": "^3.7.8",
-        "jsdom": "^28.1.0",
         "level": "^10.0.0",
         "pako": "^2.1.0",
         "quadstore": "^15.4.1",

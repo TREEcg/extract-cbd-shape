@@ -76,4 +76,32 @@ describe("Check weather all selected quads can be extracted", function () {
     expect(result.length).toBe(2);
     expect(called).toBe(2);
   });
+
+  it("bulk - should use member named graphs without dereferencing", async () => {
+    const member = df.namedNode("http://example.org/named-graph-member");
+    const store = RdfStore.createDefault();
+    store.addQuad(
+      df.quad(
+        member,
+        df.namedNode("http://example.org/name"),
+        df.literal("member"),
+        member,
+      ),
+    );
+    const noDereference = {
+      dereference: async () => {
+        throw new Error("Named-graph members must not be dereferenced");
+      },
+    };
+    const namedGraphExtractor = new CBDShapeExtractor(
+      undefined,
+      noDereference as any,
+    );
+
+    const result = await namedGraphExtractor.bulkExtract(store, [member]);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].quads).toHaveLength(1);
+    expect(result[0].quads[0].graph.equals(member)).toBe(true);
+  });
 });

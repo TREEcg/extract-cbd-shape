@@ -150,7 +150,7 @@ let main = async function () {
             console.log(String(event.target));
         })
         // add listeners
-        .on("complete", function () {
+        .on("complete", async function () {
             const results = this.map((test) => {
                 return {
                     name: test.name,
@@ -161,14 +161,9 @@ let main = async function () {
                 };
             });
 
-            renderResults("inband-diskstore", results);
-
-            // Cleanup
-            (async () => {
-                await quadStore.close();
-                await backend.close();
-                await fs.rm(tempDir, { recursive: true, force: true });
-            })();
+            await renderResults("inband-diskstore", results);
+            await quadStore.close();
+            await fs.rm(tempDir, { recursive: true, force: true });
         })
         // run async
         .run({ async: true });

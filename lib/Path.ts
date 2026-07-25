@@ -2,6 +2,10 @@ import { Quad, Term, Store } from "@rdfjs/types";
 import { CbdExtracted, SyncStore, AsyncStore } from "./CBDShapeExtractor";
 import { streamToArray } from "./Utils";
 
+export interface GraphFilter {
+  has(value: string): boolean;
+}
+
 export interface Path {
   literalType?: Term;
 
@@ -13,7 +17,7 @@ export interface Path {
     store: Store,
     extracted: CbdExtracted,
     focusNode: Term,
-    graphsToIgnore?: Array<string>,
+    graphsToIgnore?: GraphFilter,
     inverse?: boolean,
   ): Promise<PathResult[]>;
 }
@@ -39,7 +43,7 @@ export class PredicatePath implements Path {
     store: Store,
     extracted: CbdExtracted,
     focusNode: Term,
-    graphsToIgnore: Array<string>,
+    graphsToIgnore: GraphFilter,
     inverse: boolean = false,
   ): Promise<PathResult[]> {
     let quads: Quad[];
@@ -59,7 +63,7 @@ export class PredicatePath implements Path {
           : await streamToArray(store.match(focusNode, this.predicate, null, null))
       );
     }
-    quads = quads.filter((q) => !graphsToIgnore.includes(q.graph.value));
+    quads = quads.filter((q) => !graphsToIgnore.has(q.graph.value));
 
     if (quads.length > 0) {
       let cbd: CbdExtracted = extracted.push(this.predicate, inverse);
@@ -101,7 +105,7 @@ export class SequencePath implements Path {
     store: Store,
     extracted: CbdExtracted,
     focusNode: Term,
-    graphsToIgnore: Array<string>,
+    graphsToIgnore: GraphFilter,
     inverse: boolean = false,
   ): Promise<PathResult[]> {
     let results: PathResult[] = [
@@ -159,7 +163,7 @@ export class AlternativePath implements Path {
     store: Store,
     extracted: CbdExtracted,
     focusNode: Term,
-    graphsToIgnore: Array<string>,
+    graphsToIgnore: GraphFilter,
     inverse: boolean = false,
   ): Promise<PathResult[]> {
     const resultsArrays = await Promise.all(
@@ -192,7 +196,7 @@ export class InversePath implements Path {
     store: Store,
     extracted: CbdExtracted,
     focusNode: Term,
-    graphsToIgnore: Array<string>,
+    graphsToIgnore: GraphFilter,
     inverse: boolean = false,
   ): Promise<PathResult[]> {
     return await this.path.match(
@@ -224,7 +228,7 @@ export abstract class MultiPath implements Path {
     store: Store,
     extracted: CbdExtracted,
     focusNode: Term,
-    graphsToIgnore: Array<string>,
+    graphsToIgnore: GraphFilter,
     inverse: boolean = false,
   ): Promise<PathResult[]> {
     const out: PathResult[] = [];
@@ -235,15 +239,18 @@ export abstract class MultiPath implements Path {
         cbdExtracted: extracted,
       },
     ];
+    const visitedTargets = new Set([termKey(focusNode)]);
 
     for (let i = 0; true; i++) {
-      if (this.maxCount && i > this.maxCount) break;
       if (targets.length === 0) break;
       const newTargets: PathResult[] = [];
 
       for (const t of targets) {
         if (this.filter(i, t)) {
           out.push(t);
+        }
+        if (this.maxCount !== undefined && i >= this.maxCount) {
+          continue;
         }
 
         const foundPaths = await this.path.match(
@@ -255,11 +262,20 @@ export abstract class MultiPath implements Path {
         );
 
         for (const found of foundPaths) {
-          newTargets.push({
+          const next = {
             path: [...t.path, ...found.path],
-            cbdExtracted: t.cbdExtracted,
+            cbdExtracted: found.cbdExtracted,
             target: found.target,
-          });
+          };
+          const targetKey = termKey(found.target);
+          if (visitedTargets.has(targetKey)) {
+            if (this.filter(i + 1, next)) {
+              out.push(next);
+            }
+            continue;
+          }
+          visitedTargets.add(targetKey);
+          newTargets.push(next);
         }
       }
 
@@ -268,6 +284,27 @@ export abstract class MultiPath implements Path {
 
     return out;
   }
+}
+
+function termKey(term: Term): string {
+  if (term.termType === "Quad") {
+    return [
+      term.termType,
+      termKey(term.subject),
+      termKey(term.predicate),
+      termKey(term.object),
+      termKey(term.graph),
+    ].join("\0");
+  }
+  if (term.termType === "Literal") {
+    return [
+      term.termType,
+      term.value,
+      term.language,
+      term.datatype.value,
+    ].join("\0");
+  }
+  return [term.termType, term.value].join("\0");
 }
 
 export class OneOrMorePath extends MultiPath {
@@ -284,8 +321,10 @@ export class OneOrMorePath extends MultiPath {
   found(cbd: CbdExtracted, inverse?: boolean): CbdExtracted | undefined {
     let newCbd = this.path.found(cbd, inverse);
     if (!newCbd) return;
+    const visited = new Set([cbd.topology]);
     let next = this.path.found(newCbd, inverse);
-    while (next) {
+    while (next && !visited.has(newCbd.topology)) {
+      visited.add(newCbd.topology);
       newCbd = next;
       next = this.path.found(newCbd, inverse);
     }
@@ -305,8 +344,10 @@ export class ZeroOrMorePath extends MultiPath {
   }
 
   found(cbd: CbdExtracted, inverse?: boolean): CbdExtracted | undefined {
+    const visited = new Set([cbd.topology]);
     let next = this.path.found(cbd, inverse);
-    while (next) {
+    while (next && !visited.has(next.topology)) {
+      visited.add(next.topology);
       cbd = next;
       next = this.path.found(cbd, inverse);
     }
