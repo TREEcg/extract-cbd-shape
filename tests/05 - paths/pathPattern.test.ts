@@ -4,6 +4,7 @@ import { rdfDereferencer } from "rdf-dereference";
 import { CbdExtracted } from "../../lib/CBDShapeExtractor";
 import { RdfStore } from "rdf-stores";
 import { ShapesGraph } from "../../lib/ShapesGraph";
+import { OneOrMorePath, PredicatePath, ZeroOrOnePath } from "../../lib/Path";
 
 const df = new DataFactory();
 
@@ -60,7 +61,7 @@ describe("Test whether the Patterns are correctly matched", function () {
           store,
           new CbdExtracted(),
           df.namedNode("http://example.org/A"),
-          [],
+          new Set(),
         );
     expect(match1.length > 0).toBeTruthy();
   });
@@ -73,8 +74,45 @@ describe("Test whether the Patterns are correctly matched", function () {
           store,
           new CbdExtracted(),
           df.namedNode("http://example.org/A"),
-          [],
+          new Set(),
         );
     expect(match1.length > 0).toBeTruthy();
+  });
+
+  it("does not expand beyond a zero-or-one path", async () => {
+    const predicate = df.namedNode("http://example.org/next");
+    const a = df.namedNode("http://example.org/zero-or-one-a");
+    const b = df.namedNode("http://example.org/zero-or-one-b");
+    const c = df.namedNode("http://example.org/zero-or-one-c");
+    const pathStore = RdfStore.createDefault();
+    pathStore.addQuad(df.quad(a, predicate, b));
+    pathStore.addQuad(df.quad(b, predicate, c));
+
+    const matches = await new ZeroOrOnePath(
+      new PredicatePath(predicate),
+    ).match(pathStore, new CbdExtracted(), a, new Set());
+
+    expect(matches.map((match) => match.target.value)).toEqual([
+      a.value,
+      b.value,
+    ]);
+  });
+
+  it("terminates repeated paths on cyclic data", async () => {
+    const predicate = df.namedNode("http://example.org/next");
+    const a = df.namedNode("http://example.org/cycle-a");
+    const b = df.namedNode("http://example.org/cycle-b");
+    const pathStore = RdfStore.createDefault();
+    pathStore.addQuad(df.quad(a, predicate, b));
+    pathStore.addQuad(df.quad(b, predicate, a));
+
+    const matches = await new OneOrMorePath(
+      new PredicatePath(predicate),
+    ).match(pathStore, new CbdExtracted(), a, new Set());
+
+    expect(matches.map((match) => match.target.value)).toEqual([
+      b.value,
+      a.value,
+    ]);
   });
 });

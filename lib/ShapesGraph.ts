@@ -1,4 +1,4 @@
-import { Term, Store } from "@rdfjs/types";
+import { Quad, Term, Store } from "@rdfjs/types";
 import {
   AlternativePath,
   InversePath,
@@ -546,9 +546,7 @@ const getSubjects = async (
   object: Term | null,
   graph?: Term | null,
 ) => {
-  const quadStream = store.match(null, predicate, object, graph);
-
-  return (await streamToArray(quadStream)).map((quad: any) => {
+  return (await getQuads(store, null, predicate, object, graph)).map((quad) => {
     return quad.subject;
   });
 };
@@ -559,8 +557,39 @@ const getObjects = async (
   predicate: Term | null,
   graph?: Term | null,
 ) => {
-  const quadStream = store.match(subject, predicate, null, graph);
-  return (await streamToArray(quadStream)).map((quad: any) => {
+  return (await getQuads(store, subject, predicate, null, graph)).map((quad) => {
     return quad.object;
   });
+};
+
+const getQuads = async (
+  store: Store,
+  subject: Term | null,
+  predicate: Term | null,
+  object: Term | null,
+  graph?: Term | null,
+): Promise<Quad[]> => {
+  const queryable = store as Store & {
+    getQuads?: (
+      subject?: Term | null,
+      predicate?: Term | null,
+      object?: Term | null,
+      graph?: Term | null,
+    ) => Quad[];
+    get?: (pattern: {
+      subject?: Term | null,
+      predicate?: Term | null,
+      object?: Term | null,
+      graph?: Term | null,
+    }) => Promise<{ items: Quad[] }>;
+  };
+  if (queryable.getQuads) {
+    return queryable.getQuads(subject, predicate, object, graph);
+  }
+  if (queryable.get) {
+    return (
+      await queryable.get({ subject, predicate, object, graph })
+    ).items;
+  }
+  return streamToArray(store.match(subject, predicate, object, graph));
 };

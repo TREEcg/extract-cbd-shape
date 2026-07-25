@@ -227,9 +227,9 @@ let main = async function () {
     }
     })
     // Extraction CBD + named graphs + Simple shape that does not add any triples other than already present, retrieve 13 quads out of 130
-    .add(
-      "Extract4.1#CBDAndSimpleShapeAndNamedGraphsTenPercent",
-      async function () {
+    .add("Extract4.1#CBDAndSimpleShapeAndNamedGraphsTenPercent", {
+      defer: true,
+      fn: async function (deferred) {
         let result = await extractorWithShape.extract(
           kboData130Quads,
           namedNode(
@@ -238,12 +238,13 @@ let main = async function () {
           namedNode("https://kbopub.economie.fgov.be/kbo#LegalEntityShape")
         );
         //console.log("Extract4.1#CBDAndSimpleShapeAndNamedGraphsTenPercent returned: " + result.length + " quads.");
+        deferred.resolve();
       }
-    )
+    })
     // Extraction CBD + named graphs + Simple shape that does not add any triples other than already present, retrieve 13 quads out of 1300
-    .add(
-      "Extract4.2#CBDAndSimpleShapeAndNamedGraphsOnePercent",
-      async function () {
+    .add("Extract4.2#CBDAndSimpleShapeAndNamedGraphsOnePercent", {
+      defer: true,
+      fn: async function (deferred) {
         let result = await extractorWithShape.extract(
           kboData1300Quads,
           namedNode(
@@ -252,8 +253,9 @@ let main = async function () {
           namedNode("https://kbopub.economie.fgov.be/kbo#LegalEntityShape")
         );
         //console.log("Extract4.2#CBDAndSimpleShapeAndNamedGraphsOnePercent returned: " + result.length + " quads.");
+        deferred.resolve();
       }
-    )
+    })
 
     // Extraction Shape selecting specific property paths, but not too complex
     .add("Extract5#CBDAndShaclExtended", {
@@ -356,15 +358,17 @@ let main = async function () {
     })
 
     // add listeners
-    .on("complete", function () {
+    .on("complete", async function () {
       const results = this.map((test) => {
         return {
           name: test.name,
           opsPerSecond: test.hz,
           samples: test.stats.sample.length,
+          mean: test.stats.mean,
+          deviation: test.stats.deviation,
         };
       });
-      renderResults("inband-percent", results);
+      await renderResults("inband-percent", results);
     })
     // run async
     .run({ async: true });

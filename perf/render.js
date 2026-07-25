@@ -1,24 +1,23 @@
 import fs from "fs";
 import si from "systeminformation";
 
-export const renderResults = (prefix, results) => {
-  getSystemInfo().then((systemInfo) => {
-    const fileSuffix =
-      `${systemInfo.platform}-${systemInfo.distro}-${systemInfo.arch}-${systemInfo.cpu}`
-        .toLowerCase()
-        .replace(/ /g, "_");
+export const renderResults = async (prefix, results) => {
+  const systemInfo = await getSystemInfo();
+  const fileSuffix =
+    `${systemInfo.platform}-${systemInfo.distro}-${systemInfo.arch}-${systemInfo.cpu}`
+      .toLowerCase()
+      .replace(/ /g, "_");
 
-    fs.writeFileSync(
-      `./perf/results/${prefix}_${fileSuffix}.json`,
-      JSON.stringify(results, null, 2),
-    );
+  fs.writeFileSync(
+    `./perf/results/${prefix}_${fileSuffix}.json`,
+    JSON.stringify(results, null, 2),
+  );
 
-    const chartHtml = renderAsHTML(results, systemInfo);
-    fs.writeFileSync(`./perf/results/${prefix}_${fileSuffix}.html`, chartHtml);
+  const chartHtml = renderAsHTML(results, systemInfo);
+  fs.writeFileSync(`./perf/results/${prefix}_${fileSuffix}.html`, chartHtml);
 
-    const tikz = renderAsTikz(results);
-    fs.writeFileSync(`./perf/results/${prefix}_${fileSuffix}.tex`, tikz);
-  });
+  const tikz = renderAsTikz(results);
+  fs.writeFileSync(`./perf/results/${prefix}_${fileSuffix}.tex`, tikz);
 };
 
 const renderAsTikz = (results) => {
@@ -153,5 +152,4 @@ const getSystemInfo = async () => {
     cpu: `${cpu.manufacturer} ${cpu.brand}`,
   };
 };
-
 

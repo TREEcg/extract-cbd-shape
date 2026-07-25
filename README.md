@@ -28,7 +28,9 @@ let entityquads = await extractor.extract(store, entityId, shapeId, graphsToIgno
  * The graphToIgnore are the namedgraphs in the current context (the store) to disregard when extracting the member
 
 For fast extraction from pages with many named graphs, create in-memory stores with `createGraphIndexedRdfStore()`.
-This configures `rdf-stores` with graph-first indexes (`GSPO`, `GPOS`, `GOSP`), which makes retrieving all quads in the named graph of a member efficient.
+This configures `rdf-stores` with graph-first indexes (`GSPO`, `GPOS`, `GOSP`) for retrieving member named graphs, plus traversal indexes (`SPOG`, `POSG`) for CBD and SHACL path lookups across graphs.
+
+When extracting several members from the same page, use `bulkExtract()`. It avoids copying the page, isolates member named graphs from each other, and automatically uses sequential extraction for synchronous stores or bounded concurrency for asynchronous stores. The concurrency can be overridden with the `bulkConcurrency` constructor option.
 
 ## Test it
 
@@ -108,6 +110,5 @@ It won’t:
 ### Logging
 
 Logging can be enabled using the `DEBUG` environment variable, `DEBUG=extract-cbd-shape:*`.
-
 
 

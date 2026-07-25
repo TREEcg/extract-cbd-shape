@@ -1,14 +1,15 @@
 <script lang="ts">
-  import { Store, NamedNode } from "n3";
-  import rdfDereference from "rdf-dereference";
-  import {CBDShapeExtractor } from "extract-cbd-shape";
+  import { rdfDereferencer } from "rdf-dereference";
+  import { CBDShapeExtractor, createGraphIndexedRdfStore } from "extract-cbd-shape";
+  import { DataFactory } from "rdf-data-factory";
   import { onMount } from "svelte";
 
+  const dataFactory = new DataFactory();
   let b = 50000;
   let running = false;
 
-    let kboData = new Store();
-    let shaclKBO = new Store();
+    let kboData = createGraphIndexedRdfStore();
+    let shaclKBO = createGraphIndexedRdfStore();
     let extractor = new CBDShapeExtractor();
     let extractorWithShape = new CBDShapeExtractor(shaclKBO);
 
@@ -17,7 +18,7 @@
       for(let i = 0; i < count; i ++ ) {
         let _result = await extractor.extract(
           kboData,
-          new NamedNode("https://kbopub.economie.fgov.be/kbo#0877248501.2022.11"),
+          dataFactory.namedNode("https://kbopub.economie.fgov.be/kbo#0877248501.2022.11"),
         );
       }
   };
@@ -27,15 +28,15 @@
       for(let i = 0; i < count; i ++ ) {
       let result = await extractorWithShape.extract(
         kboData,
-        new NamedNode("https://kbopub.economie.fgov.be/kbo#0877248501.2022.11"),
-        new NamedNode("https://kbopub.economie.fgov.be/kbo#LegalEntityShape")
+        dataFactory.namedNode("https://kbopub.economie.fgov.be/kbo#0877248501.2022.11"),
+        dataFactory.namedNode("https://kbopub.economie.fgov.be/kbo#LegalEntityShape")
       );
       }
   };
 
   onMount(async () => {
     let kboDataStream = (
-      await rdfDereference.dereference(
+      await rdfDereferencer.dereference(
        window.location+ "kbo.ttl",
         {},
       )
@@ -43,7 +44,7 @@
 
     //load the shacl shape from the file
     let kboShaclStream = (
-      await rdfDereference.dereference(
+      await rdfDereferencer.dereference(
        window.location+ "shacl-kbo.ttl",
       )
     ).data;

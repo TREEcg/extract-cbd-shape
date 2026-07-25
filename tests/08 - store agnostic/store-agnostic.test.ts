@@ -12,13 +12,15 @@ import * as path from "path";
 describe("CBDShapeExtractor should work with different store implementations", function () {
   const shapeExtractor = new CBDShapeExtractor();
 
-  it("should create rdf-stores instances with graph-first indexes", () => {
+  it("should create rdf-stores instances with graph and traversal indexes", () => {
     const store = createGraphIndexedRdfStore();
 
     expect(store.options.indexCombinations).toEqual([
       ["graph", "subject", "predicate", "object"],
       ["graph", "predicate", "object", "subject"],
       ["graph", "object", "subject", "predicate"],
+      ["subject", "predicate", "object", "graph"],
+      ["predicate", "object", "subject", "graph"],
     ]);
   });
 

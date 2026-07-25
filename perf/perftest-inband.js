@@ -152,7 +152,7 @@ let main = async function () {
       console.log(String(event.target));
     })
     // add listeners
-    .on("complete", function () {
+    .on("complete", async function () {
       const results = this.map((test) => {
         return {
           name: test.name,
@@ -163,7 +163,7 @@ let main = async function () {
         };
       });
 
-      renderResults("inband", results);
+      await renderResults("inband", results);
     })
     // run async
     .run({ async: true });

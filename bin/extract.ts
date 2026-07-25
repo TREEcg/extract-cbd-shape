@@ -1,6 +1,6 @@
 import * as process from 'process';
 import { CBDShapeExtractor, createGraphIndexedRdfStore } from '../lib/extract-cbd-shape';
-import { Writer } from 'n3';
+import { Writer } from 'rdf-writer-ts';
 import { DataFactory } from 'rdf-data-factory';
 import { RdfStore } from 'rdf-stores';
 import { rdfDereferencer } from 'rdf-dereference';

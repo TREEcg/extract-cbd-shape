@@ -1,11 +1,11 @@
 import { rdfDereferencer, RdfDereferencer } from "rdf-dereference";
 import { NodeLink, RDFMap, ShapeTemplate } from "./Shape";
-import { Path } from "./Path";
+import { GraphFilter, Path, PathResult } from "./Path";
 import { DataFactory } from "rdf-data-factory";
 import { Quad, Term, Store } from "@rdfjs/types";
 import debug from "debug";
 import { ShapesGraph } from "./ShapesGraph";
-import { createGraphIndexedRdfStore, streamToArray, streamToAsyncIterable, uniqueQuads } from "./Utils";
+import { streamToArray, uniqueQuads } from "./Utils";
 
 const log = debug("extract-cbd-shape");
 
@@ -23,6 +23,7 @@ export interface AsyncStore extends Store {
 
 type CBDShapeExtractorOptions = {
    cbdDefaultGraph: boolean;
+   bulkConcurrency?: number;
    fetch?: typeof fetch;
 };
 
@@ -37,6 +38,7 @@ export class CBDShapeExtractor {
    dereferencer: RdfDereferencer;
    shapesGraphStore?: Store;
    private shapesGraph?: ShapesGraph;
+   private shapesGraphPromise?: Promise<ShapesGraph>;
 
    options: CBDShapeExtractorOptions;
 
@@ -67,41 +69,56 @@ export class CBDShapeExtractor {
       graphsToIgnore?: Array<Term>,
       itemExtracted?: (member: { subject: Term; quads: Quad[] }) => void,
    ): Promise<Array<{ subject: Term; quads: Quad[] }>> {
-      const out: Array<{ subject: Term; quads: Quad[] }> = [];
-      const idSet = new Set(ids.map((x) => x.value));
-
-      const memberSpecificQuads: { [id: string]: Array<Quad> } = {};
-      for (let id of ids) {
-         memberSpecificQuads[id.value] = [];
-      }
-      const newStore = createGraphIndexedRdfStore();
-      for await (const quad of streamToAsyncIterable(store.match(null, null, null, null))) {
-         if (quad.graph.termType == "NamedNode" && idSet.has(quad.graph.value)) {
-            memberSpecificQuads[quad.graph.value].push(quad);
-         } else {
-            newStore.addQuad(quad);
+      const out = new Array<{ subject: Term; quads: Quad[] }>(ids.length);
+      const explicitlyIgnoredGraphs = new Set(
+         (graphsToIgnore || []).map((term) => term.value),
+      );
+      const memberGraphs = new Set<string>();
+      for (const id of ids) {
+         if (id.termType === "NamedNode") {
+            memberGraphs.add(id.value);
          }
       }
 
-      const promises = [];
-      for (let id of ids) {
-         const promise = this.extract(
-            newStore,
-            id,
-            shapeId,
-            (graphsToIgnore || []).slice(),
-         ).then((quads) => {
-            quads.push(...memberSpecificQuads[id.value]);
+      let nextIndex = 0;
+      const worker = async () => {
+         while (true) {
+            const index = nextIndex++;
+            if (index >= ids.length) {
+               return;
+            }
+
+            const id = ids[index];
+            const ignoredGraphs: GraphFilter = {
+               has: (graph) =>
+                  explicitlyIgnoredGraphs.has(graph) ||
+                  (graph !== id.value && memberGraphs.has(graph)),
+            };
+            const quads = await this.extractWithIgnoredGraphs(
+               store,
+               id,
+               shapeId,
+               ignoredGraphs,
+            );
             if (itemExtracted) {
                itemExtracted({ subject: id, quads });
             }
+            out[index] = { subject: id, quads };
+         }
+      };
 
-            out.push({ subject: id, quads });
-         });
-         promises.push(promise);
-      }
-
-      await Promise.all(promises);
+      const requestedConcurrency = this.options.bulkConcurrency ??
+         ("getQuads" in store ? 1 : 8);
+      const concurrency = requestedConcurrency === Number.POSITIVE_INFINITY
+         ? ids.length
+         : Number.isFinite(requestedConcurrency) && requestedConcurrency > 0
+            ? Math.max(1, Math.floor(requestedConcurrency))
+            : 1;
+      const workerCount = Math.min(
+         ids.length,
+         concurrency,
+      );
+      await Promise.all(Array.from({ length: workerCount }, worker));
 
       return out;
    }
@@ -126,20 +143,34 @@ export class CBDShapeExtractor {
       graphsToIgnore?: Array<Term>,
    ): Promise<Array<Quad>> {
       // First extract everything except for something within the graphs to ignore, or within the graph of the current entity, as that’s going to be added anyway later on
-      let dontExtractFromGraph: Array<string> = (
-         graphsToIgnore ? graphsToIgnore : []
-      ).map((item) => {
-         return item.value;
-      });
+      const dontExtractFromGraph = new Set(
+         (graphsToIgnore || []).map((item) => item.value),
+      );
+
+      return this.extractWithIgnoredGraphs(
+         store,
+         id,
+         shapeId,
+         dontExtractFromGraph,
+      );
+   }
+
+   private async extractWithIgnoredGraphs(
+      store: Store,
+      id: Term,
+      shapeId: Term | undefined,
+      graphsToIgnore: GraphFilter,
+   ): Promise<Array<Quad>> {
 
       if (!this.shapesGraph && this.shapesGraphStore) {
-         this.shapesGraph = await ShapesGraph.fromStore(this.shapesGraphStore);
+         this.shapesGraphPromise ??= ShapesGraph.fromStore(this.shapesGraphStore);
+         this.shapesGraph = await this.shapesGraphPromise;
       }
 
       const extractInstance = new ExtractInstance(
          store,
          this.dereferencer,
-         dontExtractFromGraph,
+         graphsToIgnore,
          this.options,
          this.shapesGraph,
       );
@@ -250,14 +281,14 @@ class ExtractInstance {
 
    dereferencer: RdfDereferencer;
    options: CBDShapeExtractorOptions;
-   graphsToIgnore: string[];
+   graphsToIgnore: GraphFilter;
 
    shapesGraph?: ShapesGraph;
 
    constructor(
       store: Store,
       dereferencer: RdfDereferencer,
-      graphsToIgnore: string[],
+      graphsToIgnore: GraphFilter,
       options: CBDShapeExtractorOptions,
       shapesGraph?: ShapesGraph,
    ) {
@@ -362,6 +393,7 @@ class ExtractInstance {
          //For all valid items in the atLeastOneLists, process the required path, optional paths and nodelinks. Do the same for the atLeastOneLists inside these options.
          let extraPaths: Path[] = [];
          let extraNodeLinks: NodeLink[] = [];
+         const pathMatches = new Map<Path, PathResult[]>();
 
          // Process atLeastOneLists in extraPaths and extra NodeLinks
          shape.fillPathsAndLinks(extraPaths, extraNodeLinks);
@@ -372,6 +404,7 @@ class ExtractInstance {
          )) {
             if (!path.found(extracted) || shape.closed) {
                let pathResult = await path.match(this.store, extracted, id, this.graphsToIgnore);
+               pathMatches.set(path, pathResult);
                let pathQuads = pathResult.flatMap((pathRes: any) => {
                   return pathRes.path;
                });
@@ -381,12 +414,15 @@ class ExtractInstance {
          }
 
          for (let nodeLink of shape.nodeLinks.concat(extraNodeLinks)) {
-            let matches = await nodeLink.pathPattern.match(
-               this.store,
-               extracted,
-               id,
-               this.graphsToIgnore,
-            );
+            let matches = pathMatches.get(nodeLink.pathPattern);
+            if (!matches) {
+               matches = await nodeLink.pathPattern.match(
+                  this.store,
+                  extracted,
+                  id,
+                  this.graphsToIgnore,
+               );
+            }
 
             // I don't know how to do this correctly, but this is not the way
             for (let match of matches) {
@@ -434,7 +470,7 @@ class ExtractInstance {
       id: Term,
       result: Quad[],
       extractedStar: CbdExtracted,
-      graphsToIgnore: Array<string>,
+      graphsToIgnore: GraphFilter,
    ) {
       extractedStar.addCBDTerm(id);
       const graph = this.options.cbdDefaultGraph ? df.defaultGraph() : null;
@@ -451,7 +487,7 @@ class ExtractInstance {
 
       for (const q of quads) {
          // Ignore quads in the graphs to ignore
-         if (graphsToIgnore?.includes(q.graph.value)) {
+         if (graphsToIgnore.has(q.graph.value)) {
             continue;
          }
          result.push(q);

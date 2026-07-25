@@ -1,7 +1,7 @@
 import { describe, it, beforeAll, afterAll, expect } from "vitest";
 import { DataFactory } from "rdf-data-factory";
 import { RdfStore } from "rdf-stores";
-import { Parser } from "n3";
+import { Parser } from "rdf-parser-ts";
 import { CBDShapeExtractor } from "../../lib/CBDShapeExtractor";
 import { rdfDereferencer } from "rdf-dereference";
 import sinon, { SinonStub } from "sinon";
