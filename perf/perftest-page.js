@@ -4,7 +4,7 @@ import { DataFactory } from "rdf-data-factory";
 import {
   CBDShapeExtractor,
   createGraphIndexedRdfStore,
-} from "../dist/lib/extract-cbd-shape.js";
+} from "./load-extractor.js";
 import { renderResults } from "./render.js";
 
 const df = new DataFactory();

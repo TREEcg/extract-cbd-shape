@@ -1,23 +1,33 @@
 import fs from "fs";
+import path from "path";
 import si from "systeminformation";
 
 export const renderResults = async (prefix, results) => {
   const systemInfo = await getSystemInfo();
-  const fileSuffix =
-    `${systemInfo.platform}-${systemInfo.distro}-${systemInfo.arch}-${systemInfo.cpu}`
-      .toLowerCase()
-      .replace(/ /g, "_");
+  const configuredResultsDir = process.env.BENCHMARK_RESULTS_DIR;
+  const resultsDir = configuredResultsDir || "./perf/results";
+  fs.mkdirSync(resultsDir, { recursive: true });
+
+  const fileSuffix = configuredResultsDir
+    ? prefix
+    : `${prefix}_${
+        `${systemInfo.platform}-${systemInfo.distro}-${systemInfo.arch}-${systemInfo.cpu}`
+          .toLowerCase()
+          .replace(/ /g, "_")
+      }`;
+  const outputPath = (extension) =>
+    path.join(resultsDir, `${fileSuffix}.${extension}`);
 
   fs.writeFileSync(
-    `./perf/results/${prefix}_${fileSuffix}.json`,
+    outputPath("json"),
     JSON.stringify(results, null, 2),
   );
 
   const chartHtml = renderAsHTML(results, systemInfo);
-  fs.writeFileSync(`./perf/results/${prefix}_${fileSuffix}.html`, chartHtml);
+  fs.writeFileSync(outputPath("html"), chartHtml);
 
   const tikz = renderAsTikz(results);
-  fs.writeFileSync(`./perf/results/${prefix}_${fileSuffix}.tex`, tikz);
+  fs.writeFileSync(outputPath("tex"), tikz);
 };
 
 const renderAsTikz = (results) => {
@@ -152,4 +162,3 @@ const getSystemInfo = async () => {
     cpu: `${cpu.manufacturer} ${cpu.brand}`,
   };
 };
-

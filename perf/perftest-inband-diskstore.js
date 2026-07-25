@@ -6,8 +6,10 @@ import { Level } from "level";
 import { promises as fs } from "fs";
 import os from "os";
 import path from "path";
-import { CBDShapeExtractor } from "../dist/lib/CBDShapeExtractor.js";
-import { createGraphIndexedRdfStore } from "../dist/lib/extract-cbd-shape.js";
+import {
+    CBDShapeExtractor,
+    createGraphIndexedRdfStore,
+} from "./load-extractor.js";
 import { renderResults } from "./render.js";
 
 const namedNode = new DataFactory().namedNode;

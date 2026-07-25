@@ -12,7 +12,8 @@
 	"devDependencies": {
 		"@esbuild-plugins/node-globals-polyfill": "^0.2.3",
 		"@esbuild-plugins/node-modules-polyfill": "^0.2.2",
-		"@sveltejs/adapter-auto": "^2.0.0",
+		"@rdfjs/types": "^2.0.1",
+		"@sveltejs/adapter-static": "^2.0.3",
 		"@sveltejs/kit": "^1.27.4",
 		"svelte": "^4.2.7",
 		"svelte-check": "^3.6.0",
@@ -22,8 +23,12 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@codemirror/language": "^6.11.3",
+		"@codemirror/legacy-modes": "^6.5.3",
+		"@codemirror/state": "^6.7.1",
+		"@codemirror/view": "^6.43.6",
+		"codemirror": "^6.0.2",
 		"extract-cbd-shape": "file:../..",
-		"rdf-data-factory": "^2.0.2",
-		"rdf-dereference": "^5.0.0"
+		"rdf-parser-ts": "^0.3.1"
 	}
 }

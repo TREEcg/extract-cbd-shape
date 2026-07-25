@@ -1,8 +1,10 @@
 import Benchmark from "benchmark";
 import { rdfDereferencer } from "rdf-dereference";
 import { DataFactory } from "rdf-data-factory";
-import { CBDShapeExtractor } from "../dist/lib/CBDShapeExtractor.js";
-import { createGraphIndexedRdfStore } from "../dist/lib/extract-cbd-shape.js";
+import {
+  CBDShapeExtractor,
+  createGraphIndexedRdfStore,
+} from "./load-extractor.js";
 import { renderResults } from "./render.js";
 
 const namedNode = new DataFactory().namedNode;
