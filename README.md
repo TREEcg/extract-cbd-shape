@@ -1,5 +1,9 @@
 # Extract CBD Shape
 
+[![tests](https://github.com/TREEcg/extract-cbd-shape/actions/workflows/tests.yml/badge.svg)](https://github.com/TREEcg/extract-cbd-shape/actions/workflows/tests.yml)
+[![npm version](https://img.shields.io/npm/v/extract-cbd-shape.svg)](https://www.npmjs.com/package/extract-cbd-shape)
+[![npm downloads](https://img.shields.io/npm/dm/extract-cbd-shape.svg)](https://www.npmjs.com/package/extract-cbd-shape)
+
 Extract one logical RDF member from a page, dataset, or API response that contains many members.
 
 `extract-cbd-shape` is a TypeScript package for RDF-based Web APIs where a response contains a collection page, stream fragment, or batch of records, and a client needs to process one member at a time. Given a focus node, it returns the quads that describe that member.

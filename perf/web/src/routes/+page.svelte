@@ -257,10 +257,10 @@
       </div>
       <p class="lede">
         RDF APIs often publish many observations, records, or events in one
-        response. This playground shows the fallback algorithms from the member
-        extraction paper: start from one focus node, keep its bounded
-        description, and use SHACL shapes as optional hints for open or closed
-        extraction.
+        response. This playground shows our fallback algorithm implementation
+        for cases where the boundaries are not clear: start from one focus node,
+        keep its bounded description, and use SHACL shapes as optional hints for
+        open or closed extraction.
       </p>
       <div class="tree-context" aria-label="TREE collection context">
         <img
