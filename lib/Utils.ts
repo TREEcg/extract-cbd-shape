@@ -20,6 +20,12 @@ export function streamToArray(stream: Stream<Quad>): Promise<Quad[]> {
 }
 
 export function uniqueQuads(quads: Quad[]): Quad[] {
+    if (quads.length < 128) {
+        return quads.filter((value, index, array) => {
+            return index === array.findIndex((x) => x.equals(value));
+        });
+    }
+
     const seen = new Set<string>();
     const result: Quad[] = [];
 
