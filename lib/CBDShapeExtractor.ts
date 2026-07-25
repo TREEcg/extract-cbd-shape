@@ -193,11 +193,15 @@ export class CbdExtracted {
       if (t) {
          t.shape = true;
       } else {
-         this.cbdExtractedMap.set(term, { cbd: true, shape: false });
+         this.cbdExtractedMap.set(term, { cbd: false, shape: true });
       }
    }
 
    cbdExtracted(term: Term): boolean {
+      return !!this.cbdExtractedMap.get(term)?.cbd;
+   }
+
+   shapeExtracted(term: Term): boolean {
       return !!this.cbdExtractedMap.get(term)?.shape;
    }
 
@@ -331,7 +335,7 @@ class ExtractInstance {
       offline: boolean,
       shapeId?: Term | ShapeTemplate,
    ): Promise<Array<Quad>> {
-      if (extracted.cbdExtracted(id)) {
+      if (extracted.shapeExtracted(id)) {
          return [];
       }
       extracted.addShapeTerm(id);

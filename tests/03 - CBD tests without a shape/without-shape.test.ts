@@ -73,6 +73,55 @@ describe("Test CBD with nested blank nodes", async () => {
     //        writer.end((err, res) => {console.log(res);});
     expect(result.length).toBe(4); // Only this many triples are given using plain CBD
   });
+
+  it("Should be able to process cyclic blank nodes", async () => {
+    let extractor = new CBDShapeExtractor(undefined, undefined, {
+      cbdDefaultGraph: true,
+    });
+    let dataStore = RdfStore.createDefault();
+    const member = df.namedNode("https://example.test/member/complex");
+    const payloadPart = df.namedNode("https://example.test/payload-part");
+    const value = df.namedNode("https://example.test/vocab/value");
+    const detail = df.namedNode("https://example.test/vocab/detail");
+    const next = df.namedNode("https://example.test/vocab/next");
+    const first = df.blankNode("first");
+    const second = df.blankNode("second");
+
+    dataStore.addQuad(df.quad(member, value, df.literal("default")));
+    dataStore.addQuad(df.quad(member, detail, first));
+    dataStore.addQuad(df.quad(first, next, second));
+    dataStore.addQuad(df.quad(second, next, first));
+    dataStore.addQuad(df.quad(second, value, df.literal("nested")));
+    dataStore.addQuad(df.quad(member, value, df.literal("named graph"), member));
+    dataStore.addQuad(
+      df.quad(
+        payloadPart,
+        value,
+        df.literal("all quads in the member graph"),
+        member,
+      ),
+    );
+
+    let result = await extractor.extract(dataStore, member);
+
+    expect(result.length).toBe(7);
+    expect(result).toEqual(
+      expect.arrayContaining([
+        df.quad(member, value, df.literal("default")),
+        df.quad(member, detail, first),
+        df.quad(first, next, second),
+        df.quad(second, next, first),
+        df.quad(second, value, df.literal("nested")),
+        df.quad(member, value, df.literal("named graph"), member),
+        df.quad(
+          payloadPart,
+          value,
+          df.literal("all quads in the member graph"),
+          member,
+        ),
+      ]),
+    );
+  });
 });
 
 describe("Test CBD with named graph", () => {
