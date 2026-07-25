@@ -9,13 +9,23 @@ const currentDir =
 const outputFile =
   process.env.PERFORMANCE_REPORT || "./perf/results/performance-comparison.md";
 const threshold = Number(process.env.PERFORMANCE_REGRESSION_RATIO || "1.25");
+const configuredSuites = process.env.BENCHMARK_SUITES
+  ?.split(",")
+  .map((suite) => suite.trim())
+  .filter(Boolean);
 
-const suites = [
+const allSuites = [
   ["inband", "In-memory extraction"],
   ["inband-diskstore", "Disk-store extraction"],
   ["inband-percent", "Dataset selectivity"],
   ["page", "1,000-member pages"],
 ];
+const suites = configuredSuites
+  ? allSuites.filter(([suite]) => configuredSuites.includes(suite))
+  : allSuites;
+const skippedSuites = process.env.BENCHMARK_SKIPPED_SUITES
+  ? process.env.BENCHMARK_SKIPPED_SUITES.split("; ")
+  : [];
 
 const readResults = (directory, suite) => {
   const file = path.join(directory, `${suite}.json`);
@@ -106,6 +116,15 @@ if (missing.length > 0) {
     "## Missing baseline cases",
     "",
     ...missing.map((entry) => `- ${entry}`),
+  );
+}
+
+if (skippedSuites.length > 0) {
+  lines.push(
+    "",
+    "## Skipped benchmark suites",
+    "",
+    ...skippedSuites.map((entry) => `- ${entry}`),
   );
 }
 

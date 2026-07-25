@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { selectPreviousTag } from "../../perf/find-previous-tag.js";
 
 describe("selectPreviousTag", () => {
-  it("ignores mixed historical tags and selects the latest canonical release tag", () => {
+  it("selects the newest reachable tag in git order, including mixed tag formats", () => {
     const head = "current";
     const previous = selectPreviousTag(
       [
@@ -17,40 +17,33 @@ describe("selectPreviousTag", () => {
     );
 
     expect(previous).toMatchObject({
-      tag: "v0.1.15",
-      object: "release-15",
+      tag: "0.3.0b",
+      object: "experimental-beta",
     });
   });
 
-  it("skips a release tag that points at HEAD", () => {
+  it("skips a tag that points at HEAD", () => {
     const previous = selectPreviousTag(
       [
-        { tag: "v0.1.16", object: "current" },
-        { tag: "v0.1.15", object: "release-15" },
-        { tag: "v0.1.14", object: "release-14" },
+        { tag: "0.3.0-b", object: "current" },
+        { tag: "0.3.0b", object: "previous" },
+        { tag: "0.3.0-alpha", object: "older" },
       ],
       "current",
     );
 
     expect(previous).toMatchObject({
-      tag: "v0.1.15",
-      object: "release-15",
+      tag: "0.3.0b",
+      object: "previous",
     });
   });
 
-  it("treats stable releases as newer than prereleases with the same version", () => {
+  it("returns undefined when no earlier tag exists", () => {
     const previous = selectPreviousTag(
-      [
-        { tag: "v0.3.0-alpha", object: "prerelease" },
-        { tag: "v0.3.0", object: "stable" },
-        { tag: "v0.2.9", object: "older" },
-      ],
+      [{ tag: "0.3.0-b", object: "current" }],
       "current",
     );
 
-    expect(previous).toMatchObject({
-      tag: "v0.3.0",
-      object: "stable",
-    });
+    expect(previous).toBeUndefined();
   });
 });

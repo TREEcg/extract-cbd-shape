@@ -17,7 +17,7 @@
     "build": "tsc && tsc-alias && rollup -c",
     "prepublishOnly": "npm run build",
     "bench": "npm run build && npm run bench:run",
-    "bench:run": "node ./perf/perftest-inband.js && node ./perf/perftest-inband-diskstore.js && node ./perf/perftest-inband-percent.js && node ./perf/perftest-page.js"
+    "bench:run": "node ./perf/run-benchmarks.js"
   },
   "keywords": [
     "CBD",

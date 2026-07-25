@@ -54,6 +54,11 @@ jobs:
         working-directory: perf/comparison/previous-tag
         run: npm run build
 
+      - name: Detect comparable benchmark suites
+        env:
+          EXTRACT_CBD_SHAPE_DIST: ${{ github.workspace }}/perf/comparison/previous-tag/dist/lib
+        run: node ./perf/detect-baseline-benchmarks.js
+
       - name: Benchmark current revision
         env:
           BENCHMARK_RESULTS_DIR: ${{ github.workspace }}/perf/comparison/current
