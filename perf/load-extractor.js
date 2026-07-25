@@ -1,5 +1,6 @@
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { RdfStore } from "rdf-stores";
 
 const configuredDist = process.env.EXTRACT_CBD_SHAPE_DIST;
 const distUrl = configuredDist
@@ -11,4 +12,4 @@ const extractorModule = await import(new URL("CBDShapeExtractor.js", distUrl));
 
 export const CBDShapeExtractor = extractorModule.CBDShapeExtractor;
 export const createGraphIndexedRdfStore =
-  packageModule.createGraphIndexedRdfStore;
+  packageModule.createGraphIndexedRdfStore ?? RdfStore.createDefault;
