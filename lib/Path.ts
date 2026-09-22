@@ -6,6 +6,23 @@ export interface GraphFilter {
   has(value: string): boolean;
 }
 
+/**
+ * Joins the quads walked so far with the ones a next step walked. Path arrays
+ * are never modified once built, so when one of the two sides is empty the other
+ * can be shared instead of copied. That matters for long sequence and
+ * zeroOrMore/oneOrMore paths, where every step would otherwise copy everything
+ * walked before it.
+ */
+function joinPaths(walked: Array<Quad>, next: Array<Quad>): Array<Quad> {
+  if (walked.length === 0) {
+    return next;
+  }
+  if (next.length === 0) {
+    return walked;
+  }
+  return walked.concat(next);
+}
+
 export interface Path {
   literalType?: Term;
 
@@ -126,7 +143,7 @@ export class SequencePath implements Path {
             inverse,
           );
           return nexts.map((n) => ({
-            path: [...res.path, ...n.path],
+            path: joinPaths(res.path, n.path),
             cbdExtracted: n.cbdExtracted,
             target: n.target,
           }));
@@ -263,7 +280,7 @@ export abstract class MultiPath implements Path {
 
         for (const found of foundPaths) {
           const next = {
-            path: [...t.path, ...found.path],
+            path: joinPaths(t.path, found.path),
             cbdExtracted: found.cbdExtracted,
             target: found.target,
           };

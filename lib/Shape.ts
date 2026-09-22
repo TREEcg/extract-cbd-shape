@@ -155,26 +155,26 @@ export class ShapeTemplate {
 }
 
 export class RDFMap<T> {
-  private namedNodes: Map<String, T> = new Map();
-  private blankNodes: Map<String, T> = new Map();
+  // Created on first use: one of these is made per extracted entity, and most
+  // entities never put a blank node in it
+  private namedNodes?: Map<string, T>;
+  private blankNodes?: Map<string, T>;
 
   set(node: Term, item: T) {
     if (node.termType === "NamedNode") {
-      this.namedNodes.set(node.value, item);
-    }
-
-    if (node.termType === "BlankNode") {
-      this.blankNodes.set(node.value, item);
+      (this.namedNodes ??= new Map()).set(node.value, item);
+    } else if (node.termType === "BlankNode") {
+      (this.blankNodes ??= new Map()).set(node.value, item);
     }
   }
 
   get(node: Term): T | undefined {
     if (node.termType === "NamedNode") {
-      return this.namedNodes.get(node.value);
+      return this.namedNodes?.get(node.value);
     }
 
     if (node.termType === "BlankNode") {
-      return this.blankNodes.get(node.value);
+      return this.blankNodes?.get(node.value);
     }
   }
 }
