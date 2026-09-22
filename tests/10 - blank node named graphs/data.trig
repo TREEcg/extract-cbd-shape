@@ -1,0 +1,5 @@
+@prefix ex: <https://example.test/> .
+
+ex:m ex:signature _:sig .
+_:sig { ex:s ex:value "payload"; ex:next _:detail . }
+_:detail ex:value "detail"; ex:back _:sig .

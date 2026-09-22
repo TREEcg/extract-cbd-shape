@@ -69,8 +69,12 @@ Without a shape, extraction is based on a dataset-aware CBD rule:
 
 1. include quads where the focus node is the subject;
 2. recursively include quads for blank node objects;
-3. include quads in the named graph whose graph name is the focus node;
+3. include quads in the named graph whose graph name is the focus node, for every
+   focus node reached, so a blank node used as a graph name is followed as well;
 4. keep RDF dataset graph names on the extracted quads.
+
+Every blank node is processed at most once per extraction, so cycles and blank
+nodes that are both an object and a graph name terminate.
 
 With a SHACL shape, the shape is interpreted as an extraction topology:
 
@@ -174,7 +178,7 @@ It does not implement full SHACL validation semantics. In particular, it does no
 
 Named graphs are handled conservatively:
 
-- quads in a graph named after the focus member are included;
+- quads in a graph named after a focus node are included, whether that name is an IRI or a blank node;
 - `bulkExtract()` avoids leaking one member's named graph into another member;
 - other graph names are preserved, but not treated as member boundaries unless they match the extraction rule.
 

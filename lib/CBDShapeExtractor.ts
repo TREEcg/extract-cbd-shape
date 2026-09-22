@@ -280,6 +280,7 @@ export class CbdExtracted {
 
 class ExtractInstance {
    dereferenced: Set<string> = new Set();
+   includedGraphs: Set<string> = new Set();
    store: Store;
 
    dereferencer: RdfDereferencer;
@@ -307,21 +308,17 @@ class ExtractInstance {
       offline: boolean,
       shapeId?: Term | ShapeTemplate,
    ) {
+      const extracted = new CbdExtracted();
       const result = await this.maybeExtractRecursively(
          id,
-         new CbdExtracted(),
+         extracted,
          offline,
          shapeId,
       );
 
-      const store = this.store as Store | SyncStore | AsyncStore;
-      if ('getQuads' in store) {
-         result.push(...store.getQuads(null, null, null, id));
-      } else if ('get' in store) {
-         result.push(...(await store.get({ graph: id })).items);
-      } else {
-         result.push(...await streamToArray(store.match(null, null, null, id)));
-      }
+      // The named graph of the entity itself is always part of the description,
+      // even when a closed shape prevented CBD from running.
+      await this.includeNamedGraph(id, result, extracted, EMPTY_GRAPH_FILTER);
 
       if (result.length === 0) {
          if (await this.dereference(id.value)) {
@@ -478,15 +475,7 @@ class ExtractInstance {
       extractedStar.addCBDTerm(id);
       const graph = this.options.cbdDefaultGraph ? df.defaultGraph() : null;
 
-      const store = this.store as Store | SyncStore | AsyncStore;
-      let quads: Quad[];
-      if ('getQuads' in store) {
-         quads = store.getQuads(id, null, null, graph);
-      } else if ('get' in store) {
-         quads = (await store.get({ subject: id, graph })).items;
-      } else {
-         quads = await streamToArray(store.match(id, null, null, graph));
-      }
+      const quads = await this.matchQuads(id, graph);
 
       for (const q of quads) {
          // Ignore quads in the graphs to ignore
@@ -504,6 +493,84 @@ class ExtractInstance {
          ) {
             await this.CBD(q.object, result, next, graphsToIgnore);
          }
+      }
+
+      // Every focus node – including a blank node we recursed into – also brings
+      // along the named graph it names.
+      await this.includeNamedGraph(id, result, extractedStar, graphsToIgnore);
+   }
+
+   /**
+    * Adds all quads of the named graph identified by the focus node, and
+    * recurses over the blank nodes mentioned in there. The graph identifier can
+    * be a blank node as well.
+    * @param id the focus node, which doubles as the graph name
+    * @param result list of quads
+    * @param extractedStar topology object to keep track of already found properties
+    * @param graphsToIgnore
+    */
+   private async includeNamedGraph(
+      id: Term,
+      result: Quad[],
+      extractedStar: CbdExtracted,
+      graphsToIgnore: GraphFilter,
+   ) {
+      if (id.termType !== "NamedNode" && id.termType !== "BlankNode") {
+         return;
+      }
+      if (this.includedGraphs.has(id.termType + ":" + id.value)) {
+         return;
+      }
+      if (graphsToIgnore.has(id.value)) {
+         return;
+      }
+
+      const quads = await this.matchQuads(null, id);
+      if (quads.length === 0) {
+         // Nothing to remember: a later dereference may still fill this graph
+         return;
+      }
+      this.includedGraphs.add(id.termType + ":" + id.value);
+
+      for (const q of quads) {
+         result.push(q);
+
+         // Conditionally get more quads: if it’s a not yet extracted blank node
+         if (
+            q.object.termType === "BlankNode" &&
+            !extractedStar.cbdExtracted(q.object)
+         ) {
+            // Only quads about the focus node itself say something about the
+            // paths of the focus node, so only those advance the topology
+            const next = q.subject.equals(id)
+               ? extractedStar.push(q.predicate, false)
+               : new CbdExtracted(undefined, extractedStar.cbdExtractedMap);
+            await this.CBD(q.object, result, next, graphsToIgnore);
+         }
+      }
+   }
+
+   /**
+    * Queries the store irrespective of the store implementation at hand.
+    */
+   private async matchQuads(
+      subject: Term | null,
+      graph: Term | null,
+   ): Promise<Quad[]> {
+      const store = this.store as Store | SyncStore | AsyncStore;
+      if ('getQuads' in store) {
+         return store.getQuads(subject, null, null, graph);
+      } else if ('get' in store) {
+         const pattern: { subject?: Term; graph?: Term } = {};
+         if (subject) {
+            pattern.subject = subject;
+         }
+         if (graph) {
+            pattern.graph = graph;
+         }
+         return (await store.get(pattern)).items;
+      } else {
+         return streamToArray(store.match(subject, null, null, graph));
       }
    }
 
