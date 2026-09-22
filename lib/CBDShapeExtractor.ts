@@ -1,5 +1,5 @@
 import { rdfDereferencer, RdfDereferencer } from "rdf-dereference";
-import { NodeLink, RDFMap, ShapeTemplate } from "./Shape";
+import { RDFMap, ShapeTemplate } from "./Shape";
 import { GraphFilter, Path, PathResult } from "./Path";
 import { DataFactory } from "rdf-data-factory";
 import { Quad, Term, Store } from "@rdfjs/types";
@@ -83,6 +83,9 @@ export class CBDShapeExtractor {
          }
       }
 
+      // One probe for the whole page beats one lookup per focus node
+      const knownGraphs = graphNamesOf(store, ids.length);
+
       let nextIndex = 0;
       const worker = async () => {
          while (true) {
@@ -102,6 +105,7 @@ export class CBDShapeExtractor {
                id,
                shapeId,
                ignoredGraphs,
+               knownGraphs,
             );
             if (itemExtracted) {
                itemExtracted({ subject: id, quads });
@@ -163,6 +167,7 @@ export class CBDShapeExtractor {
       id: Term,
       shapeId: Term | undefined,
       graphsToIgnore: GraphFilter,
+      knownGraphs?: GraphNameHint,
    ): Promise<Array<Quad>> {
 
       if (!this.shapesGraph && this.shapesGraphStore) {
@@ -176,9 +181,56 @@ export class CBDShapeExtractor {
          graphsToIgnore,
          this.options,
          this.shapesGraph,
+         knownGraphs,
       );
 
       return await extractInstance.extract(id, false, shapeId);
+   }
+}
+
+/**
+ * A probed answer, shared by every extraction of one bulk run so that a
+ * dereference by any of them invalidates it for all.
+ */
+type GraphNameHint = { names?: Set<string> };
+
+/**
+ * Best effort list of the graph names a store holds, so focus nodes that cannot
+ * name a graph are never looked up.
+ *
+ * Returns undefined when the store has no cheap way of telling us, or when the
+ * answer would not pay for itself, in which case every candidate is looked up as
+ * before. Building the list costs one entry per graph and saves at most one
+ * lookup per focus node, so it is only worth it for a page whose members are not
+ * each in their own graph.
+ */
+function graphNamesOf(store: Store, focusNodes: number): GraphNameHint | undefined {
+   const indexed = store as Store & {
+      getDistinctTerms?: (terms: string[]) => Term[][];
+      countDistinctTerms?: (terms: string[]) => number;
+   };
+   if (
+      typeof indexed.getDistinctTerms !== "function" ||
+      typeof indexed.countDistinctTerms !== "function"
+   ) {
+      return undefined;
+   }
+   try {
+      // Counting is near free, listing is not
+      if (indexed.countDistinctTerms(["graph"]) * 8 > focusNodes) {
+         return undefined;
+      }
+      const names = new Set<string>();
+      for (const terms of indexed.getDistinctTerms(["graph"])) {
+         const graph = terms[0];
+         if (graph && graph.termType !== "DefaultGraph") {
+            names.add(graph.termType + ":" + graph.value);
+         }
+      }
+      return { names };
+   } catch {
+      // A store that does not support the probe just keeps the old behaviour
+      return undefined;
    }
 }
 
@@ -189,6 +241,12 @@ export type Extracted = {
    backwards: {
       [node: string]: Extracted;
    };
+   /**
+    * The CbdExtracted that wraps this node, cached so that walking the topology
+    * does not allocate. Safe because a topology belongs to a single extraction,
+    * and therefore to a single cbdExtractedMap.
+    */
+   wrapper?: CbdExtracted;
 };
 
 export type ExtractReasons = {
@@ -210,6 +268,7 @@ export class CbdExtracted {
          this.topology = { forwards: {}, backwards: {} };
       }
       this.cbdExtractedMap = cbdExtracted;
+      this.topology.wrapper ??= this;
    }
 
    addCBDTerm(term: Term) {
@@ -238,42 +297,26 @@ export class CbdExtracted {
       return !!this.cbdExtractedMap.get(term)?.shape;
    }
 
+   private wrap(node: Extracted): CbdExtracted {
+      return (node.wrapper ??= new CbdExtracted(node, this.cbdExtractedMap));
+   }
+
    push(term: Term, inverse: boolean): CbdExtracted {
-      if (inverse) {
-         if (!this.topology.backwards[term.value]) {
-            const ne: Extracted = {
-               forwards: {},
-               backwards: {},
-            };
-            ne.forwards[term.value] = this.topology;
-            this.topology.backwards[term.value] = ne;
-         }
-         return new CbdExtracted(
-            this.topology.backwards[term.value],
-            this.cbdExtractedMap,
-         );
-      } else {
-         if (!this.topology.forwards[term.value]) {
-            const ne: Extracted = {
-               forwards: {},
-               backwards: {},
-            };
-            ne.backwards[term.value] = this.topology;
-            this.topology.forwards[term.value] = ne;
-         }
-         return new CbdExtracted(
-            this.topology.forwards[term.value],
-            this.cbdExtractedMap,
-         );
+      const from = inverse ? this.topology.backwards : this.topology.forwards;
+      let next = from[term.value];
+      if (!next) {
+         next = { forwards: {}, backwards: {} };
+         (inverse ? next.forwards : next.backwards)[term.value] = this.topology;
+         from[term.value] = next;
       }
+      return this.wrap(next);
    }
 
    enter(term: Term, inverse: boolean): CbdExtracted | undefined {
-      const out = inverse
-         ? this.topology.backwards[term.value]
-         : this.topology.forwards[term.value];
+      const out =
+         (inverse ? this.topology.backwards : this.topology.forwards)[term.value];
       if (out) {
-         return new CbdExtracted(out, this.cbdExtractedMap);
+         return this.wrap(out);
       }
    }
 }
@@ -289,18 +332,26 @@ class ExtractInstance {
 
    shapesGraph?: ShapesGraph;
 
+   /**
+    * The graph names the store is known to contain, when the store could tell
+    * us cheaply. Undefined means: look it up for every candidate.
+    */
+   knownGraphs?: GraphNameHint;
+
    constructor(
       store: Store,
       dereferencer: RdfDereferencer,
       graphsToIgnore: GraphFilter,
       options: CBDShapeExtractorOptions,
       shapesGraph?: ShapesGraph,
+      knownGraphs?: GraphNameHint,
    ) {
       this.store = store;
       this.dereferencer = dereferencer;
       this.shapesGraph = shapesGraph;
       this.graphsToIgnore = graphsToIgnore;
       this.options = options;
+      this.knownGraphs = knownGraphs;
    }
 
    public async extract(
@@ -318,7 +369,15 @@ class ExtractInstance {
 
       // The named graph of the entity itself is always part of the description,
       // even when a closed shape prevented CBD from running.
-      await this.includeNamedGraph(id, result, extracted, EMPTY_GRAPH_FILTER);
+      const graphQuads = this.includeNamedGraph(
+         id,
+         result,
+         extracted,
+         EMPTY_GRAPH_FILTER,
+      );
+      if (graphQuads) {
+         await graphQuads;
+      }
 
       if (result.length === 0) {
          if (await this.dereference(id.value)) {
@@ -352,6 +411,12 @@ class ExtractInstance {
             })
          ).data,
       );
+      // The store grew, so what we knew about its graphs no longer holds. The
+      // hint is shared, so every member of a bulk run stops trusting it too.
+      if (this.knownGraphs) {
+         this.knownGraphs.names = undefined;
+      }
+      this.includedGraphs.clear();
       return true;
    }
 
@@ -391,17 +456,9 @@ class ExtractInstance {
       // we’ll need to process all paths of the shape. If the shape is open, we’re going to do CBD afterwards, so let’s omit paths with only a PredicatePath when the shape is open
       if (!!shape) {
          //For all valid items in the atLeastOneLists, process the required path, optional paths and nodelinks. Do the same for the atLeastOneLists inside these options.
-         let extraPaths: Path[] = [];
-         let extraNodeLinks: NodeLink[] = [];
          const pathMatches = new Map<Path, PathResult[]>();
 
-         // Process atLeastOneLists in extraPaths and extra NodeLinks
-         shape.fillPathsAndLinks(extraPaths, extraNodeLinks);
-
-         for (let path of shape.requiredPaths.concat(
-            shape.optionalPaths,
-            extraPaths,
-         )) {
+         for (let path of shape.selectedPaths()) {
             if (!path.found(extracted) || shape.closed) {
                let pathResult = await path.match(this.store, extracted, id, this.graphsToIgnore);
                pathMatches.set(path, pathResult);
@@ -413,7 +470,7 @@ class ExtractInstance {
             }
          }
 
-         for (let nodeLink of shape.nodeLinks.concat(extraNodeLinks)) {
+         for (let nodeLink of shape.selectedNodeLinks()) {
             let matches = pathMatches.get(nodeLink.pathPattern);
             if (!matches) {
                matches = await nodeLink.pathPattern.match(
@@ -475,7 +532,8 @@ class ExtractInstance {
       extractedStar.addCBDTerm(id);
       const graph = this.options.cbdDefaultGraph ? df.defaultGraph() : null;
 
-      const quads = await this.matchQuads(id, graph);
+      const matched = this.matchQuads(id, graph);
+      const quads = Array.isArray(matched) ? matched : await matched;
 
       for (const q of quads) {
          // Ignore quads in the graphs to ignore
@@ -497,41 +555,73 @@ class ExtractInstance {
 
       // Every focus node – including a blank node we recursed into – also brings
       // along the named graph it names.
-      await this.includeNamedGraph(id, result, extractedStar, graphsToIgnore);
+      const graphQuads = this.includeNamedGraph(
+         id,
+         result,
+         extractedStar,
+         graphsToIgnore,
+      );
+      if (graphQuads) {
+         await graphQuads;
+      }
    }
 
    /**
     * Adds all quads of the named graph identified by the focus node, and
     * recurses over the blank nodes mentioned in there. The graph identifier can
     * be a blank node as well.
+    *
+    * Returns undefined when there is nothing to do, so that callers can skip the
+    * await: most focus nodes do not name a graph, and this runs for every one.
     * @param id the focus node, which doubles as the graph name
     * @param result list of quads
     * @param extractedStar topology object to keep track of already found properties
     * @param graphsToIgnore
     */
-   private async includeNamedGraph(
+   private includeNamedGraph(
       id: Term,
       result: Quad[],
       extractedStar: CbdExtracted,
       graphsToIgnore: GraphFilter,
-   ) {
+   ): Promise<void> | undefined {
       if (id.termType !== "NamedNode" && id.termType !== "BlankNode") {
          return;
       }
-      if (this.includedGraphs.has(id.termType + ":" + id.value)) {
+      const key = id.termType + ":" + id.value;
+      // Memoizing the attempt – not just a hit – keeps the top level entity from
+      // being looked up both by CBD and by extract(). A dereference clears this.
+      if (this.includedGraphs.has(key)) {
+         return;
+      }
+      const known = this.knownGraphs?.names;
+      if (known && !known.has(key)) {
          return;
       }
       if (graphsToIgnore.has(id.value)) {
          return;
       }
+      this.includedGraphs.add(key);
 
-      const quads = await this.matchQuads(null, id);
-      if (quads.length === 0) {
-         // Nothing to remember: a later dereference may still fill this graph
-         return;
+      const matched = this.matchQuads(null, id);
+      if (Array.isArray(matched)) {
+         return matched.length === 0
+            ? undefined
+            : this.addNamedGraphQuads(matched, id, result, extractedStar, graphsToIgnore);
       }
-      this.includedGraphs.add(id.termType + ":" + id.value);
+      return matched.then((quads) =>
+         quads.length === 0
+            ? undefined
+            : this.addNamedGraphQuads(quads, id, result, extractedStar, graphsToIgnore),
+      );
+   }
 
+   private async addNamedGraphQuads(
+      quads: Quad[],
+      id: Term,
+      result: Quad[],
+      extractedStar: CbdExtracted,
+      graphsToIgnore: GraphFilter,
+   ): Promise<void> {
       for (const q of quads) {
          result.push(q);
 
@@ -552,11 +642,13 @@ class ExtractInstance {
 
    /**
     * Queries the store irrespective of the store implementation at hand.
+    * Synchronous stores answer synchronously, so that the hot path does not pay
+    * for a promise and a microtask per lookup.
     */
-   private async matchQuads(
+   private matchQuads(
       subject: Term | null,
       graph: Term | null,
-   ): Promise<Quad[]> {
+   ): Quad[] | Promise<Quad[]> {
       const store = this.store as Store | SyncStore | AsyncStore;
       if ('getQuads' in store) {
          return store.getQuads(subject, null, null, graph);
@@ -568,7 +660,7 @@ class ExtractInstance {
          if (graph) {
             pattern.graph = graph;
          }
-         return (await store.get(pattern)).items;
+         return store.get(pattern).then((result) => result.items);
       } else {
          return streamToArray(store.match(subject, null, null, graph));
       }

@@ -38,6 +38,11 @@ export class ShapeTemplate {
   atLeastOneLists: Array<Array<ShapeTemplate>>;
   label?: string;
 
+  // Shapes are built once by ShapesGraph and only read afterwards, so the
+  // flattened views below are computed on first use and then kept
+  private selectedPathsCache?: Array<Path>;
+  private selectedNodeLinksCache?: Array<NodeLink>;
+
   constructor() {
     //All properties will be added, but if a required property is not available, then we need to further look it up
     this.requiredPaths = [];
@@ -46,6 +51,39 @@ export class ShapeTemplate {
     this.atLeastOneLists = [];
     this.optionalPaths = [];
     this.closed = false; //default value
+  }
+
+  /**
+   * Every path this shape selects, including the ones contributed by its
+   * sh:or/sh:xone/sh:and lists.
+   */
+  selectedPaths(): Array<Path> {
+    if (!this.selectedPathsCache) {
+      this.fillCaches();
+    }
+    return this.selectedPathsCache!;
+  }
+
+  /**
+   * Every node link this shape selects, including the ones contributed by its
+   * sh:or/sh:xone/sh:and lists.
+   */
+  selectedNodeLinks(): Array<NodeLink> {
+    if (!this.selectedNodeLinksCache) {
+      this.fillCaches();
+    }
+    return this.selectedNodeLinksCache!;
+  }
+
+  private fillCaches() {
+    const extraPaths: Array<Path> = [];
+    const extraNodeLinks: Array<NodeLink> = [];
+    this.fillPathsAndLinks(extraPaths, extraNodeLinks);
+    this.selectedPathsCache = this.requiredPaths.concat(
+      this.optionalPaths,
+      extraPaths,
+    );
+    this.selectedNodeLinksCache = this.nodeLinks.concat(extraNodeLinks);
   }
 
   fillPathsAndLinks(extraPaths: Array<Path>, extraNodeLinks: Array<NodeLink>) {
@@ -92,12 +130,16 @@ export class ShapeTemplate {
   private requiredPathsAreNotPresent(
     extract: CbdExtracted,
   ): ShapeError | undefined {
-    const errors = this.requiredPaths.filter((path) => !path.found(extract));
-    if (errors.length > 0) {
-      return new ShapeError("and", errors);
-    } else {
-      return;
+    let errors: Path[] | undefined;
+    for (const path of this.requiredPaths) {
+      if (!path.found(extract)) {
+        (errors ??= []).push(path);
+      }
     }
+    if (errors) {
+      return new ShapeError("and", errors);
+    }
+    return;
   }
 
   requiredAreNotPresent(extract: CbdExtracted): ShapeError | undefined {

@@ -55,13 +55,19 @@ export class ShapesGraph {
 
     // TODO: This is a limitation though: we only support NodeShapes with at least one sh:property set? 
     // Other NodeShapes in this context are otherwise just meaningless?
+    const seenShapeNodes = new Set<string>();
     const shapeNodes: Term[] = (<Term[]>[])
       .concat(await getSubjects(shapeStore, SHACL.property, null, null))
       .concat(await getSubjects(shapeStore, RDF.terms.type, SHACL.NodeShape, null))
       .concat(await getObjects(shapeStore, null, SHACL.node, null))
       // DISTINCT
-      .filter((value: Term, index: number, array: Array<Term>) => {
-        return array.findIndex((x) => x.equals(value)) === index;
+      .filter((value: Term) => {
+        const key = value.termType + ":" + value.value;
+        if (seenShapeNodes.has(key)) {
+          return false;
+        }
+        seenShapeNodes.add(key);
+        return true;
       });
 
     let shapesGraph = new ShapesGraph(new RDFMap<ShapeTemplate>());

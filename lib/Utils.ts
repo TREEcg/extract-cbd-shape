@@ -42,7 +42,8 @@ export function streamToArray(stream: Stream<Quad>): Promise<Quad[]> {
 }
 
 export function uniqueQuads(quads: Quad[]): Quad[] {
-    if (quads.length < 256) {
+    // Below this size the pairwise comparison is cheaper than building keys
+    if (quads.length < 32) {
         return quads.filter((value, index, array) => {
             return index === array.findIndex((x) => x.equals(value));
         });
@@ -64,34 +65,44 @@ export function uniqueQuads(quads: Quad[]): Quad[] {
 }
 
 function quadKey(quad: Quad): string {
-    return [
-        termKey(quad.subject),
-        termKey(quad.predicate),
-        termKey(quad.object),
-        termKey(quad.graph),
-    ].join(" ");
+    // String concatenation rather than array joins: this runs per extracted quad
+    return (
+        termKey(quad.subject) +
+        "\u0001" +
+        quad.predicate.value +
+        "\u0001" +
+        termKey(quad.object) +
+        "\u0001" +
+        termKey(quad.graph)
+    );
 }
 
 function termKey(term: Term): string {
-    if (term.termType === "Quad") {
-        return [
-            term.termType,
-            termKey(term.subject),
-            termKey(term.predicate),
-            termKey(term.object),
-            termKey(term.graph),
-        ].join("\0");
+    switch (term.termType) {
+        case "NamedNode":
+            return "N" + term.value;
+        case "BlankNode":
+            return "B" + term.value;
+        case "DefaultGraph":
+            return "D";
+        case "Literal":
+            return (
+                "L" + term.datatype.value + "\0" + term.language + "\0" + term.value
+            );
+        case "Quad":
+            return (
+                "Q" +
+                termKey(term.subject) +
+                "\0" +
+                termKey(term.predicate) +
+                "\0" +
+                termKey(term.object) +
+                "\0" +
+                termKey(term.graph)
+            );
+        default:
+            return term.termType + "\0" + term.value;
     }
-    if (term.termType === "Literal") {
-        return [
-            term.termType,
-            term.value,
-            term.language,
-            term.datatype.value,
-        ].join("\0");
-    }
-
-    return [term.termType, term.value].join("\0");
 }
 
 /**
